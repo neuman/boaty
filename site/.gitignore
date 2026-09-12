@@ -1,0 +1,5 @@
+# `atompipe site vendor` writes three.js here. It is a third-party copy,
+# it is large, and the site loads the same version from a CDN without it —
+# so it is not ours to commit. Delete this file if you want an offline,
+# self-contained archive of the project in git.
+vendor/

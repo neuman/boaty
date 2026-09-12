@@ -1,0 +1,148 @@
+{
+  "index": 11,
+  "meta": {
+    "duration_s": 65.9143,
+    "inputs_hash": "862ca0d1d6d9",
+    "model_hash": "2a4944b9d36e",
+    "spine_version": "0.1.0",
+    "tier": 1,
+    "when": "2026-09-12T02:06:21Z"
+  },
+  "verdicts": [
+    {
+      "claims": [
+        "geometry",
+        "fit",
+        "assembly",
+        "interference",
+        "mechanical",
+        "cad"
+      ],
+      "detail": "11 interfering pair(s) of 153 — worst reported 31277.200 mm^3 on bulkhead_fwd/deck_mid vs 0.2 mm^3 / 0.01 mm tolerance: 31277.1995 mm^3 vs 0.2 mm^3 tolerance; inf mm equivalent depth over 0.00 mm^2 vs 0.01 mm",
+      "duration_s": 65.91406,
+      "error": "",
+      "evidence": [
+        "/home/neuman/Documents/work/boaty/.atompipe/out/cad-solid/clash_pairs.json"
+      ],
+      "gate": "cad.clash",
+      "limit": 0.0,
+      "locators": [
+        {
+          "kind": "part",
+          "label": "3.128e+04 mm^3 into deck_mid",
+          "position": null,
+          "severity": "",
+          "target": "bulkhead_fwd",
+          "value": 31277.199526511427,
+          "view": "assembly"
+        },
+        {
+          "kind": "part",
+          "label": "3.128e+04 mm^3 into bulkhead_fwd",
+          "position": null,
+          "severity": "",
+          "target": "deck_mid",
+          "value": 31277.199526511427,
+          "view": "assembly"
+        },
+        {
+          "kind": "part",
+          "label": "1.926e+04 mm^3 into hull_aft, 1.36 mm deep",
+          "position": null,
+          "severity": "",
+          "target": "bulkhead_aft",
+          "value": 19255.538712137455,
+          "view": "assembly"
+        },
+        {
+          "kind": "part",
+          "label": "1.926e+04 mm^3 into bulkhead_aft, 1.36 mm deep",
+          "position": null,
+          "severity": "",
+          "target": "hull_aft",
+          "value": 19255.538712137455,
+          "view": "assembly"
+        },
+        {
+          "kind": "part",
+          "label": "2465 mm^3 into girder, 2.12 mm deep",
+          "position": null,
+          "severity": "",
+          "target": "component_battery",
+          "value": 2464.6923796404644,
+          "view": "assembly"
+        },
+        {
+          "kind": "part",
+          "label": "2465 mm^3 into component_battery, 2.12 mm deep",
+          "position": null,
+          "severity": "",
+          "target": "girder",
+          "value": 2464.6923796404644,
+          "view": "assembly"
+        },
+        {
+          "kind": "part",
+          "label": "1294 mm^3 into shaft_block, 1.33 mm deep",
+          "position": null,
+          "severity": "",
+          "target": "hull_aft",
+          "value": 1293.687527592032,
+          "view": "assembly"
+        },
+        {
+          "kind": "part",
+          "label": "1294 mm^3 into hull_aft, 1.33 mm deep",
+          "position": null,
+          "severity": "",
+          "target": "shaft_block",
+          "value": 1293.687527592032,
+          "view": "assembly"
+        },
+        {
+          "kind": "part",
+          "label": "630.1 mm^3 into girder, 1.64 mm deep",
+          "position": null,
+          "severity": "",
+          "target": "component_motor",
+          "value": 630.0567403938106,
+          "view": "assembly"
+        },
+        {
+          "kind": "part",
+          "label": "630.1 mm^3 into component_motor, 1.64 mm deep",
+          "position": null,
+          "severity": "",
+          "target": "girder",
+          "value": 630.0567403938106,
+          "view": "assembly"
+        },
+        {
+          "kind": "part",
+          "label": "495.5 mm^3 into hull_bow, 0.0261 mm deep",
+          "position": null,
+          "severity": "",
+          "target": "deck_bow",
+          "value": 495.455439816538,
+          "view": "assembly"
+        },
+        {
+          "kind": "part",
+          "label": "495.5 mm^3 into deck_bow, 0.0261 mm deep",
+          "position": null,
+          "severity": "",
+          "target": "hull_bow",
+          "value": 495.455439816538,
+          "view": "assembly"
+        }
+      ],
+      "measured": 11.0,
+      "pack": "cad-solid",
+      "passed": false,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 1,
+      "units": "pairs"
+    }
+  ]
+}

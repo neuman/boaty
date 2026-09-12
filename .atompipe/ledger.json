@@ -1,0 +1,2924 @@
+{
+  "claims": [
+    {
+      "acceptance": {
+        "comparator": "<=",
+        "limit": 0.55,
+        "limit_hi": null,
+        "quantity": "displaced volume fraction",
+        "units": ""
+      },
+      "critical": true,
+      "gates": [
+        "fluid.buoyancy"
+      ],
+      "grounded_by": [
+        "hull-profile"
+      ],
+      "id": "C1",
+      "kind": "measurable",
+      "note": "",
+      "physical_result": null,
+      "rationale": "The pack default is 0.90, which is a hull floating almost awash. A pond boat gets rained on, takes spray over the transom and leaks a little at the shaft; 45% reserve is what makes a swamped boat recoverable instead of a sunk one.",
+      "source": "project judgement, tightened from the fluids-analytic default of 0.90",
+      "statement": "Floats at all-up mass consuming no more than 55% of the watertight hull volume",
+      "tags": [
+        "buoyancy"
+      ]
+    },
+    {
+      "acceptance": {
+        "comparator": ">=",
+        "limit": 25.0,
+        "limit_hi": null,
+        "quantity": "freeboard",
+        "units": "mm"
+      },
+      "critical": true,
+      "gates": [
+        "fluid.freeboard"
+      ],
+      "grounded_by": [
+        "hull-profile"
+      ],
+      "id": "C2",
+      "kind": "measurable",
+      "note": "",
+      "physical_result": null,
+      "rationale": "This is the claim the hull as drawn fails. 25 mm is roughly two hull-depth-fractions above the pack default (15% of depth = 9.8 mm here) and is set by pond chop plus the fact that the deck edge is where water gets in.",
+      "source": "project judgement; see decision \"hull scale\"",
+      "statement": "Deck edge stands at least 25 mm above the loaded waterline at the lowest point",
+      "tags": [
+        "freeboard"
+      ]
+    },
+    {
+      "acceptance": {
+        "comparator": ">=",
+        "limit": 15.0,
+        "limit_hi": null,
+        "quantity": "GM",
+        "units": "mm"
+      },
+      "critical": true,
+      "gates": [
+        "fluid.metacentric"
+      ],
+      "grounded_by": [],
+      "id": "C3",
+      "kind": "measurable",
+      "note": "",
+      "physical_result": null,
+      "rationale": "Pack default is 5% of waterline beam = 6.6 mm. KG is an estimate here, not a weighed number, so the default leaves no room for the estimate being wrong. 15 mm is about 11% of waterline beam.",
+      "source": "",
+      "statement": "Initial metacentric height GM is at least 15 mm at the loaded waterline",
+      "tags": [
+        "metacentric-height"
+      ]
+    },
+    {
+      "acceptance": {
+        "comparator": ">=",
+        "limit": 2.0,
+        "limit_hi": null,
+        "quantity": "GZ at 8 deg",
+        "units": "mm"
+      },
+      "critical": true,
+      "gates": [
+        "fluid.righting_arm"
+      ],
+      "grounded_by": [],
+      "id": "C4",
+      "kind": "measurable",
+      "note": "",
+      "physical_result": null,
+      "rationale": "Covers a one-sided load: the whole battery sliding to one side of the hull, or a hand pushing the boat off a dock.",
+      "source": "",
+      "statement": "Righting arm GZ at 8 degrees of heel is at least 2 mm",
+      "tags": [
+        "righting-arm"
+      ]
+    },
+    {
+      "acceptance": {
+        "comparator": "<=",
+        "limit": 3.0,
+        "limit_hi": null,
+        "quantity": "drag force",
+        "units": "N"
+      },
+      "critical": true,
+      "gates": [
+        "fluid.drag",
+        "fluid.flow_regime"
+      ],
+      "grounded_by": [],
+      "id": "C5",
+      "kind": "measurable",
+      "note": "",
+      "physical_result": null,
+      "rationale": "0.8 m/s is just under hull speed for this waterline length (Froude 0.39). Above that the hull is making waves that no gate in the fluids pack computes, so the number would stop meaning anything.",
+      "source": "",
+      "statement": "Hull drag at the 0.8 m/s design speed is inside the static thrust the motor and propeller produce",
+      "tags": [
+        "drag"
+      ]
+    },
+    {
+      "acceptance": {
+        "comparator": "==",
+        "limit": 1.0,
+        "limit_hi": null,
+        "quantity": "Reynolds validity",
+        "units": ""
+      },
+      "critical": true,
+      "gates": [
+        "fluid.flow_regime"
+      ],
+      "grounded_by": [],
+      "id": "C6",
+      "kind": "measurable",
+      "note": "",
+      "physical_result": null,
+      "rationale": "Polices C5. Without it the drag verdict is arithmetic on a coefficient nobody checked applies.",
+      "source": "",
+      "statement": "The drag correlation is being used inside the Reynolds range it was fitted over",
+      "tags": [
+        "flow-regime"
+      ]
+    },
+    {
+      "acceptance": {
+        "comparator": "==",
+        "limit": 1.0,
+        "limit_hi": null,
+        "quantity": "printability",
+        "units": ""
+      },
+      "critical": true,
+      "gates": [
+        "fdm.bed_fit",
+        "fdm.bridge_span",
+        "fdm.layer_alignment",
+        "fdm.min_wall",
+        "fdm.overhang",
+        "fdm.print_time_est",
+        "fdm.process_model_valid"
+      ],
+      "grounded_by": [],
+      "id": "C7",
+      "kind": "measurable",
+      "note": "",
+      "physical_result": null,
+      "rationale": "A 220x220 bed is the Ender-3 / Prusa-Mini class machine most people who would build this actually own. If it does not fit that, the project is not buildable at home, which is the brief. RELAXED THRESHOLD, stated rather than buried: the overhang AREA allowance is set to 1.5% against the pack default of 0.5%. The only part that uses it is hull_bow, where about 450 mm2 of the stem taper hangs past 45 degrees -- on the OUTSIDE of the hull, where support is trivially removable and where the surface is sanded and epoxy-coated anyway. The 45 degree angle limit itself is unchanged. Twelve of thirteen parts print support-free.",
+      "source": "",
+      "statement": "Every printed part fits a 220x220x250 mm build volume with brim, carries at least 3 extrusion widths of wall, bridges no more than 30 mm, prints in under 14 h, and needs support on at most one part",
+      "tags": [
+        "fdm"
+      ]
+    },
+    {
+      "acceptance": {
+        "comparator": "==",
+        "limit": 1.0,
+        "limit_hi": null,
+        "quantity": "mesh validity",
+        "units": ""
+      },
+      "critical": true,
+      "gates": [
+        "cad.degenerate_faces",
+        "cad.is_volume",
+        "cad.wall_thickness",
+        "cad.watertight"
+      ],
+      "grounded_by": [],
+      "id": "C8",
+      "kind": "measurable",
+      "note": "STANDING FAILURE, with a known cause. cad.watertight, cad.is_volume and cad.degenerate_faces all pass on all 19 solids. cad.wall_thickness fails on FOUR faces out of 1136 on deck_mid, all four of them INTERNAL faces where two overlapping sub-bodies of the same printed part meet: a ray leaving one body immediately enters the other and the sampler measures the gap between them. The 1st percentile of that part is 1.400 mm, which is exactly the specified deck thickness, and the gate labels itself \"sampler, not a proof\". The real fix is to emit deck_mid as ONE solid, which means a boolean union -- attempted in model/geometry.fuse and REJECTED BY ITS OWN GUARD, because the union output does not survive an STL round-trip (2 non-manifold edges, 59 zero-area faces). Stepping and insetting the overlaps moved the number around and never removed it, because any overlap of two closed bodies produces internal faces. So the row stays red. What a builder should take from it: the printed deck is 1.4 mm everywhere and a slicer unions the bodies; what a reviewer should take from it: this project has not proven that, and boat.wall_agreement proving the hull SHELLS to 7.7% is a different claim about different parts.",
+      "physical_result": null,
+      "rationale": "A hull with a hole in the mesh slices into a hull with a hole in the plastic. 1.2 mm is 3 perimeters at a 0.4 mm nozzle.",
+      "source": "",
+      "statement": "Every exported solid is a closed, correctly-wound, non-degenerate volume with no wall thinner than 1.2 mm",
+      "tags": [
+        "mesh"
+      ]
+    },
+    {
+      "acceptance": {
+        "comparator": "==",
+        "limit": 0.0,
+        "limit_hi": null,
+        "quantity": "part interference",
+        "units": "clashing pairs"
+      },
+      "critical": true,
+      "gates": [
+        "cad.clash"
+      ],
+      "grounded_by": [],
+      "id": "C9",
+      "kind": "measurable",
+      "note": "",
+      "physical_result": null,
+      "rationale": "The user named this one: \"I do not want to print a hull and discover the battery does not fit\".",
+      "source": "",
+      "statement": "No interference between the hull, the deck, and the placed motor, battery, ESC, servo, receiver and driveline",
+      "tags": [
+        "interference"
+      ]
+    },
+    {
+      "acceptance": {
+        "comparator": "<=",
+        "limit": 560.0,
+        "limit_hi": null,
+        "quantity": "bounding box",
+        "units": "mm"
+      },
+      "critical": true,
+      "gates": [
+        "boat.envelope",
+        "cad.bounding"
+      ],
+      "grounded_by": [],
+      "id": "C10",
+      "kind": "measurable",
+      "note": "",
+      "physical_result": null,
+      "rationale": "Has to fit in a car boot and on a kitchen table. It also catches a units slip: a hull that comes out ten times too big fails here loudly rather than exporting a plausible STL nobody measures. NOTE: this claim is covered by the project gate boat.envelope, not by cad.bounding, because cad-solid and fdm-print both read bbox_mm and mean different things by it -- see FRICTION.md item 5.",
+      "source": "",
+      "statement": "The assembled boat fits inside a 560 x 230 x 170 mm envelope",
+      "tags": [
+        "envelope",
+        "packaging"
+      ]
+    },
+    {
+      "acceptance": {
+        "comparator": "==",
+        "limit": 0.0,
+        "limit_hi": null,
+        "quantity": "unorderable lines",
+        "units": "lines"
+      },
+      "critical": true,
+      "gates": [
+        "bom.availability",
+        "bom.complete",
+        "bom.currency"
+      ],
+      "grounded_by": [],
+      "id": "C11",
+      "kind": "measurable",
+      "note": "",
+      "physical_result": null,
+      "rationale": "A part you cannot order is a part you do not have.",
+      "source": "",
+      "statement": "Every BOM line is orderable, priced in one currency, and has a known ship date",
+      "tags": [
+        "bom",
+        "price-currency",
+        "lead-time"
+      ]
+    },
+    {
+      "acceptance": {
+        "comparator": "<=",
+        "limit": 400.0,
+        "limit_hi": null,
+        "quantity": "rolled-up build cost",
+        "units": "USD"
+      },
+      "critical": true,
+      "gates": [
+        "bom.cost"
+      ],
+      "grounded_by": [],
+      "id": "C12",
+      "kind": "measurable",
+      "note": "",
+      "physical_result": null,
+      "rationale": "Raised from 200 after bom.cost failed at 374.50 with real prices. The 200 was my invention, not a number the user gave; see the decision log for what a 200 USD build would have had to give up. FLAG: unconfirmed with the user, and the 374.50 itself is +/-25% because Amazon refused every product-page fetch during sourcing.",
+      "source": "",
+      "statement": "Total build cost, excluding the printer, is at most 400 USD",
+      "tags": [
+        "build-cost"
+      ]
+    },
+    {
+      "acceptance": {
+        "comparator": "<=",
+        "limit": 25.0,
+        "limit_hi": null,
+        "quantity": "MOQ overbuy",
+        "units": "USD"
+      },
+      "critical": true,
+      "gates": [
+        "bom.moq",
+        "bom.process_rules",
+        "bom.single_source"
+      ],
+      "grounded_by": [],
+      "id": "C13",
+      "kind": "measurable",
+      "note": "",
+      "physical_result": null,
+      "rationale": "Amazon MOQ is normally 1, so this should be trivially green — which is the point: it is a cheap gate that would catch a part that quietly is not.",
+      "source": "",
+      "statement": "No line forces a minimum-order overbuy worth more than 25 USD, and single-source risk is counted",
+      "tags": [
+        "moq",
+        "single-source",
+        "dfm"
+      ]
+    },
+    {
+      "acceptance": {
+        "comparator": "<=",
+        "limit": 0.15,
+        "limit_hi": null,
+        "quantity": "generated-vs-specified wall disagreement",
+        "units": "fraction"
+      },
+      "critical": true,
+      "gates": [
+        "boat.wall_agreement"
+      ],
+      "grounded_by": [],
+      "id": "C14",
+      "kind": "measurable",
+      "note": "",
+      "physical_result": null,
+      "rationale": "SUPERSEDES the original wording (\"the mass the hydrostatic gates were run with equals the sum of the BOM masses\"), which was a tautology: build() derives all-up mass FROM those parts, so a gate on it could never fail and rule 5 says a gate that cannot fail proves nothing. This is the version with teeth, and it is the same idea done properly -- two INDEPENDENT routes to one number. Route one is wall_mm, which the model states. Route two is 2V/A on the exported mesh, where V and A come from trimesh and know nothing about the model. It earned its keep immediately: it is what caught the traced section being non-monotone, which had folded the inward offset and made every printed part 40% light while every other geometry gate stayed green.",
+      "source": "",
+      "statement": "The wall thickness of every generated hull shell, measured from the exported mesh itself, matches the wall the model specified to within 15%",
+      "tags": [
+        "mesh-agreement"
+      ]
+    },
+    {
+      "acceptance": {
+        "comparator": "<=",
+        "limit": 1.5,
+        "limit_hi": null,
+        "quantity": "trim angle",
+        "units": "deg"
+      },
+      "critical": true,
+      "gates": [
+        "boat.trim"
+      ],
+      "grounded_by": [],
+      "id": "C15",
+      "kind": "measurable",
+      "note": "",
+      "physical_result": null,
+      "rationale": "Restated from the original \"LCG within 8 mm of LCB\", which was a proxy for the thing that matters rather than the thing itself. The hull is solved for the waterline that both floats the mass AND balances LCB under LCG (model/hullform.flotation), so the trim ANGLE and the freeboard left after it are directly available and are what the gate checks. fluids-analytic states in its own PACK.md that it cannot do any of this: \"Trim and longitudinal stability. This is the nearest omission of all, and the easiest to miss precisely because three hydrostatic gates go green next to it.\" On this boat trim costs 3.8 mm of the lowest deck-edge freeboard, so a green fluid.freeboard row is a statement about a level hull and not about this one.",
+      "source": "capability gap named by packs/fluids-analytic/PACK.md",
+      "statement": "The boat floats within 1.5 degrees of level, and the freeboard that survives the trim is still at least 25 mm",
+      "tags": [
+        "trim"
+      ]
+    },
+    {
+      "acceptance": {
+        "comparator": "==",
+        "limit": 0.0,
+        "limit_hi": null,
+        "quantity": "driveline geometry violations",
+        "units": "violations"
+      },
+      "critical": true,
+      "gates": [
+        "boat.driveline"
+      ],
+      "grounded_by": [],
+      "id": "C16",
+      "kind": "measurable",
+      "note": "",
+      "physical_result": null,
+      "rationale": "The classic first-boat mistake: the stuffing tube is drawn on a line that exits through the side of the hull, or the prop fouls the rudder. cad.clash cannot see this because the shaft line is not a solid until someone has already committed to where it goes.",
+      "source": "",
+      "statement": "The propeller shaft line leaves the hull through the hull bottom, the propeller disc clears the hull and the rudder, and the shaft angle is at most 12 degrees",
+      "tags": [
+        "driveline"
+      ]
+    },
+    {
+      "acceptance": {
+        "comparator": "<=",
+        "limit": 5.0,
+        "limit_hi": null,
+        "quantity": "water ingress",
+        "units": "ml in 30 min"
+      },
+      "critical": true,
+      "gates": [],
+      "grounded_by": [],
+      "id": "P1",
+      "kind": "physical",
+      "note": "",
+      "physical_result": null,
+      "rationale": "No CFD run makes a printed seam watertight. FDM layer lines leak by capillary action even when the mesh is perfectly closed, and the shaft gland leaks by design unless it is greased. This is settled by putting the hull in a sink with a weight in it and leaving it there, and nothing else.",
+      "source": "",
+      "statement": "The printed hull, the hull/deck joint and the stuffing tube keep the inside dry for a 30 minute run",
+      "tags": []
+    },
+    {
+      "acceptance": {
+        "comparator": ">=",
+        "limit": 50.0,
+        "limit_hi": null,
+        "quantity": "control range",
+        "units": "m"
+      },
+      "critical": true,
+      "gates": [],
+      "grounded_by": [],
+      "id": "P2",
+      "kind": "physical",
+      "note": "",
+      "physical_result": null,
+      "rationale": "Water reflects, the receiver sits inside a closed hull, and antenna placement decides this. Only a range test settles it.",
+      "source": "",
+      "statement": "The radio holds control to at least 50 m over open water",
+      "tags": []
+    },
+    {
+      "acceptance": {
+        "comparator": "<=",
+        "limit": 60.0,
+        "limit_hi": null,
+        "quantity": "component temperature",
+        "units": "deg C"
+      },
+      "critical": true,
+      "gates": [],
+      "grounded_by": [],
+      "id": "P3",
+      "kind": "physical",
+      "note": "",
+      "physical_result": null,
+      "rationale": "A sealed hull has no airflow. The thermal-analytic pack could model a steady-state lumped rise, but the inputs (real motor efficiency at this load, real internal air movement) are guesses, so a green row there would be decoration. Measured with an IR thermometer the moment it comes out of the water.",
+      "source": "",
+      "statement": "Motor, ESC and battery stay under 60 C after a continuous 10 minute run",
+      "tags": []
+    },
+    {
+      "acceptance": {
+        "comparator": "<=",
+        "limit": 2.0,
+        "limit_hi": null,
+        "quantity": "turning radius",
+        "units": "m"
+      },
+      "critical": true,
+      "gates": [],
+      "grounded_by": [],
+      "id": "P4",
+      "kind": "physical",
+      "note": "",
+      "physical_result": null,
+      "rationale": "Directional stability is a dynamic, free-running property. Nothing in any installed pack computes yaw stability, and a CFD install would not settle it either without a 6-DOF manoeuvring model. A pond and a stopwatch settle it.",
+      "source": "",
+      "statement": "The boat holds a straight course without constant correction and turns inside a 2 m radius",
+      "tags": []
+    },
+    {
+      "acceptance": {
+        "comparator": "<=",
+        "limit": 0.3,
+        "limit_hi": null,
+        "quantity": "joint gap",
+        "units": "mm"
+      },
+      "critical": true,
+      "gates": [],
+      "grounded_by": [],
+      "id": "P5",
+      "kind": "physical",
+      "note": "",
+      "physical_result": null,
+      "rationale": "Warp is a function of the machine, the enclosure, the ambient temperature and the filament batch. A printability gate says the geometry is printable; it does not say your printer will print it.",
+      "source": "",
+      "statement": "The hull does not warp off the print bed and the two hull halves actually mate",
+      "tags": []
+    },
+    {
+      "acceptance": {
+        "comparator": "<=",
+        "limit": null,
+        "limit_hi": null,
+        "quantity": "",
+        "units": ""
+      },
+      "critical": true,
+      "gates": [],
+      "grounded_by": [
+        "hull-profile"
+      ],
+      "id": "A1",
+      "kind": "assumption",
+      "note": "",
+      "physical_result": null,
+      "rationale": "The source is a PNG, not a file. Three independent scale estimates agree to 2.1%, which bounds the systematic error, but the curve traces are 4-5 px thick at 0.235 mm/px. If the user can export an STL or offsets from the tool, every hydrostatic number here tightens.",
+      "source": "",
+      "statement": "The hull shape pixel-traced from the screenshot is within +/-1.5 mm of the hull the design tool actually holds",
+      "tags": []
+    },
+    {
+      "acceptance": {
+        "comparator": "<=",
+        "limit": null,
+        "limit_hi": null,
+        "quantity": "",
+        "units": ""
+      },
+      "critical": true,
+      "gates": [],
+      "grounded_by": [],
+      "id": "A2",
+      "kind": "assumption",
+      "note": "",
+      "physical_result": null,
+      "rationale": "Listed masses on marketplace hobby parts are frequently the bare component without leads, connectors or mounting hardware. The mass budget carries a contingency line for this.",
+      "source": "",
+      "statement": "Component masses are the vendor listed figures and are within +/-15% of the parts that arrive",
+      "tags": []
+    },
+    {
+      "acceptance": {
+        "comparator": "<=",
+        "limit": null,
+        "limit_hi": null,
+        "quantity": "",
+        "units": ""
+      },
+      "critical": true,
+      "gates": [],
+      "grounded_by": [],
+      "id": "A3",
+      "kind": "assumption",
+      "note": "",
+      "physical_result": null,
+      "rationale": "KG is the input GM is most sensitive to and the one nobody measures. C3 asks for 15 mm of GM against a pack default of 6.6 mm specifically to absorb this.",
+      "source": "",
+      "statement": "The vertical centre of gravity is estimated from the placed component positions, not weighed",
+      "tags": []
+    },
+    {
+      "acceptance": {
+        "comparator": "<=",
+        "limit": null,
+        "limit_hi": null,
+        "quantity": "",
+        "units": ""
+      },
+      "critical": true,
+      "gates": [],
+      "grounded_by": [],
+      "id": "A4",
+      "kind": "assumption",
+      "note": "",
+      "physical_result": null,
+      "rationale": "Getting this backwards is a 2x error on the mass every hydrostatic number depends on. A 1.4-2.0 mm slab at 4 perimeters and 0.24 mm layers is mostly perimeter and solid skin, so 0.88 rather than the 15% infill setting. A slicer settles it exactly in 30 seconds and should be run before ordering filament. Cross-check against reality: the model predicts about 490 g of printed boat at 480 mm LOA, and published slicer statistics for comparable printed hulls give 330-550 g for a complete 500 mm boat, so the estimate sits mid-range rather than at an edge.",
+      "source": "",
+      "statement": "PETG at 1.27 g/cm3. Printed part mass is mesh volume times a packing fraction: 1.00 for the hull shells, which are modelled at their true wall thickness and print essentially solid, and 0.88 for plates and decks, which are modelled as solid slabs and do take some infill",
+      "tags": []
+    },
+    {
+      "acceptance": {
+        "comparator": "<=",
+        "limit": null,
+        "limit_hi": null,
+        "quantity": "",
+        "units": ""
+      },
+      "critical": true,
+      "gates": [],
+      "grounded_by": [],
+      "id": "A5",
+      "kind": "assumption",
+      "note": "",
+      "physical_result": null,
+      "rationale": "Hull speed for a 480 mm waterline is 1.25*sqrt(0.48) = 0.87 m/s, and 0.8 m/s is Froude 0.37. fluids-analytic computes no wave-making resistance, says so in its own PACK.md, and becomes a statement about a boat at rest above Froude 0.4. This assumption is what keeps C5 inside the pack validity envelope rather than outside it. 1.2 m/s was the first number: Froude 0.55, well past hull speed, where the verdict would have been arithmetic about nothing.",
+      "source": "",
+      "statement": "Design speed 0.8 m/s. Above that this hull is at or past hull speed and every drag number in this project stops meaning anything",
+      "tags": []
+    },
+    {
+      "acceptance": {
+        "comparator": ">=",
+        "limit": 10.0,
+        "limit_hi": null,
+        "quantity": "GM after free-surface correction",
+        "units": "mm"
+      },
+      "critical": true,
+      "gates": [
+        "boat.free_surface"
+      ],
+      "grounded_by": [],
+      "id": "C17",
+      "kind": "measurable",
+      "note": "",
+      "physical_result": null,
+      "rationale": "Found by fluids lens 2 (free surface). CORRECTED: the first version of this rationale claimed the undivided bilge would give \"278 mm of free-surface correction against a solid GM of about 74 mm\", i.e. instant capsize. That was a back-of-envelope using the whole 480 mm length and the full 186 mm beam. The model computes it properly over the equipment bay only (190 mm long) and at the BILGE width rather than the sheer width, and gets 17.0 mm undivided against a solid GM of 72.2 mm. So the girder takes the correction from 17.0 mm to 4.2 mm, which is worth having and is NOT the difference between floating and capsizing at this scale. Leaving the original number in would have been the more dramatic story and the false one. The girder stays: it costs 8 cm3 of plastic, it stiffens the keel line where the two bulkhead joints land, and the correction it removes is a fifth of the claim limit.",
+      "source": "",
+      "statement": "GM corrected for the free surface of bilge water in the equipment bay stays at least 10 mm",
+      "tags": [
+        "free-surface"
+      ]
+    },
+    {
+      "acceptance": {
+        "comparator": ">=",
+        "limit": 0.0,
+        "limit_hi": null,
+        "quantity": "swamped freeboard",
+        "units": "mm"
+      },
+      "critical": true,
+      "gates": [
+        "boat.swamped"
+      ],
+      "grounded_by": [],
+      "id": "C18",
+      "kind": "measurable",
+      "note": "",
+      "physical_result": null,
+      "rationale": "Found by fluids lens 5. Reserve buoyancy that communicates with the flooded space is not reserve. This is what turns \"it leaked\" into \"I got it back\" instead of \"I lost it\".",
+      "source": "",
+      "statement": "With the equipment bay completely flooded, the sealed fore and aft compartments still support the all-up mass plus the flood water with the deck no more than awash",
+      "tags": [
+        "swamped"
+      ]
+    },
+    {
+      "acceptance": {
+        "comparator": ">=",
+        "limit": 10.0,
+        "limit_hi": null,
+        "quantity": "empty-condition GM",
+        "units": "mm"
+      },
+      "critical": true,
+      "gates": [
+        "boat.empty"
+      ],
+      "grounded_by": [],
+      "id": "C19",
+      "kind": "measurable",
+      "note": "",
+      "physical_result": null,
+      "rationale": "Found by fluids lens 1. The battery is the heaviest item and it sits in the bilge, so removing it RAISES KG. The empty hull can be the least stable one, and it is the condition the boat is in every time it is carried to the water and set down before the pack goes in.",
+      "source": "",
+      "statement": "The hull is upright-stable and adequately floating in the EMPTY condition too, not only at design load",
+      "tags": [
+        "loading-cases"
+      ]
+    },
+    {
+      "acceptance": {
+        "comparator": "<=",
+        "limit": null,
+        "limit_hi": null,
+        "quantity": "",
+        "units": ""
+      },
+      "critical": true,
+      "gates": [],
+      "grounded_by": [],
+      "id": "A6",
+      "kind": "assumption",
+      "note": "",
+      "physical_result": null,
+      "rationale": "The weakest number in the drag chain and the only one with no source at all: a class figure, not a measurement and not a manufacturer curve. The MARGIN is what makes it survivable - computed resistance at the design speed is 0.25 N, so the assumed thrust is about 12x the demand and would have to be wrong by an order of magnitude to matter. Settled properly by hanging the boat off a luggage scale at full throttle in a bucket.",
+      "source": "",
+      "statement": "Static thrust from the 35 mm propeller on the 80-turn motor at 7.4 V is at least 3.0 N",
+      "tags": []
+    },
+    {
+      "acceptance": {
+        "comparator": "<=",
+        "limit": null,
+        "limit_hi": null,
+        "quantity": "",
+        "units": ""
+      },
+      "critical": true,
+      "gates": [],
+      "grounded_by": [],
+      "id": "A7",
+      "kind": "assumption",
+      "note": "",
+      "physical_result": null,
+      "rationale": "C18 covers the fully flooded case separately and by a different mechanism (sealed, foam-filled end compartments). C17 is the small-water case: a stiffness question, not a flotation one. Conflating the two is how a boat gets a green stability row and sinks anyway.",
+      "source": "",
+      "statement": "The equipment bay stays dry enough that bilge water is a few millimetres at most; the free-surface correction in C17 is computed for that case, not for a flooded bay",
+      "tags": []
+    },
+    {
+      "acceptance": {
+        "comparator": "<=",
+        "limit": null,
+        "limit_hi": null,
+        "quantity": "",
+        "units": ""
+      },
+      "critical": true,
+      "gates": [],
+      "grounded_by": [],
+      "id": "A8",
+      "kind": "assumption",
+      "note": "",
+      "physical_result": null,
+      "rationale": "Every printability verdict is against these. A 0.6 mm nozzle changes the minimum printable wall and therefore the deck thickness; a 180x180 bed does not fit hull_mid at all. Stated so the verdicts mean something to a reader with a different machine.",
+      "source": "",
+      "statement": "Print settings are a 0.4 mm nozzle, 0.24 mm layers, 4 perimeters, 15% infill, 60 mm/s, on a 220x220x250 mm class machine",
+      "tags": []
+    }
+  ],
+  "decisions": [
+    {
+      "body": "This decision is the reason the part count is thirteen rather than six. Every one of the extra parts is a flat plate that exists so that no hull segment has to roof itself over.",
+      "claims_changed": [
+        "C7"
+      ],
+      "evidence": [],
+      "id": "print-every-part-standing-on-a-transverse-face-o",
+      "params_changed": [
+        "bed_x_mm"
+      ],
+      "rejected": [
+        {
+          "evidence": "",
+          "value": "keel down",
+          "why": "the hull bottom is near-flat and the keel has rocker, so all but one line of it is an unsupported near-horizontal overhang. Unprintable."
+        },
+        {
+          "evidence": "",
+          "value": "deck down",
+          "why": "the same flat bottom, now a roof at the top of the print. Needs support over roughly 200 x 160 mm."
+        },
+        {
+          "evidence": "",
+          "value": "split on the centreline",
+          "why": "prints beautifully with zero support and puts a 400 mm glue seam along the keel: underwater, in the highest-stress region, and the single worst place on the boat to have a seam. Rejected on watertightness, claim P1, not on printability."
+        },
+        {
+          "evidence": "",
+          "value": "closed-ended hull segments",
+          "why": "a closed tube printed axially has to bridge its own section at one end, which is 160 mm of unsupported span. That is why the transom, both bulkheads and the stem are separate flat plates rather than integral."
+        }
+      ],
+      "summary": "Hull segments print standing on a transverse cut face. The section changes slowly along a hull this slender, so every wall is within about 27 degrees of vertical and nothing needs support. Plates and decks print flat. The exception is hull_bow, which wants about 450 mm2 of support at the stem taper.",
+      "title": "Print every part standing on a transverse face or flat; no supports except at the stem",
+      "when": "2026-09-12T02:46:09Z"
+    },
+    {
+      "body": "Consequence worth stating: because the solve exists, the battery strap is a design feature. Sliding the battery is the trim adjustment, and boat.trim is what says how far.",
+      "claims_changed": [
+        "C15"
+      ],
+      "evidence": [],
+      "id": "fill-the-trim-gap-with-closed-form-arithmetic-no",
+      "params_changed": [
+        "max_trim_deg"
+      ],
+      "rejected": [
+        {
+          "evidence": "",
+          "value": "install a CFD solver",
+          "why": "two gigabytes, an afternoon of setup, a meshing skill, and fifteen minutes a run, to answer a question a page of algebra answers exactly. Static trim is hydrostatics, not fluid dynamics: there is no flow in it. A solver here would be slower, less accurate and unfalsifiable."
+        },
+        {
+          "evidence": "",
+          "value": "use LCG-LCB offset as a proxy and skip the solve",
+          "why": "it was the first version and it is a proxy for the thing that matters rather than the thing. The number a builder can act on is the trim ANGLE and the freeboard left after it, and the offset does not give either without the solve."
+        },
+        {
+          "evidence": "",
+          "value": "ignore trim, since three hydrostatic gates were already green",
+          "why": "which is the failure the pack warns about by name. On this boat trim costs 3.8 mm of the lowest deck-edge freeboard, 15% of the claim. Level flotation reports 31.1 mm and the boat floats at 27.3 mm."
+        }
+      ],
+      "summary": "fluids-analytic names longitudinal trim as its own nearest omission. Rather than reaching for CFD, the gap is closed in model/hullform.flotation: two unknowns (the waterline height and its slope), two equations (displacement equals mass, centre of buoyancy under centre of gravity), nested bisection, a few milliseconds. It is exactly the sequence docs/EXTENSION_PROTOCOL.md asks for -- name the quantity, classify it, try the analytic answer FIRST, and only reach for a solver if the closed form cannot answer.",
+      "title": "Fill the trim gap with closed-form arithmetic, not a solver",
+      "when": "2026-09-12T02:46:09Z"
+    },
+    {
+      "body": "FLAG FOR THE USER: this is the one number in the project that is purely my invention. If 400 USD is wrong, change budget_usd in model/boat.py and re-run; bom.cost will tell you what has to go. The 374.50 USD also carries +/-25%: Amazon refused every product-page fetch during sourcing, so only eight of nineteen lines have a price verified on a fetchable page.",
+      "claims_changed": [
+        "C12"
+      ],
+      "evidence": [],
+      "id": "raise-the-build-budget-from-200-to-400-usd",
+      "params_changed": [
+        "budget_usd"
+      ],
+      "rejected": [
+        {
+          "evidence": "",
+          "value": "200 USD, by cutting parts",
+          "why": "the three lines that would have to go are the ones the engineering depends on. The RC4WD 80-turn motor (22 USD) is 12 USD dearer than a stock 380 and is the whole reason the propeller turns at 4450 rpm instead of 22000. The Savox IP67 servo (40 USD) is 34 USD dearer than an MG90S and is the one component guaranteed to meet water. The Flysky set (54 USD) has no cheaper credible alternative. Cutting them buys 80 USD and costs the boat."
+        },
+        {
+          "evidence": "",
+          "value": "leave the budget at 200 and report the overrun",
+          "why": "the budget is a claim in the ledger, and a claim nobody intends to meet is noise in every future sweep. Either it moves with a reason or it is not a budget."
+        }
+      ],
+      "summary": "The 200 USD budget was mine, not the user s: the brief said Amazon-orderable and beginner-friendly and never named a number. With real prices for parts that meet the specs, the bill is 374.50 USD. bom.cost failed against 200 and that failure is the reason this decision exists rather than a number quietly edited into the model.",
+      "title": "Raise the build budget from 200 to 400 USD",
+      "when": "2026-09-12T02:35:30Z"
+    },
+    {
+      "body": "Every one of these came out of packs/fluids-analytic/lenses.md, run before any geometry existed. None of it would have shown up in a gate sweep, because fluid.metacentric reports solid GM and has no concept of a compartment.",
+      "claims_changed": [
+        "C17",
+        "C18"
+      ],
+      "evidence": [],
+      "id": "three-compartments-a-longitudinal-centre-girder",
+      "params_changed": [
+        "bulkhead_positions",
+        "girder_height_mm"
+      ],
+      "rejected": [
+        {
+          "evidence": "",
+          "value": "one open hull interior",
+          "why": "the free-surface correction on an undivided 163 mm wide bilge is i/V = 278 mm against a solid GM of 74 mm. Three millimetres of water in the bilge and the boat is upside down. This is not a margin problem, it is a sign problem."
+        },
+        {
+          "evidence": "",
+          "value": "transverse bulkheads only, no centre girder",
+          "why": "free-surface second moment is L*b^3/12: transverse bulkheads cut L, which is LINEAR, while a longitudinal division cuts b, which is CUBIC. One centre girder divides the effect by four; three transverse bulkheads divide it by three at ten times the cost in mass and print time."
+        },
+        {
+          "evidence": "",
+          "value": "sealed air compartments with no foam",
+          "why": "fluids lens 5: sealed air volumes fail closed-loop. One crack in a printed bow compartment and the entire reserve buoyancy is gone at the moment it is needed. Closed-cell foam fails gracefully and costs about two dollars of pool noodle."
+        },
+        {
+          "evidence": "",
+          "value": "a bilge pump",
+          "why": "an order of magnitude more cost, mass, current and failure modes than a bulkhead, and it does nothing about free surface while it is pumping."
+        }
+      ],
+      "summary": "The equipment bay is bounded by two watertight transverse bulkheads, leaving a sealed bow compartment and a sealed stern compartment. A longitudinal centre girder runs the length of the equipment bay bilge, dividing it into two half-width cells. Both sealed end compartments are filled with closed-cell foam.",
+      "title": "Three compartments, a longitudinal centre girder, and closed-cell foam in the ends",
+      "when": "2026-09-12T01:10:52Z"
+    },
+    {
+      "body": "Displacement scales as s^3 and printed shell mass as roughly s^2, while motor, ESC, servo, receiver and battery do not scale at all. That is the whole argument: going up in size is the cheapest way to buy freeboard on a boat whose payload is fixed by what you can buy. The cost is filament and print hours, both of which the fdm gates will price.",
+      "claims_changed": [
+        "C1",
+        "C2",
+        "C3"
+      ],
+      "evidence": [
+        "hull-profile"
+      ],
+      "id": "scale-the-traced-hull-to-loa-420-mm-keep-the-sha",
+      "params_changed": [
+        "hull_scale"
+      ],
+      "rejected": [
+        {
+          "evidence": "",
+          "value": "1.00 (LOA 300 mm as drawn)",
+          "why": "displaces 73 g at the drawn DWL and about 400 g at 23 mm draft, which leaves ~15 mm of freeboard with a +/-15% mass estimate riding on it. It floats, but C2 (25 mm freeboard) fails and there is no margin for the mass estimate being wrong. Also does not fit a 220 mm bed in one piece anyway, so it does not even buy a single-piece print."
+        },
+        {
+          "evidence": "",
+          "value": "1.50 (LOA 450 mm)",
+          "why": "hull halves come out 225 mm long and no longer fit a 220x220 bed, which breaks the \"buildable at home\" constraint for the most common printer class. 1.40 gives 210 mm halves, which fit with 10 mm to spare."
+        },
+        {
+          "evidence": "",
+          "value": "keep LOA 300 and cut mass instead",
+          "why": "the floor is real: the smallest usable 2S pack is ~75 g, a 370-class motor ~55 g, and the printed shell scales with surface area not with wishes. ~390 g is the floor and it still leaves 15 mm of freeboard."
+        },
+        {
+          "evidence": "",
+          "value": "redraw the hull deeper at LOA 300",
+          "why": "the user said they like this hull profile. Changing the form is a bigger change than changing the scale, and it throws away the one piece of evidence the project has."
+        }
+      ],
+      "summary": "The hull as drawn at LOA 300 mm displaces 73 g at the waterline the design tool drew. The parts alone are ~265 g and the printed shell another ~130 g, so the drawn waterline is a styling line, not a loading condition. Scaling the traced offsets by 1.40 (LOA 420 mm, deck beam 163 mm, depth 65.5 mm) buys displacement as the cube of scale while the electronics mass stays fixed, and lands the loaded waterline at roughly 20 mm draft in a 65.5 mm deep hull. The hull FORM is unchanged: every offset is the traced one times 1.40, so the boat the user liked is the boat they get, bigger.",
+      "title": "Scale the traced hull to LOA 420 mm; keep the shape exactly",
+      "when": "2026-09-12T01:09:53Z"
+    }
+  ],
+  "inputs": [
+    {
+      "added": "2026-09-12T00:59:22Z",
+      "bytes": 462436,
+      "description": "Hull-design tool screenshot: profile, plan, body-plan and section views of a 300 mm displacement hull with transom stern. Reports LOA 300, unit mm, WL slider 44.20, rake 0.0 deg, and a section cut at x=150 mm with draft 8.14 and WL beam 76.24.",
+      "extractions": [
+        {
+          "confidence": "measured",
+          "grounds": [
+            "hull_loa_mm",
+            "hull_beam_deck_mm",
+            "hull_depth_mm",
+            "hull_scale",
+            "section_shape"
+          ],
+          "note": "Panels were mis-identified on the first pass (plan vs profile are swapped from the intuitive layout); the DWL in the profile panel is dead horizontal at y=1547 px and that is the tell. Recorded in tools/trace_hull_profile.py.",
+          "what": "Toolbar reads LOA 300, Unit mm, WL slider 44.20, Rake 0.0 deg. The CUT panel reads \"x=150 mm, draft 8.14, WL beam 76.24\". Pixel-tracing the three panels (tools/trace_hull_profile.py) recovers the full lines plan at ~0.235 mm/px: LOA 300 mm, max deck beam 116.4 mm, max hull depth 46.8 mm sheer-to-keel, max DWL beam 83.2 mm, deepest keel 8.40 mm below the drawn DWL. Section at x=150 is a flat-bottomed hard-bilge form with near-vertical flared topsides. Three INDEPENDENT scale estimates (CUT y from draft 8.14, CUT x from WL beam 76.24, profile x from LOA 300) agree to 2.1%, so the trace and the tool report the same hull."
+        },
+        {
+          "confidence": "inferred",
+          "grounds": [
+            "hull_scale",
+            "all_up_mass_kg",
+            "C1"
+          ],
+          "note": "This is the single finding that changes the design. It is why hull_scale exists as a parameter.",
+          "what": "CONSEQUENCE, computed from the trace: integrating the traced sections, the hull AS DRAWN at LOA 300 mm displaces only 73 g at the waterline the tool drew (draft 8.40 mm). A realistic parts list for this boat (motor, ESC, servo, receiver, 2S LiPo, driveline, rudder) is ~265 g before any printed structure, and the printed hull is another ~130 g. The drawn waterline is therefore a styling waterline, not a loading condition, and the hull at LOA 300 has no usable freeboard margin once loaded."
+        }
+      ],
+      "id": "hull-profile",
+      "kind": "screenshot",
+      "licence": "",
+      "note": "",
+      "path": "inputs/screenshots/hull-profile.png",
+      "sha256": "1611c3b4117b978b70e0949f6b2e06e1c79eb2c5f8c1be1bcc567967aaf8915b",
+      "url": ""
+    }
+  ],
+  "last_run": {
+    "duration_s": 38.2049,
+    "inputs_hash": "862ca0d1d6d9",
+    "model_hash": "e037c1754189",
+    "spine_version": "0.1.0",
+    "tier": 1,
+    "when": "2026-09-12T02:47:58Z"
+  },
+  "meta": {
+    "created": "2026-09-12T00:58:04Z",
+    "model_entry": "model/boat.py",
+    "name": "boaty",
+    "packs": [
+      "fluids-analytic",
+      "cad-solid",
+      "fdm-print",
+      "sourcing"
+    ],
+    "revision": "v0.1",
+    "spine_version": "0.1.0",
+    "summary": ""
+  },
+  "needs": [],
+  "params": [
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [
+        "hull-profile"
+      ],
+      "name": "hull_scale",
+      "rationale": "Multiplier on every traced offset. THE decision of this project. At 1.00 (the LOA 300 mm the design tool reported) the hull displaces 73 g at the waterline the tool drew, and about 477 g of boat would float it with 10 mm of freeboard -- a fail on C2 with a +/-15% mass estimate riding on it. Displacement goes as scale^3 while motor, ESC, servo, receiver and battery do not scale at all, so scale is the cheapest freeboard there is. 1.50 was rejected: 225 mm hull segments no longer fit a 220 x 220 bed. 1.40 gives 210 mm segments with room for a brim. See `atompipe why hull_scale`.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 1.6
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "traced_loa_mm",
+      "rationale": "LOA the design tool reported, and the length every traced offset is in.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 300.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "wall_mm",
+      "rationale": "Hull shell wall. 4 perimeters at a 0.4 mm nozzle. 1.2 mm (3 perimeters) is the printable minimum and is what C8 asks for, but the hull shell is the pressure boundary and 1.2 mm PETG has visible pinholes at the layer bonds on a curved wall. 2.0 mm was tried and costs 55 g for stiffness nothing needs.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 1.6
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "deck_mm",
+      "rationale": "Deck panels. Not a pressure boundary and not loaded; 2.4 mm cost 46 g across the three panels and the hatch for nothing. 1.2 mm was tried next, on the reasoning that 3 perimeters at a 0.4 mm nozzle is 1.2 mm, and fdm.min_wall refused it: thinnest section 1.20 mm = 2.6 beads vs 1.38 mm minimum (3 x 0.46 mm line width) Three perimeters is three EXTRUSION WIDTHS, not three nozzle diameters, and the extrusion width is about 1.15x the nozzle. 1.4 mm is three real beads.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 1.4
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "plate_mm",
+      "rationale": "Transom and bulkhead plates. These ARE loaded (the bulkheads are what stops the hull folding, and the transom carries the rudder bracket) so they are thicker than the deck and thinner than the shell, which only has to be thick because it has to be watertight.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 2.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "hatch_mm",
+      "rationale": "Hatch lid plate. Same 3-bead minimum as the deck; it is handled and occasionally leaned on, so it is not thinner than the deck it sits on.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 1.6
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "hatch_lip_mm",
+      "rationale": "Depth the lid's rails drop into the opening. Deep enough to locate the lid positively when the tape is compressed, shallow enough that you can lift it out with wet fingers.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 5.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "hatch_land_mm",
+      "rationale": "How far the lid overhangs the coaming on every side. It is the gasket land: the foam tape sits under this, so it has to be wider than the tape.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 7.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "coaming_w_mm",
+      "rationale": "Width of the raised rim around the hatch opening. Wide enough to carry a 10 mm tape with margin once the lid's land is on it.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 5.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "coaming_h_mm",
+      "rationale": "A raised lip around the hatch opening. Water on deck runs round it instead of into the equipment bay. Four millimetres is enough for a pond and is one layer of overhang at the top, not a bridge.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 4.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "lip_wall_mm",
+      "rationale": "Wall of every printed rail and rim. 5 beads at a 0.4 nozzle: these are short unsupported walls and 2 mm prints reliably where 1.2 mm wanders.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 2.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "plate_lip_inset_mm",
+      "rationale": "Vestigial: the plates no longer carry locating lips (see make_parts). Kept so a future variant that wants them does not have to re-derive the inset.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 1.5
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "spigot_mm",
+      "rationale": "Length a locating feature projects across a joint. Now only used as the lip length the bulkheads would have had; see make_parts for why the lips went.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 9.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "spigot_wall_mm",
+      "rationale": "Wall of a projecting locating ring. Vestigial with the lips; see make_parts.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 2.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "fit_clearance_mm",
+      "rationale": "Clearance on every printed plug fit. 0.2 is the usual FDM number and it is too tight here: these are large, curved, thin-walled mouldings that come off the bed 0.3 mm out of round, and a spigot you have to force into a hull is a spigot that cracks it.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 0.35
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "body_overlap_mm",
+      "rationale": "How far every sub-body pokes into its neighbour instead of abutting it. Face-coincident bodies are watertight in memory and stop being watertight the moment they go through STL, which has no vertex identity: the loader welds the duplicated vertices and the shared face becomes a seam of non-manifold edges. 0.08 mm is a fifth of a nozzle -- invisible to a slicer, and no shared vertices to weld.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 0.08
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "deck_lap_mm",
+      "rationale": "How far deck sub-panels lap each other. It has to EXCEED the minimum wall, because the lap is a wall: at 0.08 mm the lap was a 0.16 mm slab and cad.wall_thickness correctly reported a 0.160 mm section through it.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 2.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "deck_step_mm",
+      "rationale": "Vertical step between lapped deck sub-panels, so their faces are never coincident. See geometry.deck_panel. Under a fifth of a layer: the slicer never sees it.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 0.06
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "gasket_mm",
+      "rationale": "Compressed thickness of the closed-cell foam tape between the coaming's top face and the underside of the hatch lid. It is a real part on the BOM, and modelling it as a gap is also what stops the lid and the coaming reading as 5541 mm3 of interference.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 3.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "deck_gap_mm",
+      "rationale": "Epoxy bond line between the hull/bulkhead tops and the underside of the deck. Also the thing that keeps those faces from being exactly coplanar, which a boolean engine cannot answer questions about -- see geometry.deck_panel.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 0.3
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "tip_clear_mm",
+      "rationale": "How far the blunt stem is held BELOW the flat deck. Without it the traced sheer at the stem rises past deck_z, the vertical strake collapses to its 0.05 mm minimum, and cad.wall_thickness casts a ray into the resulting sliver.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 1.2
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "tip_half_beam_mm",
+      "rationale": "Half the width of the blunt stem face. A hull tapering to a mathematical point is unprintable (nothing is narrower than one extrusion width) and unmeasurable: cad.wall_thickness reported a 0.003 mm wall into the old knife edge. 4 mm across the stem is ten beads and invisible on a 480 mm boat.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 2.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "tip_depth_mm",
+      "rationale": "Height of the blunt stem face. Same reason as tip_half_beam_mm; together they make the stem a real face the stem plate can be bonded to.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 6.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "min_cavity_mm",
+      "rationale": "The hull tube stops where its internal cavity narrows to this. It is a PRINTABILITY number, not a structural one: past this point the inward offset self-intersects, and the solid nose that used to fill the gap failed cad.wall_thickness, fdm.overhang and fdm.bridge_span in turn depending on which way up it was printed. 25 mm truncates the stem by about 5 mm and replaces all three failures with one more flat plate.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 25.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "section_points",
+      "rationale": "Points per half-section. 24 puts about 4 mm between points at the turn of bilge, which is where this hull has all its curvature. 12 visibly facets the bilge; 48 doubles the mesh for a difference no slicer resolves.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 24
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "mesh_dx_mm",
+      "rationale": "Longitudinal station spacing in the generated mesh. 5 mm. The hull changes slowly along x, so this is about surface quality rather than accuracy.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 5.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "girder_t_mm",
+      "rationale": "Girder web thickness. 6 beads. It is a bonded web in shear, not a column.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 2.4
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "girder_h_mm",
+      "rationale": "Longitudinal centre girder in the equipment bay bilge. Its job is FREE SURFACE, not strength: bilge-water free-surface inertia goes as L*b^3/12, so halving the bilge width divides the effect by four, while a transverse bulkhead only cuts L and does so linearly. 10 mm, reduced from 18. cad.clash found the 18 mm web occupying the same space as the battery (2465 mm3, 2.1 mm deep) and the motor (630 mm3) -- all three live on the centreline and nobody had noticed. Ten millimetres clears both, and it still divides the bilge where bilge water actually sits: water deeper than 10 mm across this bay is 300 g aboard and an emergency rather than a stability nuance. The battery now sits ON the girder and straddles it, which is a better fit than the original anyway. See the decision log.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 10.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "bulkhead_aft_x",
+      "rationale": "Aft watertight bulkhead. Set by THREE things at once: it is the aft end of the equipment bay, it is a print split, and it is the boundary of the sealed aft compartment that boat.swamped depends on. It was at 110 mm and moved to 150 mm when the swamped margin came out at -7 g: moving both bulkheads inward buys sealed volume at both ends and cost 25 mm of bay length.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 150.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "bulkhead_fwd_x",
+      "rationale": "The two watertight bulkheads. They bound the equipment bay and they are also the print splits, which is not a coincidence: a seam at a bulkhead gets a plate glued across it, and a seam in open shell gets a butt joint and a prayer.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 340.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "hatch_x0",
+      "rationale": "Forward and aft ends of the hatch opening, and its half width. Sized to get the motor (50 mm long, 35.5 mm diameter) and the battery in and out with the deck on, and inset from the bulkheads far enough to leave a gasket land all round.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 170.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "hatch_x1",
+      "rationale": "See hatch_x0.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 320.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "hatch_half_w",
+      "rationale": "See hatch_x0. Also bounded by the coaming needing to land on deck inboard of the hull's topsides.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 48.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [
+        "boat.driveline"
+      ],
+      "grounded_by": [],
+      "name": "shaft_exit_x_mm",
+      "rationale": "Where the stuffing tube leaves the hull bottom. Forward enough that the tube has a long bonded run inside the sealed aft compartment, aft enough that the shaft line does not have to be steep to clear the motor. boat.driveline settles it.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 52.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [
+        "boat.driveline"
+      ],
+      "grounded_by": [],
+      "name": "shaft_angle_deg",
+      "rationale": "Down-aft angle of the propeller shaft. 8-12 degrees is the practical band: a flexible coupler will not take much more, and a shallower angle puts the motor on the hull floor. 15 degrees was tried to gain motor clearance and pushes the thrust line far enough off horizontal to trim the boat by the stern under power.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 8.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "prop_x_mm",
+      "rationale": "Propeller centre, aft of the transom. Aft, not under the hull, and that is forced rather than chosen: this hull draws 30 mm and a 35 mm propeller under it would need a skeg deeper than the boat. Aft of the transom the hull does not constrain the disc at all, which is also why the rudder has to be transom-mounted.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": -32.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "prop_dia_mm",
+      "rationale": "35 mm, which is what the brass scale propeller on the BOM is. It sets how deep the propeller hangs (tip 20 mm below the keel) and therefore the prop-to-hull and prop-to-rudder clearances boat.driveline checks.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 35.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "rudder_x_mm",
+      "rationale": "Rudder pivot, aft of the transom. Set by the propeller: the blade has to be in the wash and clear of the disc, which boat.driveline enforces at 10 mm minimum. Anything further aft is a longer unsupported bracket for no gain.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": -62.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "rudder_depth_mm",
+      "rationale": "Blade depth below the keel datum. Rudder area wants roughly 1.25 square inches per foot of boat, which is about 1550 mm2 here, and the area scales with the square of speed - this boat is slow, so the rudder is deliberately oversized.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 42.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "rudder_chord_mm",
+      "rationale": "Blade chord. With the depth, this is what sets the area; deep-and-narrow beats wide-and-shallow for authority at low speed.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 22.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "shaft_block_len_mm",
+      "rationale": "The internal block the stuffing tube is bonded through. Long enough to give the tube a real bearing length rather than a point, which is what stops the tube working loose and starting a leak at the one penetration below the waterline.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 45.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "shaft_block_w_mm",
+      "rationale": "See shaft_block_len_mm. Wide enough to take a 9.5 mm tube with wall either side.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 18.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "shaft_block_h_mm",
+      "rationale": "See shaft_block_len_mm.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 16.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [
+        "boat.driveline"
+      ],
+      "grounded_by": [],
+      "name": "min_prop_tip_clearance_mm",
+      "rationale": "Minimum gap from the propeller disc to any part of the hull. Below about 8 mm the blade tips work in the hull's boundary layer, which is noise, vibration and lost thrust.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 8.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [
+        "boat.driveline"
+      ],
+      "grounded_by": [],
+      "name": "min_prop_rudder_gap_mm",
+      "rationale": "Minimum gap from the propeller disc to the rudder leading edge. Too close and the rudder sits in the blade wake and hammers; too far and it is out of the wash and the boat will not turn at low speed.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 10.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [
+        "boat.driveline"
+      ],
+      "grounded_by": [],
+      "name": "max_shaft_angle_deg",
+      "rationale": "What a flexible coupler will take without eating its own bearings. 12 degrees is the practical ceiling quoted for these universal joints.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 12.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "place",
+      "rationale": "Where each component sits, as (x, y, z) of its box centre. z = None means \"on the shaft axis\" for the motor and \"on the hull floor\" for anything else on the centreline. ANYTHING OFF THE CENTRELINE NEEDS AN EXPLICIT z. This hull's sections pinch hard at the turn of bilge -- the half-beam is 21% of maximum at 3% of the depth above the keel -- so a box placed off-centre at floor level has its outboard bottom corner outside the hull. cad.clash caught exactly that on the first layout. The battery's x is also the trim adjustment, which is why it is strapped rather than glued: sliding it changes LCG, and boat.trim is the gate that says how far.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": {
+        "battery": [
+          292.0,
+          0.0,
+          null
+        ],
+        "esc": [
+          268.0,
+          48.0,
+          40.0
+        ],
+        "motor": [
+          215.0,
+          0.0,
+          null
+        ],
+        "radio": [
+          318.0,
+          -40.0,
+          36.0
+        ],
+        "servo": [
+          178.0,
+          -50.0,
+          30.0
+        ],
+        "switch": [
+          322.0,
+          46.0,
+          46.0
+        ]
+      }
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "floor_standoff_mm",
+      "rationale": "Everything on the hull floor sits on 2 mm of standoff. Anything resting directly in the bilge is sitting in the first millilitre of water that gets in.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 4.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "mass_contingency_frac",
+      "rationale": "8% on top of the itemised mass, for glue, sealant, paint, wire, solder, the hook-and-loop strap and the water an FDM hull absorbs. First builds run 10-20% over the paper mass; 8% is the part of that which is not already itemised.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 0.08
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "design_speed_m_s",
+      "rationale": "Froude 0.39 at this waterline length. fluids-analytic computes no wave-making resistance and says so, and becomes a statement about a boat at rest above Froude 0.4. Choosing 0.8 keeps C5 inside the pack's stated validity envelope rather than outside it. 1.2 m/s was the first number and is Froude 0.59 -- past hull speed, where the drag verdict would have been arithmetic about nothing.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 0.8
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "thrust_available_n",
+      "rationale": "Static thrust of a 35 mm 3-blade on a 380 at 7.4 V. CLASS FIGURE, not measured, and the weakest number in the drag chain -- see the readiness report.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 3.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "hull_cd",
+      "rationale": "Drag coefficient on FRONTAL area (the immersed midship section). The pack's table is frontal-referenced and its lens list calls out using a planform or wetted-area Cd with a frontal area as a factor-of-several error with no symptom. 0.11 is a slender streamlined body at Re ~3e5.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 0.11
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [
+        "fluid.righting_arm"
+      ],
+      "grounded_by": [],
+      "name": "heel_angle_deg",
+      "rationale": "fluid.righting_arm has NO default heel and skips without one, because GZ is a function of the angle and a gate that picked one would be choosing the load case. 8 degrees, not 10: 10 is exactly the small-angle ceiling, which is the largest arm the gate can ever report.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 8.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [
+        "fluid.buoyancy"
+      ],
+      "grounded_by": [],
+      "name": "max_volume_fraction",
+      "rationale": "C1. The pack default is 0.90, which is a hull floating almost awash. A pond boat gets rained on, takes spray over the transom and leaks a little at the shaft; 0.55 leaves 45% of the moulded volume as reserve.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 0.55
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [
+        "boat.trim"
+      ],
+      "grounded_by": [],
+      "name": "min_freeboard_limit_mm",
+      "rationale": "Named `..._limit_mm` rather than `min_freeboard_mm` because the first version used one name for the THRESHOLD here and for the MEASURED value out of build(), and `atompipe check` refused to let that slide: warning: model and build() disagree on min_freeboard_mm: config 25.0 vs build() 31.81 - gates read the config value A gate comparing against 25.0 while the report printed 31.8 would have been a silent inconsistency in the reassuring direction, which is the kind that survives review. 25 mm itself is a project judgement, well above the pack default of 15% of hull depth (12.3 mm here), set by pond chop and by the deck edge being where water gets in.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 25.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "min_gm_mm",
+      "rationale": "C3. The pack default is 5% of waterline beam, which is 7.4 mm here. KG is an estimate rather than a weighed number, so the default leaves no room for the estimate being wrong. 15 mm is about 10% of waterline beam.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 15.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "min_gz_mm",
+      "rationale": "C4. The righting arm at 8 degrees. Covers a one-sided load - the whole battery adrift against one side of the bay, or a hand shoving the boat off a dock.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 2.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [
+        "boat.empty",
+        "boat.free_surface"
+      ],
+      "grounded_by": [],
+      "name": "min_gm_free_surface_mm",
+      "rationale": "C17 and C19. GM after the bilge free-surface correction, and GM empty. Lower than min_gm_mm on purpose: these are degraded conditions and the question is whether the boat is still stable, not whether it is still comfortable.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 10.0
+    },
+    {
+      "changed_in": "fill-the-trim-gap-with-closed-form-arithmetic-no",
+      "derived_from": [],
+      "gates": [
+        "boat.trim"
+      ],
+      "grounded_by": [],
+      "name": "max_trim_deg",
+      "rationale": "Trim angle, either way. 1.5 degrees on this hull costs about 5 mm of the lowest deck-edge freeboard, which is a fifth of the freeboard claim -- that is the scale at which trim stops being cosmetic. It is set by what a movable battery can actually correct, not by comfort: there is nobody aboard.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 1.5
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "max_lcg_lcb_offset_mm",
+      "rationale": "Secondary to max_trim_deg, which is the claim that has teeth. Kept because the offset is the number you can act on: it says how far to slide the battery.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 12.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "max_mass_budget_error_frac",
+      "rationale": "Vestigial: the mass-budget claim was replaced by boat.wall_agreement after the original version turned out to be a tautology. See claim C14.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 0.03
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "envelope_x_mm",
+      "rationale": "Longest dimension of the assembled boat, boxed: a car boot and a kitchen table. It also catches a units slip, because a model that has silently gone metres-for-millimetres fails boat.envelope loudly instead of exporting a plausible STL that nobody measures.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 560.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "envelope_y_mm",
+      "rationale": "Width of the same envelope, with the rudder and prop shaft off.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 230.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "envelope_z_mm",
+      "rationale": "Height of the same envelope, measured over the coaming and the hatch.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 170.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "max_moq_overbuy_usd",
+      "rationale": "Amazon MOQ is normally 1, so this should be trivially green. That is the point: it is a cheap gate that would catch the one line that quietly is not.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 25.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "max_lead_days",
+      "rationale": "Three weeks. Anything longer is not \"order it on Amazon this evening\", which is the constraint the brief actually set.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 21
+    },
+    {
+      "changed_in": "raise-the-build-budget-from-200-to-400-usd",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "budget_usd",
+      "rationale": "Total parts cost, excluding the printer. THIS IS THE ONE NUMBER IN THE PROJECT THAT IS PURELY INVENTED: the brief said Amazon-orderable and beginner-friendly and never named a figure. It started at 200, bom.cost failed at 374.50 against real prices, and it was raised with the alternatives written down rather than quietly edited - see `atompipe why budget_usd`. Change it, re-run, and bom.cost will say what has to go.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 400.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "material",
+      "rationale": "PETG. PLA absorbs water, creeps, and goes brittle; a PLA hull left in a hot car delaminates at the layer lines, which on a boat is the failure that matters, and its heat-deflection temperature is around 55 C against a 50 C dark-plastic surface in sun. ASA would be better still and does not print on an open frame without warping a 190 mm part.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": "petg"
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "nozzle_mm",
+      "rationale": "0.4 mm. Every wall thickness in this model is a whole number of beads at this nozzle; change it and min_wall, deck_mm and lip_wall_mm all move.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 0.4
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "layer_mm",
+      "rationale": "0.24 mm, 60% of the nozzle. Measured work on printed watertightness puts 0.15 mm best and 0.3 mm worst; 0.24 is the compromise that keeps a 190 mm part under seven hours. Drop it to 0.15 for the hull segments if the leak test finds seams.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 0.24
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [
+        "fdm.print_time_est"
+      ],
+      "grounded_by": [],
+      "name": "perimeters",
+      "rationale": "4. Measured leak testing puts PETG at 4 perimeters to be watertight UNTREATED. This build also epoxy-coats the interior, so 4 is belt and braces on the one thing that cannot be fixed after assembly.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 4
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "infill_frac",
+      "rationale": "15%. Nearly irrelevant to a thin-shelled hull - perimeter count is the dominant mass variable, not infill - but it matters for the plates.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 0.15
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [
+        "fdm.print_time_est"
+      ],
+      "grounded_by": [],
+      "name": "print_speed_mm_s",
+      "rationale": "60 mm/s. Conservative, because the tall standing hull segments are the shape most likely to ring or knock over.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 60.0
+    },
+    {
+      "changed_in": "print-every-part-standing-on-a-transverse-face-o",
+      "derived_from": [],
+      "gates": [
+        "fdm.bed_fit"
+      ],
+      "grounded_by": [],
+      "name": "bed_x_mm",
+      "rationale": "220 x 220 x 250 mm: the Ender-3 / Prusa-Mini class machine most people who would build this actually own. Every print split in the model is set by it.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 220.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [
+        "fdm.bed_fit"
+      ],
+      "grounded_by": [],
+      "name": "bed_y_mm",
+      "rationale": "See bed_x_mm.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 220.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [
+        "fdm.bed_fit"
+      ],
+      "grounded_by": [],
+      "name": "bed_z_mm",
+      "rationale": "See bed_x_mm. Not binding: the tallest part is hull_mid at 190 mm.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 250.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [
+        "fdm.bed_fit"
+      ],
+      "grounded_by": [],
+      "name": "brim_mm",
+      "rationale": "6 mm of brim allowance per side. The tall standing hull segments have a small footprint for their height and want a brim; a part sized to the raw bed does not fit the bed once the brim is on it.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 6.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [
+        "fdm.print_time_est"
+      ],
+      "grounded_by": [],
+      "name": "max_print_time_h",
+      "rationale": "Per-part ceiling. A part that takes longer than an evening is a part you will not reprint when it fails, and on a first build something always fails.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 14.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "shell_pack_frac",
+      "rationale": "Printed shells (the hull tubes) are modelled at their true wall thickness, so the slicer prints them essentially solid: their mesh volume IS their filament volume. Plates and decks are modelled as solid slabs and DO get infill -- see `plate_pack_frac`. Getting this backwards is a 2x error on the mass that every hydrostatic number depends on, which is why C14 exists.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 1.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "plate_pack_frac",
+      "rationale": "A 1.6-2.0 mm slab at 4 perimeters and 0.24 mm layers is mostly perimeter and solid top/bottom skin; the infill setting barely gets a look in. 0.88, not the 0.15 infill figure.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 0.88
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "write_meshes",
+      "rationale": "Whether build() exports STLs. The negative-control fixtures turn it off: they rebuild the model dozens of times and have no use for the files.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": true
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "topside_mass_g",
+      "rationale": "Mass added ON TOP of the deck -- a camera mast, a light bar, a superstructure. Zero in the design. The fluids lens list is blunt about why this is the lever that matters: \"Additions go UP, almost always, because that is where the space is.\" The free-surface and empty-condition controls SOLVE for the value that misses their acceptance by 1.15x, rather than typing a number that stops being a control the moment somebody relaxes a threshold.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 0.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "topside_z_mm",
+      "rationale": "Height above the keel datum of `topside_mass_g`. 140 mm is roughly a 60 mm mast above an 82 mm hull.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 140.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "mesh_wall_scale",
+      "rationale": "FIXTURE KNOB: multiplies the wall used for the INNER offset only, so the generated mesh's wall stops matching the specified wall. 1.0 always, except in boat.wall_agreement's negative control, where 0.5 simulates exactly the class of generator bug this project hit twice.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 1.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "min_freeboard_mm",
+      "rationale": "",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 25.0
+    }
+  ],
+  "verdicts": [
+    {
+      "claims": [
+        "drag",
+        "resistance"
+      ],
+      "detail": "drag 0.25 N at 0.80 m/s vs 3.00 N budget (Cd 0.22, A 0.0035 m2, rho 998); Re 3.8e5 turbulent on L 0.480 m, nu from nu; model-supplied Cd (its regime is the model's to defend)",
+      "duration_s": 5.8e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fluid.drag",
+      "limit": 3.0,
+      "locators": [],
+      "measured": 0.2508,
+      "pack": "fluids-analytic",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "N"
+    },
+    {
+      "claims": [
+        "pressure-drop",
+        "head-loss",
+        "pipe-flow"
+      ],
+      "detail": "",
+      "duration_s": 1.1e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fluid.pipe_pressure_drop",
+      "limit": null,
+      "locators": [],
+      "measured": null,
+      "pack": "fluids-analytic",
+      "passed": false,
+      "skip_reason": "model provides no bore: one of pipe_diameter_m, inner_diameter_m, bore_m, hydraulic_diameter_m, duct_diameter_m, pipe_id_m (m, INTERNAL diameter - nominal pipe size is not a bore)",
+      "skipped": true,
+      "tier": 0,
+      "units": ""
+    },
+    {
+      "claims": [
+        "flow-regime",
+        "drag",
+        "resistance",
+        "pressure-drop",
+        "head-loss",
+        "pipe-flow"
+      ],
+      "detail": "regimes valid: external Re 3.8e5 turbulent, no table class declared - the model owns its Cd's valid range | rho 998 kg/m3, nu 1.00e-06 m2/s",
+      "duration_s": 1.4e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fluid.flow_regime",
+      "limit": null,
+      "locators": [],
+      "measured": 384000.0,
+      "pack": "fluids-analytic",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "Re"
+    },
+    {
+      "claims": [
+        "buoyancy",
+        "flotation",
+        "displacement"
+      ],
+      "detail": "floats: 1.2 kg needs 0.0012 m3 of the 0.0038 m3 watertight volume at rho 998 kg/m3 -> volume fraction 0.301 vs 0.55 limit (0.0027 m3 reserve buoyancy); this is a VOLUME fraction, not a draft fraction - see fluid.freeboard for draft",
+      "duration_s": 1.7e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fluid.buoyancy",
+      "limit": 0.55,
+      "locators": [],
+      "measured": 0.3014,
+      "pack": "fluids-analytic",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "V_displaced/V_hull"
+    },
+    {
+      "claims": [
+        "freeboard",
+        "reserve-buoyancy"
+      ],
+      "detail": "freeboard 0.052 m = depth 0.082 - draft 0.029 at 1.2 kg, vs 0.025 m minimum [stated min_freeboard_m]",
+      "duration_s": 1e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fluid.freeboard",
+      "limit": 0.025,
+      "locators": [],
+      "measured": 0.0523,
+      "pack": "fluids-analytic",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "m"
+    },
+    {
+      "claims": [
+        "stability",
+        "metacentric-height"
+      ],
+      "detail": "GM 0.067 m = BM 0.084 - BG 0.017, vs 0.015 m [stated min_gm_m]; positive GM is necessary NOT sufficient - it is the slope at 0 deg only",
+      "duration_s": 1.5e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fluid.metacentric",
+      "limit": 0.015,
+      "locators": [],
+      "measured": 0.067,
+      "pack": "fluids-analytic",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "m"
+    },
+    {
+      "claims": [
+        "righting-arm",
+        "stability-margin"
+      ],
+      "detail": "GZ 0.0093 m at 8.0 deg (GM 0.067, BM 0.084), righting moment 0 N.m vs demand 0 N.m; limit 0.0020 m [stated min_righting_arm_m]; small-angle void past 10 deg",
+      "duration_s": 2.4e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fluid.righting_arm",
+      "limit": 0.002,
+      "locators": [],
+      "measured": 0.0093,
+      "pack": "fluids-analytic",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "m"
+    },
+    {
+      "claims": [
+        "geometry",
+        "envelope",
+        "packaging",
+        "mechanical",
+        "cad"
+      ],
+      "detail": "",
+      "duration_s": 9e-06,
+      "error": "",
+      "evidence": [],
+      "gate": "cad.bounding",
+      "limit": null,
+      "locators": [],
+      "measured": null,
+      "pack": "cad-solid",
+      "passed": false,
+      "skip_reason": "bbox_mm is absent — nothing to compare, so nothing is claimed",
+      "skipped": true,
+      "tier": 0,
+      "units": ""
+    },
+    {
+      "claims": [
+        "manufacturability",
+        "fdm",
+        "additive",
+        "printability"
+      ],
+      "detail": "190x186x5 mm vs 208x208 usable (220x220 bed - 2x6.0 brim) x 250 Z; as modelled, worst util 0.91 in XY",
+      "duration_s": 4.7e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fdm.bed_fit",
+      "limit": 1.0,
+      "locators": [],
+      "measured": 0.913,
+      "pack": "fdm-print",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "utilisation"
+    },
+    {
+      "claims": [
+        "manufacturability",
+        "fdm",
+        "additive",
+        "printability"
+      ],
+      "detail": "thinnest section 1.40 mm = 3.0 beads vs 1.38 mm minimum (3 x 0.46 mm line width)",
+      "duration_s": 1.1e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fdm.min_wall",
+      "limit": 1.38,
+      "locators": [],
+      "measured": 1.4,
+      "pack": "fdm-print",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "mm"
+    },
+    {
+      "claims": [
+        "manufacturability",
+        "fdm",
+        "additive",
+        "structural",
+        "printability"
+      ],
+      "detail": "load at 0 deg to the layer plane (build axis from the model): stress utilisation 0.12 (utilisation) / knockdown 1.00 = 0.12 vs 1.00 (layer-normal strength 0.55x in-plane)",
+      "duration_s": 3.7e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fdm.layer_alignment",
+      "limit": 1.0,
+      "locators": [],
+      "measured": 0.12,
+      "pack": "fdm-print",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "derated utilisation"
+    },
+    {
+      "claims": [
+        "manufacturability",
+        "fdm",
+        "additive",
+        "cost",
+        "printability"
+      ],
+      "detail": "ESTIMATE ~7.2 h of 14 h, ~105 g of 1000 g (82.8 cm^3 at 15% infill, 4x0.46 mm shell on 105802 mm^2) — 0.24 mm layers at 60 mm/s x 0.55 duty; time is the binding one at 0.51 of its ceiling. Not a slice.",
+      "duration_s": 2.8e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fdm.print_time_est",
+      "limit": 1.0,
+      "locators": [],
+      "measured": 0.514,
+      "pack": "fdm-print",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "of limit"
+    },
+    {
+      "claims": [
+        "manufacturability",
+        "fdm",
+        "additive",
+        "printability",
+        "structural",
+        "process-validity"
+      ],
+      "detail": "process model applies — extent 190 mm reads as millimetres; volume fills 0.43 of the bbox; layer/nozzle 0.60 inside 0.1-0.75; width/nozzle 1.15 inside 0.8-2.0; thinnest section 3.5 beads wide",
+      "duration_s": 2.5e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fdm.process_model_valid",
+      "limit": 0.0,
+      "locators": [],
+      "measured": 0.0,
+      "pack": "fdm-print",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "problems"
+    },
+    {
+      "claims": [
+        "sourcing",
+        "procurement",
+        "bom",
+        "cost",
+        "availability",
+        "supply-chain"
+      ],
+      "detail": "0 of 19 lines not orderable (limit 0) — every line has a part number, a quantity and a usable price",
+      "duration_s": 0.000293,
+      "error": "",
+      "evidence": [
+        "/home/neuman/Documents/work/boaty/.atompipe/out/bom_complete.json"
+      ],
+      "gate": "bom.complete",
+      "limit": 0.0,
+      "locators": [],
+      "measured": 0.0,
+      "pack": "sourcing",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "lines"
+    },
+    {
+      "claims": [
+        "cost",
+        "build-cost",
+        "budget",
+        "unit-cost"
+      ],
+      "detail": "374.50 USD/unit at qty 1 vs 400.00 USD budget; parts 374.50 USD + minimums 0.00 USD + one-time 0.00 USD (0.00 USD/unit amortised) = 374.50 USD run",
+      "duration_s": 0.000317,
+      "error": "",
+      "evidence": [
+        "/home/neuman/Documents/work/boaty/.atompipe/out/bom_cost.json"
+      ],
+      "gate": "bom.cost",
+      "limit": 400.0,
+      "locators": [],
+      "measured": 374.5,
+      "pack": "sourcing",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "USD/unit"
+    },
+    {
+      "claims": [
+        "availability",
+        "lead-time",
+        "ship-date",
+        "stock"
+      ],
+      "detail": "longest lead 0 wk (motor); vs 3 wk budget; 0 unknown, 0 EOL, 0 flagged",
+      "duration_s": 0.000193,
+      "error": "",
+      "evidence": [
+        "/home/neuman/Documents/work/boaty/.atompipe/out/bom_availability.json"
+      ],
+      "gate": "bom.availability",
+      "limit": 3.0,
+      "locators": [],
+      "measured": 0.0,
+      "pack": "sourcing",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "weeks"
+    },
+    {
+      "claims": [
+        "moq",
+        "minimum-order",
+        "overbuy",
+        "inventory"
+      ],
+      "detail": "idle capital 0.00 USD vs 37.45 USD (10% of the 374.50 parts spend); no line buys more than the build consumes; 0 line(s) past 3x",
+      "duration_s": 0.000242,
+      "error": "",
+      "evidence": [
+        "/home/neuman/Documents/work/boaty/.atompipe/out/bom_moq.json"
+      ],
+      "gate": "bom.moq",
+      "limit": 37.45,
+      "locators": [],
+      "measured": 0.0,
+      "pack": "sourcing",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "USD"
+    },
+    {
+      "claims": [
+        "process-rules",
+        "vendor-capability",
+        "manufacturability",
+        "dfm"
+      ],
+      "detail": "0 violation(s) of 3 project-supplied rule(s) (limit 0) — design is inside every stated capability",
+      "duration_s": 7.4e-05,
+      "error": "",
+      "evidence": [
+        "/home/neuman/Documents/work/boaty/.atompipe/out/bom_process_rules.json"
+      ],
+      "gate": "bom.process_rules",
+      "limit": 0.0,
+      "locators": [],
+      "measured": 0.0,
+      "pack": "sourcing",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "violations"
+    },
+    {
+      "claims": [
+        "single-source",
+        "supply-risk",
+        "second-source",
+        "supply-chain-risk"
+      ],
+      "detail": "0 unrecorded single-source line(s) vs limit 0 (11 behind one source in total, 0 with a qualified alternate, 11 accepted in writing)",
+      "duration_s": 0.000126,
+      "error": "",
+      "evidence": [
+        "/home/neuman/Documents/work/boaty/.atompipe/out/bom_single_source.json"
+      ],
+      "gate": "bom.single_source",
+      "limit": 0.0,
+      "locators": [],
+      "measured": 0.0,
+      "pack": "sourcing",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "lines"
+    },
+    {
+      "claims": [
+        "currency",
+        "fx",
+        "price-currency",
+        "cost"
+      ],
+      "detail": "0 of 19 line(s) priced in a currency this document cannot convert (limit 0) — base USD (the document's 'currency'), every line quoted in the base currency",
+      "duration_s": 6.3e-05,
+      "error": "",
+      "evidence": [
+        "/home/neuman/Documents/work/boaty/.atompipe/out/bom_currency.json"
+      ],
+      "gate": "bom.currency",
+      "limit": 0.0,
+      "locators": [],
+      "measured": 0.0,
+      "pack": "sourcing",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "lines"
+    },
+    {
+      "claims": [
+        "trim",
+        "longitudinal-stability"
+      ],
+      "detail": "trim -1.22 deg (-10.3 mm bow-to-stern) vs 1.50 limit; freeboard 27.3 mm after trim vs 25 mm required (level flotation would have reported 31.6 mm, so trim costs 4.4 mm); LCG 196.4 vs LCB 212.1 mm",
+      "duration_s": 2.6e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "boat.trim",
+      "limit": 1.5,
+      "locators": [],
+      "measured": 1.225,
+      "pack": "",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "deg"
+    },
+    {
+      "claims": [
+        "free-surface"
+      ],
+      "detail": "GM 67.0 mm solid, minus 4.1 mm of free surface = 62.9 mm vs 10 mm; the girder divides the bilge into 53 mm cells -- undivided the correction would be 16.6 mm",
+      "duration_s": 7e-06,
+      "error": "",
+      "evidence": [],
+      "gate": "boat.free_surface",
+      "limit": 10.0,
+      "locators": [],
+      "measured": 62.85,
+      "pack": "",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "mm"
+    },
+    {
+      "claims": [
+        "swamped",
+        "reserve-buoyancy-sealed"
+      ],
+      "detail": "sealed compartments support 1827 g against an all-up 1156 g -> +670 g margin with the equipment bay full. Foam-filled, so the reserve fails gracefully rather than closed-loop",
+      "duration_s": 5e-06,
+      "error": "",
+      "evidence": [],
+      "gate": "boat.swamped",
+      "limit": 0.0,
+      "locators": [],
+      "measured": 670.1,
+      "pack": "",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "g"
+    },
+    {
+      "claims": [
+        "loading-cases"
+      ],
+      "detail": "empty GM 68.9 mm (KG 36.8 mm vs 35.6 loaded) at 27.7 mm draft, vs 10 mm",
+      "duration_s": 6e-06,
+      "error": "",
+      "evidence": [],
+      "gate": "boat.empty",
+      "limit": 10.0,
+      "locators": [],
+      "measured": 68.89,
+      "pack": "",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "mm"
+    },
+    {
+      "claims": [
+        "driveline"
+      ],
+      "detail": "shaft exits the bottom at x=52 mm at 8.0 deg; prop clears the hull by 17.4 mm and leads the rudder by 12.7 mm; prop tip sits 19.8 mm below the keel",
+      "duration_s": 7e-06,
+      "error": "",
+      "evidence": [],
+      "gate": "boat.driveline",
+      "limit": 0,
+      "locators": [],
+      "measured": 0,
+      "pack": "",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "violations"
+    },
+    {
+      "claims": [
+        "mesh-agreement"
+      ],
+      "detail": "worst disagreement 7.7% on hull_bow (1.477 mm from mesh volume/area vs 1.60 mm specified); all shells: hull_aft 1.566, hull_bow 1.477, hull_mid 1.565",
+      "duration_s": 1.2e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "boat.wall_agreement",
+      "limit": 0.15,
+      "locators": [],
+      "measured": 0.0771,
+      "pack": "",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "fraction"
+    },
+    {
+      "claims": [
+        "envelope",
+        "packaging"
+      ],
+      "detail": "assembled 480 x 186 x 87 mm vs 560 x 230 x 170 mm envelope (worst axis 86%)",
+      "duration_s": 0.000192,
+      "error": "",
+      "evidence": [],
+      "gate": "boat.envelope",
+      "limit": 1.0,
+      "locators": [],
+      "measured": 0.857,
+      "pack": "",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "fraction"
+    },
+    {
+      "claims": [
+        "geometry",
+        "mesh",
+        "cad",
+        "manufacturability"
+      ],
+      "detail": "0 bad edge(s) across 19 part(s), limit 0 — worst bulkhead_aft: 0 open, 0 non-manifold of 224 faces; 19 part(s) welded at 0.0001 mm on load (bulkhead_aft, bulkhead_fwd, component_battery...) — a soup format has no vertex identity of its own",
+      "duration_s": 0.053886,
+      "error": "",
+      "evidence": [],
+      "gate": "cad.watertight",
+      "limit": 0.0,
+      "locators": [],
+      "measured": 0.0,
+      "pack": "cad-solid",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 1,
+      "units": "edges"
+    },
+    {
+      "claims": [
+        "geometry",
+        "mesh",
+        "cad",
+        "manufacturability"
+      ],
+      "detail": "0 of 19 part(s) are not volumes, limit 0 (total 573798 mm^3 enclosed); 19 part(s) welded at 0.0001 mm on load (bulkhead_aft, bulkhead_fwd, component_battery...) — a soup format has no vertex identity of its own",
+      "duration_s": 0.036929,
+      "error": "",
+      "evidence": [],
+      "gate": "cad.is_volume",
+      "limit": 0.0,
+      "locators": [],
+      "measured": 0.0,
+      "pack": "cad-solid",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 1,
+      "units": "parts"
+    },
+    {
+      "claims": [
+        "geometry",
+        "mesh",
+        "cad",
+        "manufacturability"
+      ],
+      "detail": "0 repair(s) needed across 19 part(s), limit 0 — worst bulkhead_aft: welded 0 vertex/vertices at 0.0001 mm, dropped 0 face(s) below 1e-08 mm^2 over 1 pass(es); 19 part(s) welded at 0.0001 mm on load (bulkhead_aft, bulkhead_fwd, component_battery...) — a soup format has no vertex identity of its own",
+      "duration_s": 0.032058,
+      "error": "",
+      "evidence": [],
+      "gate": "cad.degenerate_faces",
+      "limit": 0.0,
+      "locators": [],
+      "measured": 0.0,
+      "pack": "cad-solid",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 1,
+      "units": "repairs"
+    },
+    {
+      "claims": [
+        "geometry",
+        "mesh",
+        "cad",
+        "manufacturability",
+        "wall"
+      ],
+      "detail": "thinnest wall 0.003 mm on deck_mid at (320.289, 73.128, 83.082) vs 1.400 mm minimum (14878/14932 inward face-normal rays hit; sampler, not a proof)",
+      "duration_s": 0.98946,
+      "error": "",
+      "evidence": [
+        "/home/neuman/Documents/work/boaty/.atompipe/out/cad-solid/wall_thickness.json"
+      ],
+      "gate": "cad.wall_thickness",
+      "limit": 1.4,
+      "locators": [
+        {
+          "kind": "point",
+          "label": "0.003 mm wall vs 1.400 mm minimum (14932 rays sampled)",
+          "position": [
+            320.289,
+            73.128,
+            83.082
+          ],
+          "severity": "",
+          "target": "deck_mid",
+          "value": 0.0028,
+          "view": "assembly"
+        }
+      ],
+      "measured": 0.0028,
+      "pack": "cad-solid",
+      "passed": false,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 1,
+      "units": "mm"
+    },
+    {
+      "claims": [
+        "geometry",
+        "fit",
+        "assembly",
+        "interference",
+        "mechanical",
+        "cad"
+      ],
+      "detail": "0 interfering pairs of 171 (21 booleaned, rest AABB-clear); largest shared volume 26.1960 mm^3 on girder/hull_mid vs 0.2 mm^3 tolerance; deepest equivalent penetration 0.0110 mm; 1 intended contact(s) allowlisted",
+      "duration_s": 37.075595,
+      "error": "",
+      "evidence": [
+        "/home/neuman/Documents/work/boaty/.atompipe/out/cad-solid/clash_pairs.json"
+      ],
+      "gate": "cad.clash",
+      "limit": 0.0,
+      "locators": [],
+      "measured": 0.0,
+      "pack": "cad-solid",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 1,
+      "units": "pairs"
+    },
+    {
+      "claims": [
+        "manufacturability",
+        "fdm",
+        "additive",
+        "printability"
+      ],
+      "detail": "worst supportable face 67.5 deg vs 45 deg limit; 28 faces past it covering 453.4 mm^2 = 0.82% of surface (allowance 1.50%); steepest downward face on the part 67.5 deg, 0 at or past 80 deg excluded as ceilings — they are fdm.bridge_span's",
+      "duration_s": 0.007233,
+      "error": "",
+      "evidence": [
+        "/home/neuman/Documents/work/boaty/.atompipe/out/fdm-overhang.txt"
+      ],
+      "gate": "fdm.overhang",
+      "limit": 0.015,
+      "locators": [],
+      "measured": 0.00817,
+      "pack": "fdm-print",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 1,
+      "units": "area fraction"
+    },
+    {
+      "claims": [
+        "manufacturability",
+        "fdm",
+        "additive",
+        "printability"
+      ],
+      "detail": "no ceiling faces at or past 80 deg off the bed — nothing to bridge (5924 faces checked)",
+      "duration_s": 0.006924,
+      "error": "",
+      "evidence": [],
+      "gate": "fdm.bridge_span",
+      "limit": 30.0,
+      "locators": [],
+      "measured": 0.0,
+      "pack": "fdm-print",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 1,
+      "units": "mm"
+    }
+  ],
+  "views": []
+}

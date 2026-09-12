@@ -1,0 +1,462 @@
+{
+  "index": 1,
+  "meta": {
+    "duration_s": 0.0012,
+    "inputs_hash": "862ca0d1d6d9",
+    "model_hash": "84fdbf11a0f5",
+    "spine_version": "0.1.0",
+    "tier": 0,
+    "when": "2026-09-12T01:40:26Z"
+  },
+  "verdicts": [
+    {
+      "claims": [
+        "drag",
+        "resistance"
+      ],
+      "detail": "drag 0.32 N at 0.80 m/s vs 3.00 N budget (Cd 0.28, A 0.0036 m2, rho 998); Re 3.8e5 turbulent on L 0.480 m, nu from nu; model-supplied Cd (its regime is the model's to defend)",
+      "duration_s": 9.5e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fluid.drag",
+      "limit": 3.0,
+      "locators": [],
+      "measured": 0.3222,
+      "pack": "fluids-analytic",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "N"
+    },
+    {
+      "claims": [
+        "pressure-drop",
+        "head-loss",
+        "pipe-flow"
+      ],
+      "detail": "",
+      "duration_s": 2e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fluid.pipe_pressure_drop",
+      "limit": null,
+      "locators": [],
+      "measured": null,
+      "pack": "fluids-analytic",
+      "passed": false,
+      "skip_reason": "model provides no bore: one of pipe_diameter_m, inner_diameter_m, bore_m, hydraulic_diameter_m, duct_diameter_m, pipe_id_m (m, INTERNAL diameter - nominal pipe size is not a bore)",
+      "skipped": true,
+      "tier": 0,
+      "units": ""
+    },
+    {
+      "claims": [
+        "flow-regime",
+        "drag",
+        "resistance",
+        "pressure-drop",
+        "head-loss",
+        "pipe-flow"
+      ],
+      "detail": "regimes valid: external Re 3.8e5 turbulent, no table class declared - the model owns its Cd's valid range | rho 998 kg/m3, nu 1.00e-06 m2/s",
+      "duration_s": 2.2e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fluid.flow_regime",
+      "limit": null,
+      "locators": [],
+      "measured": 384000.0,
+      "pack": "fluids-analytic",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "Re"
+    },
+    {
+      "claims": [
+        "buoyancy",
+        "flotation",
+        "displacement"
+      ],
+      "detail": "floats: 1.2 kg needs 0.0012 m3 of the 0.0039 m3 watertight volume at rho 998 kg/m3 -> volume fraction 0.295 vs 0.55 limit (0.0028 m3 reserve buoyancy); this is a VOLUME fraction, not a draft fraction - see fluid.freeboard for draft",
+      "duration_s": 3.2e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fluid.buoyancy",
+      "limit": 0.55,
+      "locators": [],
+      "measured": 0.2948,
+      "pack": "fluids-analytic",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "V_displaced/V_hull"
+    },
+    {
+      "claims": [
+        "freeboard",
+        "reserve-buoyancy"
+      ],
+      "detail": "freeboard 0.052 m = depth 0.082 - draft 0.029 at 1.2 kg, vs 0.025 m minimum [stated min_freeboard_m]",
+      "duration_s": 4.4e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fluid.freeboard",
+      "limit": 0.025,
+      "locators": [],
+      "measured": 0.0525,
+      "pack": "fluids-analytic",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "m"
+    },
+    {
+      "claims": [
+        "stability",
+        "metacentric-height"
+      ],
+      "detail": "GM 0.079 m = BM 0.091 - BG 0.011, vs 0.015 m [stated min_gm_m]; positive GM is necessary NOT sufficient - it is the slope at 0 deg only",
+      "duration_s": 2.2e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fluid.metacentric",
+      "limit": 0.015,
+      "locators": [],
+      "measured": 0.0794,
+      "pack": "fluids-analytic",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "m"
+    },
+    {
+      "claims": [
+        "righting-arm",
+        "stability-margin"
+      ],
+      "detail": "GZ 0.0110 m at 8.0 deg (GM 0.079, BM 0.091), righting moment 0 N.m vs demand 0 N.m; limit 0.0020 m [stated min_righting_arm_m]; small-angle void past 10 deg",
+      "duration_s": 3.1e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fluid.righting_arm",
+      "limit": 0.002,
+      "locators": [],
+      "measured": 0.011,
+      "pack": "fluids-analytic",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "m"
+    },
+    {
+      "claims": [
+        "geometry",
+        "envelope",
+        "packaging",
+        "mechanical",
+        "cad"
+      ],
+      "detail": "",
+      "duration_s": 1.7e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "cad.bounding",
+      "limit": null,
+      "locators": [],
+      "measured": null,
+      "pack": "cad-solid",
+      "passed": false,
+      "skip_reason": "bbox_limit_mm is absent — nothing to compare, so nothing is claimed",
+      "skipped": true,
+      "tier": 0,
+      "units": ""
+    },
+    {
+      "claims": [
+        "manufacturability",
+        "fdm",
+        "additive",
+        "printability"
+      ],
+      "detail": "480x186x87 mm vs 208x208 usable (220x220 bed - 2x6.0 brim) x 250 Z; as modelled, worst util 2.31 in XY",
+      "duration_s": 0.000115,
+      "error": "",
+      "evidence": [],
+      "gate": "fdm.bed_fit",
+      "limit": 1.0,
+      "locators": [
+        {
+          "kind": "part",
+          "label": "2.31x the usable build volume in XY (480x186x87 mm as modelled)",
+          "position": null,
+          "severity": "",
+          "target": "hull_mid__0",
+          "value": 2.308,
+          "view": "print_part"
+        }
+      ],
+      "measured": 2.308,
+      "pack": "fdm-print",
+      "passed": false,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "utilisation"
+    },
+    {
+      "claims": [
+        "manufacturability",
+        "fdm",
+        "additive",
+        "printability"
+      ],
+      "detail": "thinnest section 1.20 mm = 2.6 beads vs 1.38 mm minimum (3 x 0.46 mm line width)",
+      "duration_s": 1.9e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fdm.min_wall",
+      "limit": 1.38,
+      "locators": [],
+      "measured": 1.2,
+      "pack": "fdm-print",
+      "passed": false,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "mm"
+    },
+    {
+      "claims": [
+        "manufacturability",
+        "fdm",
+        "additive",
+        "structural",
+        "printability"
+      ],
+      "detail": "",
+      "duration_s": 9e-06,
+      "error": "",
+      "evidence": [],
+      "gate": "fdm.layer_alignment",
+      "limit": null,
+      "locators": [],
+      "measured": null,
+      "pack": "fdm-print",
+      "passed": false,
+      "skip_reason": "the projection has no load_axis / primary_load_axis (the primary load direction as an [x, y, z] vector in the part's print orientation); add it to the model and re-run",
+      "skipped": true,
+      "tier": 0,
+      "units": ""
+    },
+    {
+      "claims": [
+        "manufacturability",
+        "fdm",
+        "additive",
+        "cost",
+        "printability"
+      ],
+      "detail": "ESTIMATE ~7.9 h of 14 h, ~116 g of 1000 g (91.4 cm^3 at 15% infill, 4x0.46 mm shell on 217729 mm^2) — 0.24 mm layers at 60 mm/s x 0.55 duty; time is the binding one at 0.57 of its ceiling. Not a slice.",
+      "duration_s": 3.4e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fdm.print_time_est",
+      "limit": 1.0,
+      "locators": [],
+      "measured": 0.566,
+      "pack": "fdm-print",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "of limit"
+    },
+    {
+      "claims": [
+        "manufacturability",
+        "fdm",
+        "additive",
+        "printability",
+        "structural",
+        "process-validity"
+      ],
+      "detail": "process model applies — extent 480 mm reads as millimetres; volume fills 0.01 of the bbox; layer/nozzle 0.60 inside 0.1-0.75; width/nozzle 1.15 inside 0.8-2.0; thinnest section 3.0 beads wide",
+      "duration_s": 3.8e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fdm.process_model_valid",
+      "limit": 0.0,
+      "locators": [],
+      "measured": 0.0,
+      "pack": "fdm-print",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "problems"
+    },
+    {
+      "claims": [
+        "sourcing",
+        "procurement",
+        "bom",
+        "cost",
+        "availability",
+        "supply-chain"
+      ],
+      "detail": "",
+      "duration_s": 1.8e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "bom.complete",
+      "limit": null,
+      "locators": [],
+      "measured": null,
+      "pack": "sourcing",
+      "passed": false,
+      "skip_reason": "no BOM: the model projection defines neither 'bom_path' nor 'bom', and ctx.extra carries neither 'bom_path' nor 'bom'",
+      "skipped": true,
+      "tier": 0,
+      "units": ""
+    },
+    {
+      "claims": [
+        "cost",
+        "build-cost",
+        "budget",
+        "unit-cost"
+      ],
+      "detail": "",
+      "duration_s": 8e-06,
+      "error": "",
+      "evidence": [],
+      "gate": "bom.cost",
+      "limit": null,
+      "locators": [],
+      "measured": null,
+      "pack": "sourcing",
+      "passed": false,
+      "skip_reason": "no BOM: the model projection defines neither 'bom_path' nor 'bom', and ctx.extra carries neither 'bom_path' nor 'bom'",
+      "skipped": true,
+      "tier": 0,
+      "units": ""
+    },
+    {
+      "claims": [
+        "availability",
+        "lead-time",
+        "ship-date",
+        "stock"
+      ],
+      "detail": "",
+      "duration_s": 4e-06,
+      "error": "",
+      "evidence": [],
+      "gate": "bom.availability",
+      "limit": null,
+      "locators": [],
+      "measured": null,
+      "pack": "sourcing",
+      "passed": false,
+      "skip_reason": "no BOM: the model projection defines neither 'bom_path' nor 'bom', and ctx.extra carries neither 'bom_path' nor 'bom'",
+      "skipped": true,
+      "tier": 0,
+      "units": ""
+    },
+    {
+      "claims": [
+        "moq",
+        "minimum-order",
+        "overbuy",
+        "inventory"
+      ],
+      "detail": "",
+      "duration_s": 3e-06,
+      "error": "",
+      "evidence": [],
+      "gate": "bom.moq",
+      "limit": null,
+      "locators": [],
+      "measured": null,
+      "pack": "sourcing",
+      "passed": false,
+      "skip_reason": "no BOM: the model projection defines neither 'bom_path' nor 'bom', and ctx.extra carries neither 'bom_path' nor 'bom'",
+      "skipped": true,
+      "tier": 0,
+      "units": ""
+    },
+    {
+      "claims": [
+        "process-rules",
+        "vendor-capability",
+        "manufacturability",
+        "dfm"
+      ],
+      "detail": "",
+      "duration_s": 3e-06,
+      "error": "",
+      "evidence": [],
+      "gate": "bom.process_rules",
+      "limit": null,
+      "locators": [],
+      "measured": null,
+      "pack": "sourcing",
+      "passed": false,
+      "skip_reason": "no BOM: the model projection defines neither 'bom_path' nor 'bom', and ctx.extra carries neither 'bom_path' nor 'bom'",
+      "skipped": true,
+      "tier": 0,
+      "units": ""
+    },
+    {
+      "claims": [
+        "single-source",
+        "supply-risk",
+        "second-source",
+        "supply-chain-risk"
+      ],
+      "detail": "",
+      "duration_s": 1e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "bom.single_source",
+      "limit": null,
+      "locators": [],
+      "measured": null,
+      "pack": "sourcing",
+      "passed": false,
+      "skip_reason": "no BOM: the model projection defines neither 'bom_path' nor 'bom', and ctx.extra carries neither 'bom_path' nor 'bom'",
+      "skipped": true,
+      "tier": 0,
+      "units": ""
+    },
+    {
+      "claims": [
+        "currency",
+        "fx",
+        "price-currency",
+        "cost"
+      ],
+      "detail": "",
+      "duration_s": 3e-06,
+      "error": "",
+      "evidence": [],
+      "gate": "bom.currency",
+      "limit": null,
+      "locators": [],
+      "measured": null,
+      "pack": "sourcing",
+      "passed": false,
+      "skip_reason": "no BOM: the model projection defines neither 'bom_path' nor 'bom', and ctx.extra carries neither 'bom_path' nor 'bom'",
+      "skipped": true,
+      "tier": 0,
+      "units": ""
+    }
+  ]
+}

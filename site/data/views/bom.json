@@ -1,0 +1,480 @@
+{
+  "columns": [
+    {
+      "align": "left",
+      "key": "ref",
+      "label": "Ref"
+    },
+    {
+      "align": "left",
+      "key": "description",
+      "label": "Description"
+    },
+    {
+      "align": "left",
+      "key": "vendor",
+      "label": "Vendor"
+    },
+    {
+      "align": "left",
+      "key": "vendor_pn",
+      "label": "Vendor P/N"
+    },
+    {
+      "align": "right",
+      "key": "purchased",
+      "label": "Buy",
+      "note": "pieces ordered for the run — MOQ and order multiples included"
+    },
+    {
+      "align": "right",
+      "key": "unit_price",
+      "kind": "money",
+      "label": "Unit"
+    },
+    {
+      "align": "right",
+      "key": "extended",
+      "kind": "money",
+      "label": "Extended",
+      "note": "null where the line is unpriced. Not zero: an unknown that adds up is an unknown that makes the total smaller"
+    },
+    {
+      "align": "right",
+      "key": "lead_time_weeks",
+      "label": "Lead",
+      "note": "effective: zero where distributor stock already covers the order",
+      "units": "wk"
+    },
+    {
+      "align": "left",
+      "key": "lifecycle",
+      "label": "Lifecycle"
+    },
+    {
+      "align": "right",
+      "key": "sources",
+      "label": "Sources",
+      "note": "independent sources, counted from who MAKES the part where the line records it. Two distributors of one factory's part is one source"
+    },
+    {
+      "align": "left",
+      "key": "risk",
+      "label": "Risk"
+    }
+  ],
+  "rows": [
+    {
+      "description": "RC4WD Z-E0001 540 crawler brushed motor, 80 turn",
+      "extended": 22.0,
+      "id": "motor",
+      "lead_time_weeks": 0.0,
+      "lifecycle": "active",
+      "needed": 1.0,
+      "purchased": 1.0,
+      "quoted_lead_weeks": 0.42857142857142855,
+      "ref": "motor",
+      "risk": "covered from stock",
+      "source_basis": "manufacturer",
+      "source_names": [
+        "RC4WD",
+        "INJORA 540 80T",
+        "INJORA 55T (B08CSJTDGH) runs faster than ideal"
+      ],
+      "sources": 3,
+      "stock": 100.0,
+      "unit_price": 22.0,
+      "vendor": "Amazon",
+      "vendor_pn": "B00CR32LZ0"
+    },
+    {
+      "description": "Fire Phoenix 'New Rain' 60 A waterproof brushed ESC, single motor",
+      "extended": 26.0,
+      "id": "esc",
+      "lead_time_weeks": 0.0,
+      "lifecycle": "active",
+      "needed": 1.0,
+      "purchased": 1.0,
+      "quoted_lead_weeks": 0.42857142857142855,
+      "ref": "esc",
+      "risk": "covered from stock",
+      "source_basis": "manufacturer",
+      "source_names": [
+        "Fire",
+        "Hobbywing QuicRun WP-1060 (B0CNT14KMH), 39 g, IP67, better built, ~$30"
+      ],
+      "sources": 2,
+      "stock": 100.0,
+      "unit_price": 26.0,
+      "vendor": "Amazon",
+      "vendor_pn": "B08B5TTFVV"
+    },
+    {
+      "description": "Savox SW-0250MG waterproof digital micro servo, IP67",
+      "extended": 40.0,
+      "id": "servo",
+      "lead_time_weeks": 0.0,
+      "lifecycle": "active",
+      "needed": 1.0,
+      "purchased": 1.0,
+      "quoted_lead_weeks": 0.42857142857142855,
+      "ref": "servo",
+      "risk": "covered from stock",
+      "source_basis": "manufacturer",
+      "source_names": [
+        "Savox",
+        "Miuzei MG90S metal gear (B0BWJ41FZB), 14 g, ~$6 -- NOT waterproof"
+      ],
+      "sources": 2,
+      "stock": 100.0,
+      "unit_price": 40.0,
+      "vendor": "Amazon",
+      "vendor_pn": "B0C11MYL3W"
+    },
+    {
+      "description": "Flysky FS-GT5 2.4 GHz pistol-grip transmitter with FS-BS6 receiver",
+      "extended": 54.0,
+      "id": "radio",
+      "lead_time_weeks": 0.0,
+      "lifecycle": "active",
+      "needed": 1.0,
+      "purchased": 1.0,
+      "quoted_lead_weeks": 0.42857142857142855,
+      "ref": "radio",
+      "risk": "covered from stock",
+      "source_basis": "manufacturer",
+      "source_names": [
+        "Flysky",
+        "RadioLink RC4GS V3 + R6FG (B09YR4SN17)",
+        "Spektrum DX3 Smart, $89.99 verified"
+      ],
+      "sources": 3,
+      "stock": 100.0,
+      "unit_price": 54.0,
+      "vendor": "Amazon",
+      "vendor_pn": "B07C16BX6L"
+    },
+    {
+      "description": "Zeee 2S 7.4 V 2200 mAh 50C shorty LiPo, XT60",
+      "extended": 15.5,
+      "id": "battery",
+      "lead_time_weeks": 0.0,
+      "lifecycle": "active",
+      "needed": 1.0,
+      "purchased": 1.0,
+      "quoted_lead_weeks": 0.42857142857142855,
+      "ref": "battery",
+      "risk": "covered from stock",
+      "source_basis": "manufacturer",
+      "source_names": [
+        "Zeee",
+        "Ovonic 2200 2S (B0CF9JRPZL) 87x33x18 mm 118 g",
+        "Gens Ace 2200 (B09Z1YLQ8G)"
+      ],
+      "sources": 3,
+      "stock": 100.0,
+      "unit_price": 15.5,
+      "vendor": "Amazon",
+      "vendor_pn": "B0BYNKBKGT"
+    },
+    {
+      "description": "HTRC B6 V2 80 W balance charger",
+      "extended": 28.0,
+      "id": "charger",
+      "lead_time_weeks": 0.0,
+      "lifecycle": "active",
+      "needed": 1.0,
+      "purchased": 1.0,
+      "quoted_lead_weeks": 0.42857142857142855,
+      "ref": "charger",
+      "risk": "single source; covered from stock",
+      "source_basis": "manufacturer",
+      "source_names": [
+        "HTRC"
+      ],
+      "sources": 1,
+      "stock": 100.0,
+      "unit_price": 28.0,
+      "vendor": "Amazon",
+      "vendor_pn": "B08DV5PSD8"
+    },
+    {
+      "description": "uxcell 4 mm drive shaft assembly: 250 mm shaft, 200 mm stuffing tube, universal joint for a 3.17 mm motor shaft, nylon prop, dog, nut",
+      "extended": 18.0,
+      "id": "shaft_kit",
+      "lead_time_weeks": 0.0,
+      "lifecycle": "active",
+      "needed": 1.0,
+      "purchased": 1.0,
+      "quoted_lead_weeks": 0.42857142857142855,
+      "ref": "shaft_kit",
+      "risk": "covered from stock",
+      "source_basis": "manufacturer",
+      "source_names": [
+        "generic",
+        "generic 'RC boat 4mm drive shaft' sets, sleeve OD 10 mm (B07RK979GW)"
+      ],
+      "sources": 2,
+      "stock": 100.0,
+      "unit_price": 18.0,
+      "vendor": "Amazon",
+      "vendor_pn": "B07Q3286KM"
+    },
+    {
+      "description": "3-blade brass scale propeller, 35 mm diameter, M4",
+      "extended": 13.0,
+      "id": "prop",
+      "lead_time_weeks": 0.0,
+      "lifecycle": "active",
+      "needed": 1.0,
+      "purchased": 1.0,
+      "quoted_lead_weeks": 0.42857142857142855,
+      "ref": "prop",
+      "risk": "single source; covered from stock",
+      "source_basis": "manufacturer",
+      "source_names": [
+        "generic"
+      ],
+      "sources": 1,
+      "stock": 100.0,
+      "unit_price": 13.0,
+      "vendor": "Amazon",
+      "vendor_pn": "B0D814JF9S"
+    },
+    {
+      "description": "Hobbypark aluminium transom-mount rudder, 75 mm, frame 60 x 43 mm",
+      "extended": 16.0,
+      "id": "rudder",
+      "lead_time_weeks": 0.0,
+      "lifecycle": "active",
+      "needed": 1.0,
+      "purchased": 1.0,
+      "quoted_lead_weeks": 0.42857142857142855,
+      "ref": "rudder",
+      "risk": "covered from stock",
+      "source_basis": "manufacturer",
+      "source_names": [
+        "Hobbypark",
+        "95 mm version (B07FS2G9KN) for boats up to 850 mm"
+      ],
+      "sources": 2,
+      "stock": 100.0,
+      "unit_price": 16.0,
+      "vendor": "Amazon",
+      "vendor_pn": "B07FS9KBYZ"
+    },
+    {
+      "description": "Pushrod, clevises and 3 mm brass pushrod tube",
+      "extended": 8.0,
+      "id": "linkage",
+      "lead_time_weeks": 0.0,
+      "lifecycle": "active",
+      "needed": 1.0,
+      "purchased": 1.0,
+      "quoted_lead_weeks": 0.42857142857142855,
+      "ref": "linkage",
+      "risk": "single source; covered from stock",
+      "source_basis": "manufacturer",
+      "source_names": [
+        "Pushrod"
+      ],
+      "sources": 1,
+      "stock": 100.0,
+      "unit_price": 8.0,
+      "vendor": "Amazon",
+      "vendor_pn": "RC pushrod linkage clevis set 2mm brass tube"
+    },
+    {
+      "description": "RC on/off switch with an external aluminium control rod",
+      "extended": 12.0,
+      "id": "switch",
+      "lead_time_weeks": 0.0,
+      "lifecycle": "active",
+      "needed": 1.0,
+      "purchased": 1.0,
+      "quoted_lead_weeks": 0.42857142857142855,
+      "ref": "switch",
+      "risk": "single source; covered from stock",
+      "source_basis": "manufacturer",
+      "source_names": [
+        "RC"
+      ],
+      "sources": 1,
+      "stock": 100.0,
+      "unit_price": 12.0,
+      "vendor": "Amazon",
+      "vendor_pn": "B0CCTS8BW3"
+    },
+    {
+      "description": "Self-adhesive silicone or EPDM closed-cell foam tape, 10 x 3 mm",
+      "extended": 9.0,
+      "id": "hatch_seal",
+      "lead_time_weeks": 0.0,
+      "lifecycle": "active",
+      "needed": 1.0,
+      "purchased": 1.0,
+      "quoted_lead_weeks": 0.42857142857142855,
+      "ref": "hatch_seal",
+      "risk": "single source; covered from stock",
+      "source_basis": "manufacturer",
+      "source_names": [
+        "Self-adhesive"
+      ],
+      "sources": 1,
+      "stock": 100.0,
+      "unit_price": 9.0,
+      "vendor": "Amazon",
+      "vendor_pn": "self adhesive silicone foam tape 10mm x 3mm closed cell"
+    },
+    {
+      "description": "Closed-cell polyethylene foam for the sealed end compartments",
+      "extended": 7.0,
+      "id": "foam",
+      "lead_time_weeks": 0.0,
+      "lifecycle": "active",
+      "needed": 1.0,
+      "purchased": 1.0,
+      "quoted_lead_weeks": 0.42857142857142855,
+      "ref": "foam",
+      "risk": "single source; covered from stock",
+      "source_basis": "manufacturer",
+      "source_names": [
+        "Closed-cell"
+      ],
+      "sources": 1,
+      "stock": 100.0,
+      "unit_price": 7.0,
+      "vendor": "Amazon",
+      "vendor_pn": "closed cell polyethylene foam block"
+    },
+    {
+      "description": "Dynamite marine grease, 5 oz, for the stuffing tube",
+      "extended": 12.0,
+      "id": "grease",
+      "lead_time_weeks": 0.0,
+      "lifecycle": "active",
+      "needed": 1.0,
+      "purchased": 1.0,
+      "quoted_lead_weeks": 0.42857142857142855,
+      "ref": "grease",
+      "risk": "single source; covered from stock",
+      "source_basis": "manufacturer",
+      "source_names": [
+        "Dynamite"
+      ],
+      "sources": 1,
+      "stock": 100.0,
+      "unit_price": 12.0,
+      "vendor": "Amazon",
+      "vendor_pn": "B00XUM0OQK"
+    },
+    {
+      "description": "Permatex 82180 Ultra Black RTV, neutral cure, sensor safe",
+      "extended": 9.0,
+      "id": "rtv",
+      "lead_time_weeks": 0.0,
+      "lifecycle": "active",
+      "needed": 1.0,
+      "purchased": 1.0,
+      "quoted_lead_weeks": 0.42857142857142855,
+      "ref": "rtv",
+      "risk": "single source; covered from stock",
+      "source_basis": "manufacturer",
+      "source_names": [
+        "Permatex"
+      ],
+      "sources": 1,
+      "stock": 100.0,
+      "unit_price": 9.0,
+      "vendor": "Amazon",
+      "vendor_pn": "B0002UEN1U"
+    },
+    {
+      "description": "Smooth-On XTC-3D brush-on epoxy coating, 6.4 oz",
+      "extended": 28.0,
+      "id": "epoxy",
+      "lead_time_weeks": 0.0,
+      "lifecycle": "active",
+      "needed": 1.0,
+      "purchased": 1.0,
+      "quoted_lead_weeks": 0.42857142857142855,
+      "ref": "epoxy",
+      "risk": "single source; covered from stock",
+      "source_basis": "manufacturer",
+      "source_names": [
+        "Smooth-On"
+      ],
+      "sources": 1,
+      "stock": 100.0,
+      "unit_price": 28.0,
+      "vendor": "Amazon",
+      "vendor_pn": "B09MSPD3MK"
+    },
+    {
+      "description": "MG Chemicals 422B silicone conformal coating, 55 mL with brushes",
+      "extended": 24.0,
+      "id": "coating",
+      "lead_time_weeks": 0.0,
+      "lifecycle": "active",
+      "needed": 1.0,
+      "purchased": 1.0,
+      "quoted_lead_weeks": 0.42857142857142855,
+      "ref": "coating",
+      "risk": "single source; covered from stock",
+      "source_basis": "manufacturer",
+      "source_names": [
+        "MG"
+      ],
+      "sources": 1,
+      "stock": 100.0,
+      "unit_price": 24.0,
+      "vendor": "Amazon",
+      "vendor_pn": "B008O9YIV6"
+    },
+    {
+      "description": "M3 stainless screws and washers, hook-and-loop battery strap",
+      "extended": 11.0,
+      "id": "fasteners",
+      "lead_time_weeks": 0.0,
+      "lifecycle": "active",
+      "needed": 1.0,
+      "purchased": 1.0,
+      "quoted_lead_weeks": 0.42857142857142855,
+      "ref": "fasteners",
+      "risk": "single source; covered from stock",
+      "source_basis": "manufacturer",
+      "source_names": [
+        "M3"
+      ],
+      "sources": 1,
+      "stock": 100.0,
+      "unit_price": 11.0,
+      "vendor": "Amazon",
+      "vendor_pn": "M3 stainless machine screw assortment"
+    },
+    {
+      "description": "PETG filament, 1.75 mm, 1 kg spool, light colour",
+      "extended": 22.0,
+      "id": "filament",
+      "lead_time_weeks": 0.0,
+      "lifecycle": "active",
+      "needed": 1.0,
+      "purchased": 1.0,
+      "quoted_lead_weeks": 0.42857142857142855,
+      "ref": "filament",
+      "risk": "covered from stock",
+      "source_basis": "manufacturer",
+      "source_names": [
+        "Overture",
+        "Sunlu",
+        "Polymaker",
+        "eSun"
+      ],
+      "sources": 4,
+      "stock": 100.0,
+      "unit_price": 22.0,
+      "vendor": "Amazon",
+      "vendor_pn": "PETG 1.75mm 1kg"
+    }
+  ]
+}

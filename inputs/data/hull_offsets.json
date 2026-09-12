@@ -1,0 +1,1149 @@
+{
+ "source": "inputs/screenshots/hull-profile.png",
+ "traced_by": "tools/trace_hull_profile.py",
+ "reported_by_tool": {
+  "loa_mm": 300.0,
+  "cut_x_mm": 150.0,
+  "cut_draft_mm": 8.14,
+  "cut_wl_beam_mm": 76.24
+ },
+ "calibration": {
+  "cut_scale_y_mm_per_px": 0.23594202898550726,
+  "cut_scale_x_mm_per_px": 0.231030303030303,
+  "section_depth_mm": 43.29536231884058,
+  "section_half_beam_sheer_mm": 52.67490909090908,
+  "section_freeboard_at_dwl_mm": 35.15536231884058,
+  "profile_scale_mm_per_px": 0.23510971786833856,
+  "scale_spread_rel": 0.02098782879870555
+ },
+ "note": "x_mm measured from the transom, +ve forward. keel_below_dwl_mm and sheer_above_dwl_mm are relative to the DWL the tool drew, which is the tool's slider position, NOT a loading condition. Everything here is a pixel trace of a screenshot: treat it as +/-1 mm, not as CAD.",
+ "section_at_x150": [
+  {
+   "half_beam_mm": 0.0,
+   "below_sheer_mm": 32.442
+  },
+  {
+   "half_beam_mm": 0.693,
+   "below_sheer_mm": 36.052
+  },
+  {
+   "half_beam_mm": 0.924,
+   "below_sheer_mm": 39.662
+  },
+  {
+   "half_beam_mm": 1.155,
+   "below_sheer_mm": 43.272
+  },
+  {
+   "half_beam_mm": 1.386,
+   "below_sheer_mm": 43.295
+  },
+  {
+   "half_beam_mm": 1.617,
+   "below_sheer_mm": 43.295
+  },
+  {
+   "half_beam_mm": 1.848,
+   "below_sheer_mm": 43.272
+  },
+  {
+   "half_beam_mm": 2.079,
+   "below_sheer_mm": 43.248
+  },
+  {
+   "half_beam_mm": 2.31,
+   "below_sheer_mm": 43.225
+  },
+  {
+   "half_beam_mm": 2.541,
+   "below_sheer_mm": 43.201
+  },
+  {
+   "half_beam_mm": 2.772,
+   "below_sheer_mm": 43.177
+  },
+  {
+   "half_beam_mm": 3.003,
+   "below_sheer_mm": 43.177
+  },
+  {
+   "half_beam_mm": 3.234,
+   "below_sheer_mm": 43.177
+  },
+  {
+   "half_beam_mm": 3.465,
+   "below_sheer_mm": 43.177
+  },
+  {
+   "half_beam_mm": 3.696,
+   "below_sheer_mm": 43.177
+  },
+  {
+   "half_beam_mm": 3.928,
+   "below_sheer_mm": 43.177
+  },
+  {
+   "half_beam_mm": 4.159,
+   "below_sheer_mm": 43.177
+  },
+  {
+   "half_beam_mm": 4.39,
+   "below_sheer_mm": 43.177
+  },
+  {
+   "half_beam_mm": 4.621,
+   "below_sheer_mm": 43.177
+  },
+  {
+   "half_beam_mm": 4.852,
+   "below_sheer_mm": 43.177
+  },
+  {
+   "half_beam_mm": 5.083,
+   "below_sheer_mm": 43.177
+  },
+  {
+   "half_beam_mm": 5.314,
+   "below_sheer_mm": 43.177
+  },
+  {
+   "half_beam_mm": 5.545,
+   "below_sheer_mm": 43.177
+  },
+  {
+   "half_beam_mm": 5.776,
+   "below_sheer_mm": 43.177
+  },
+  {
+   "half_beam_mm": 6.007,
+   "below_sheer_mm": 43.154
+  },
+  {
+   "half_beam_mm": 6.238,
+   "below_sheer_mm": 43.13
+  },
+  {
+   "half_beam_mm": 6.469,
+   "below_sheer_mm": 43.107
+  },
+  {
+   "half_beam_mm": 6.7,
+   "below_sheer_mm": 43.083
+  },
+  {
+   "half_beam_mm": 6.931,
+   "below_sheer_mm": 43.059
+  },
+  {
+   "half_beam_mm": 7.162,
+   "below_sheer_mm": 43.059
+  },
+  {
+   "half_beam_mm": 7.393,
+   "below_sheer_mm": 43.059
+  },
+  {
+   "half_beam_mm": 7.624,
+   "below_sheer_mm": 43.059
+  },
+  {
+   "half_beam_mm": 7.855,
+   "below_sheer_mm": 43.059
+  },
+  {
+   "half_beam_mm": 8.086,
+   "below_sheer_mm": 43.059
+  },
+  {
+   "half_beam_mm": 8.317,
+   "below_sheer_mm": 43.036
+  },
+  {
+   "half_beam_mm": 8.548,
+   "below_sheer_mm": 43.012
+  },
+  {
+   "half_beam_mm": 8.779,
+   "below_sheer_mm": 42.989
+  },
+  {
+   "half_beam_mm": 9.01,
+   "below_sheer_mm": 42.965
+  },
+  {
+   "half_beam_mm": 9.241,
+   "below_sheer_mm": 42.941
+  },
+  {
+   "half_beam_mm": 9.472,
+   "below_sheer_mm": 42.941
+  },
+  {
+   "half_beam_mm": 9.703,
+   "below_sheer_mm": 42.941
+  },
+  {
+   "half_beam_mm": 9.934,
+   "below_sheer_mm": 42.918
+  },
+  {
+   "half_beam_mm": 10.165,
+   "below_sheer_mm": 42.894
+  },
+  {
+   "half_beam_mm": 10.396,
+   "below_sheer_mm": 42.871
+  },
+  {
+   "half_beam_mm": 10.627,
+   "below_sheer_mm": 42.847
+  },
+  {
+   "half_beam_mm": 10.858,
+   "below_sheer_mm": 42.823
+  },
+  {
+   "half_beam_mm": 11.089,
+   "below_sheer_mm": 42.8
+  },
+  {
+   "half_beam_mm": 11.32,
+   "below_sheer_mm": 42.776
+  },
+  {
+   "half_beam_mm": 11.552,
+   "below_sheer_mm": 42.753
+  },
+  {
+   "half_beam_mm": 11.783,
+   "below_sheer_mm": 42.729
+  },
+  {
+   "half_beam_mm": 12.014,
+   "below_sheer_mm": 42.706
+  },
+  {
+   "half_beam_mm": 12.245,
+   "below_sheer_mm": 42.682
+  },
+  {
+   "half_beam_mm": 12.476,
+   "below_sheer_mm": 42.658
+  },
+  {
+   "half_beam_mm": 12.707,
+   "below_sheer_mm": 42.635
+  },
+  {
+   "half_beam_mm": 12.938,
+   "below_sheer_mm": 42.588
+  },
+  {
+   "half_beam_mm": 13.169,
+   "below_sheer_mm": 42.54
+  },
+  {
+   "half_beam_mm": 13.4,
+   "below_sheer_mm": 42.517
+  },
+  {
+   "half_beam_mm": 13.631,
+   "below_sheer_mm": 42.493
+  },
+  {
+   "half_beam_mm": 13.862,
+   "below_sheer_mm": 42.446
+  },
+  {
+   "half_beam_mm": 14.093,
+   "below_sheer_mm": 42.422
+  },
+  {
+   "half_beam_mm": 14.324,
+   "below_sheer_mm": 42.399
+  },
+  {
+   "half_beam_mm": 14.555,
+   "below_sheer_mm": 42.352
+  },
+  {
+   "half_beam_mm": 14.786,
+   "below_sheer_mm": 42.304
+  },
+  {
+   "half_beam_mm": 15.017,
+   "below_sheer_mm": 42.281
+  },
+  {
+   "half_beam_mm": 15.248,
+   "below_sheer_mm": 42.234
+  },
+  {
+   "half_beam_mm": 15.479,
+   "below_sheer_mm": 42.186
+  },
+  {
+   "half_beam_mm": 15.71,
+   "below_sheer_mm": 42.139
+  },
+  {
+   "half_beam_mm": 15.941,
+   "below_sheer_mm": 42.092
+  },
+  {
+   "half_beam_mm": 16.172,
+   "below_sheer_mm": 42.045
+  },
+  {
+   "half_beam_mm": 16.403,
+   "below_sheer_mm": 42.021
+  },
+  {
+   "half_beam_mm": 16.634,
+   "below_sheer_mm": 41.974
+  },
+  {
+   "half_beam_mm": 16.865,
+   "below_sheer_mm": 41.95
+  },
+  {
+   "half_beam_mm": 17.096,
+   "below_sheer_mm": 41.903
+  },
+  {
+   "half_beam_mm": 17.327,
+   "below_sheer_mm": 41.856
+  },
+  {
+   "half_beam_mm": 17.558,
+   "below_sheer_mm": 41.809
+  },
+  {
+   "half_beam_mm": 17.789,
+   "below_sheer_mm": 41.762
+  },
+  {
+   "half_beam_mm": 18.02,
+   "below_sheer_mm": 41.715
+  },
+  {
+   "half_beam_mm": 18.251,
+   "below_sheer_mm": 41.667
+  },
+  {
+   "half_beam_mm": 18.482,
+   "below_sheer_mm": 41.62
+  },
+  {
+   "half_beam_mm": 18.713,
+   "below_sheer_mm": 41.573
+  },
+  {
+   "half_beam_mm": 18.944,
+   "below_sheer_mm": 41.526
+  },
+  {
+   "half_beam_mm": 19.176,
+   "below_sheer_mm": 41.479
+  },
+  {
+   "half_beam_mm": 19.407,
+   "below_sheer_mm": 41.431
+  },
+  {
+   "half_beam_mm": 19.638,
+   "below_sheer_mm": 41.384
+  },
+  {
+   "half_beam_mm": 19.869,
+   "below_sheer_mm": 41.337
+  },
+  {
+   "half_beam_mm": 20.1,
+   "below_sheer_mm": 41.29
+  },
+  {
+   "half_beam_mm": 20.331,
+   "below_sheer_mm": 41.243
+  },
+  {
+   "half_beam_mm": 20.562,
+   "below_sheer_mm": 41.195
+  },
+  {
+   "half_beam_mm": 20.793,
+   "below_sheer_mm": 41.148
+  },
+  {
+   "half_beam_mm": 21.024,
+   "below_sheer_mm": 41.101
+  },
+  {
+   "half_beam_mm": 21.255,
+   "below_sheer_mm": 41.054
+  },
+  {
+   "half_beam_mm": 21.486,
+   "below_sheer_mm": 41.007
+  },
+  {
+   "half_beam_mm": 21.717,
+   "below_sheer_mm": 40.96
+  },
+  {
+   "half_beam_mm": 21.948,
+   "below_sheer_mm": 40.912
+  },
+  {
+   "half_beam_mm": 22.179,
+   "below_sheer_mm": 40.865
+  },
+  {
+   "half_beam_mm": 22.41,
+   "below_sheer_mm": 40.818
+  },
+  {
+   "half_beam_mm": 22.641,
+   "below_sheer_mm": 40.771
+  },
+  {
+   "half_beam_mm": 22.872,
+   "below_sheer_mm": 40.724
+  },
+  {
+   "half_beam_mm": 23.103,
+   "below_sheer_mm": 40.676
+  },
+  {
+   "half_beam_mm": 23.334,
+   "below_sheer_mm": 40.629
+  },
+  {
+   "half_beam_mm": 23.565,
+   "below_sheer_mm": 40.582
+  },
+  {
+   "half_beam_mm": 23.796,
+   "below_sheer_mm": 40.511
+  },
+  {
+   "half_beam_mm": 24.027,
+   "below_sheer_mm": 40.464
+  },
+  {
+   "half_beam_mm": 24.258,
+   "below_sheer_mm": 40.417
+  },
+  {
+   "half_beam_mm": 24.489,
+   "below_sheer_mm": 40.346
+  },
+  {
+   "half_beam_mm": 24.72,
+   "below_sheer_mm": 40.275
+  },
+  {
+   "half_beam_mm": 24.951,
+   "below_sheer_mm": 40.228
+  },
+  {
+   "half_beam_mm": 25.182,
+   "below_sheer_mm": 40.181
+  },
+  {
+   "half_beam_mm": 25.413,
+   "below_sheer_mm": 40.11
+  },
+  {
+   "half_beam_mm": 25.644,
+   "below_sheer_mm": 40.039
+  },
+  {
+   "half_beam_mm": 25.875,
+   "below_sheer_mm": 39.992
+  },
+  {
+   "half_beam_mm": 26.106,
+   "below_sheer_mm": 39.945
+  },
+  {
+   "half_beam_mm": 26.337,
+   "below_sheer_mm": 39.874
+  },
+  {
+   "half_beam_mm": 26.568,
+   "below_sheer_mm": 39.803
+  },
+  {
+   "half_beam_mm": 26.8,
+   "below_sheer_mm": 39.756
+  },
+  {
+   "half_beam_mm": 27.031,
+   "below_sheer_mm": 39.709
+  },
+  {
+   "half_beam_mm": 27.262,
+   "below_sheer_mm": 39.638
+  },
+  {
+   "half_beam_mm": 27.493,
+   "below_sheer_mm": 39.567
+  },
+  {
+   "half_beam_mm": 27.724,
+   "below_sheer_mm": 39.52
+  },
+  {
+   "half_beam_mm": 27.955,
+   "below_sheer_mm": 39.473
+  },
+  {
+   "half_beam_mm": 28.186,
+   "below_sheer_mm": 39.379
+  },
+  {
+   "half_beam_mm": 28.417,
+   "below_sheer_mm": 39.308
+  },
+  {
+   "half_beam_mm": 28.648,
+   "below_sheer_mm": 39.261
+  },
+  {
+   "half_beam_mm": 28.879,
+   "below_sheer_mm": 39.19
+  },
+  {
+   "half_beam_mm": 29.11,
+   "below_sheer_mm": 39.096
+  },
+  {
+   "half_beam_mm": 29.341,
+   "below_sheer_mm": 39.048
+  },
+  {
+   "half_beam_mm": 29.572,
+   "below_sheer_mm": 38.978
+  },
+  {
+   "half_beam_mm": 29.803,
+   "below_sheer_mm": 38.883
+  },
+  {
+   "half_beam_mm": 30.034,
+   "below_sheer_mm": 38.812
+  },
+  {
+   "half_beam_mm": 30.265,
+   "below_sheer_mm": 38.742
+  },
+  {
+   "half_beam_mm": 30.496,
+   "below_sheer_mm": 38.647
+  },
+  {
+   "half_beam_mm": 30.727,
+   "below_sheer_mm": 38.577
+  },
+  {
+   "half_beam_mm": 30.958,
+   "below_sheer_mm": 38.506
+  },
+  {
+   "half_beam_mm": 31.189,
+   "below_sheer_mm": 38.411
+  },
+  {
+   "half_beam_mm": 31.42,
+   "below_sheer_mm": 38.341
+  },
+  {
+   "half_beam_mm": 31.651,
+   "below_sheer_mm": 38.27
+  },
+  {
+   "half_beam_mm": 31.882,
+   "below_sheer_mm": 38.175
+  },
+  {
+   "half_beam_mm": 32.113,
+   "below_sheer_mm": 38.105
+  },
+  {
+   "half_beam_mm": 32.344,
+   "below_sheer_mm": 38.01
+  },
+  {
+   "half_beam_mm": 32.575,
+   "below_sheer_mm": 37.916
+  },
+  {
+   "half_beam_mm": 32.806,
+   "below_sheer_mm": 37.845
+  },
+  {
+   "half_beam_mm": 33.037,
+   "below_sheer_mm": 37.751
+  },
+  {
+   "half_beam_mm": 33.268,
+   "below_sheer_mm": 37.656
+  },
+  {
+   "half_beam_mm": 33.499,
+   "below_sheer_mm": 37.562
+  },
+  {
+   "half_beam_mm": 33.73,
+   "below_sheer_mm": 37.468
+  },
+  {
+   "half_beam_mm": 33.961,
+   "below_sheer_mm": 37.373
+  },
+  {
+   "half_beam_mm": 34.192,
+   "below_sheer_mm": 37.279
+  },
+  {
+   "half_beam_mm": 34.424,
+   "below_sheer_mm": 37.184
+  },
+  {
+   "half_beam_mm": 34.655,
+   "below_sheer_mm": 37.09
+  },
+  {
+   "half_beam_mm": 34.886,
+   "below_sheer_mm": 36.996
+  },
+  {
+   "half_beam_mm": 35.117,
+   "below_sheer_mm": 36.854
+  },
+  {
+   "half_beam_mm": 35.348,
+   "below_sheer_mm": 36.76
+  },
+  {
+   "half_beam_mm": 35.579,
+   "below_sheer_mm": 36.618
+  },
+  {
+   "half_beam_mm": 35.81,
+   "below_sheer_mm": 36.524
+  },
+  {
+   "half_beam_mm": 36.041,
+   "below_sheer_mm": 36.382
+  },
+  {
+   "half_beam_mm": 36.272,
+   "below_sheer_mm": 36.288
+  },
+  {
+   "half_beam_mm": 36.503,
+   "below_sheer_mm": 36.17
+  },
+  {
+   "half_beam_mm": 36.734,
+   "below_sheer_mm": 36.099
+  },
+  {
+   "half_beam_mm": 36.965,
+   "below_sheer_mm": 36.005
+  },
+  {
+   "half_beam_mm": 37.196,
+   "below_sheer_mm": 35.934
+  },
+  {
+   "half_beam_mm": 37.427,
+   "below_sheer_mm": 35.84
+  },
+  {
+   "half_beam_mm": 37.658,
+   "below_sheer_mm": 35.674
+  },
+  {
+   "half_beam_mm": 37.889,
+   "below_sheer_mm": 35.462
+  },
+  {
+   "half_beam_mm": 38.12,
+   "below_sheer_mm": 35.25
+  },
+  {
+   "half_beam_mm": 38.351,
+   "below_sheer_mm": 35.014
+  },
+  {
+   "half_beam_mm": 38.582,
+   "below_sheer_mm": 34.778
+  },
+  {
+   "half_beam_mm": 38.813,
+   "below_sheer_mm": 34.613
+  },
+  {
+   "half_beam_mm": 39.044,
+   "below_sheer_mm": 34.448
+  },
+  {
+   "half_beam_mm": 39.275,
+   "below_sheer_mm": 34.259
+  },
+  {
+   "half_beam_mm": 39.506,
+   "below_sheer_mm": 34.07
+  },
+  {
+   "half_beam_mm": 39.737,
+   "below_sheer_mm": 33.858
+  },
+  {
+   "half_beam_mm": 39.968,
+   "below_sheer_mm": 33.622
+  },
+  {
+   "half_beam_mm": 40.199,
+   "below_sheer_mm": 33.386
+  },
+  {
+   "half_beam_mm": 40.43,
+   "below_sheer_mm": 33.126
+  },
+  {
+   "half_beam_mm": 40.661,
+   "below_sheer_mm": 32.867
+  },
+  {
+   "half_beam_mm": 40.892,
+   "below_sheer_mm": 32.607
+  },
+  {
+   "half_beam_mm": 41.123,
+   "below_sheer_mm": 32.348
+  },
+  {
+   "half_beam_mm": 41.354,
+   "below_sheer_mm": 32.065
+  },
+  {
+   "half_beam_mm": 41.585,
+   "below_sheer_mm": 31.781
+  },
+  {
+   "half_beam_mm": 41.816,
+   "below_sheer_mm": 31.475
+  },
+  {
+   "half_beam_mm": 42.048,
+   "below_sheer_mm": 31.168
+  },
+  {
+   "half_beam_mm": 42.279,
+   "below_sheer_mm": 30.814
+  },
+  {
+   "half_beam_mm": 42.51,
+   "below_sheer_mm": 30.46
+  },
+  {
+   "half_beam_mm": 42.741,
+   "below_sheer_mm": 30.106
+  },
+  {
+   "half_beam_mm": 42.972,
+   "below_sheer_mm": 29.752
+  },
+  {
+   "half_beam_mm": 43.203,
+   "below_sheer_mm": 29.351
+  },
+  {
+   "half_beam_mm": 43.434,
+   "below_sheer_mm": 28.95
+  },
+  {
+   "half_beam_mm": 43.665,
+   "below_sheer_mm": 28.573
+  },
+  {
+   "half_beam_mm": 43.896,
+   "below_sheer_mm": 28.171
+  },
+  {
+   "half_beam_mm": 44.127,
+   "below_sheer_mm": 27.747
+  },
+  {
+   "half_beam_mm": 44.358,
+   "below_sheer_mm": 27.322
+  },
+  {
+   "half_beam_mm": 44.589,
+   "below_sheer_mm": 26.945
+  },
+  {
+   "half_beam_mm": 44.82,
+   "below_sheer_mm": 26.52
+  },
+  {
+   "half_beam_mm": 45.051,
+   "below_sheer_mm": 26.095
+  },
+  {
+   "half_beam_mm": 45.282,
+   "below_sheer_mm": 25.694
+  },
+  {
+   "half_beam_mm": 45.513,
+   "below_sheer_mm": 25.317
+  },
+  {
+   "half_beam_mm": 45.744,
+   "below_sheer_mm": 24.892
+  },
+  {
+   "half_beam_mm": 45.975,
+   "below_sheer_mm": 24.491
+  },
+  {
+   "half_beam_mm": 46.206,
+   "below_sheer_mm": 24.137
+  },
+  {
+   "half_beam_mm": 46.437,
+   "below_sheer_mm": 23.712
+  },
+  {
+   "half_beam_mm": 46.668,
+   "below_sheer_mm": 23.217
+  },
+  {
+   "half_beam_mm": 46.899,
+   "below_sheer_mm": 22.698
+  },
+  {
+   "half_beam_mm": 47.13,
+   "below_sheer_mm": 22.108
+  },
+  {
+   "half_beam_mm": 47.361,
+   "below_sheer_mm": 21.4
+  },
+  {
+   "half_beam_mm": 47.592,
+   "below_sheer_mm": 20.645
+  },
+  {
+   "half_beam_mm": 47.823,
+   "below_sheer_mm": 19.843
+  },
+  {
+   "half_beam_mm": 48.054,
+   "below_sheer_mm": 18.97
+  },
+  {
+   "half_beam_mm": 48.285,
+   "below_sheer_mm": 18.05
+  },
+  {
+   "half_beam_mm": 48.516,
+   "below_sheer_mm": 17.106
+  },
+  {
+   "half_beam_mm": 48.747,
+   "below_sheer_mm": 16.138
+  },
+  {
+   "half_beam_mm": 48.978,
+   "below_sheer_mm": 15.171
+  },
+  {
+   "half_beam_mm": 49.209,
+   "below_sheer_mm": 14.204
+  },
+  {
+   "half_beam_mm": 49.44,
+   "below_sheer_mm": 13.236
+  },
+  {
+   "half_beam_mm": 49.672,
+   "below_sheer_mm": 12.269
+  },
+  {
+   "half_beam_mm": 49.903,
+   "below_sheer_mm": 11.325
+  },
+  {
+   "half_beam_mm": 50.134,
+   "below_sheer_mm": 10.381
+  },
+  {
+   "half_beam_mm": 50.365,
+   "below_sheer_mm": 9.414
+  },
+  {
+   "half_beam_mm": 50.596,
+   "below_sheer_mm": 8.447
+  },
+  {
+   "half_beam_mm": 50.827,
+   "below_sheer_mm": 7.479
+  },
+  {
+   "half_beam_mm": 51.058,
+   "below_sheer_mm": 6.512
+  },
+  {
+   "half_beam_mm": 51.289,
+   "below_sheer_mm": 5.592
+  },
+  {
+   "half_beam_mm": 51.52,
+   "below_sheer_mm": 4.79
+  },
+  {
+   "half_beam_mm": 51.751,
+   "below_sheer_mm": 4.082
+  },
+  {
+   "half_beam_mm": 51.982,
+   "below_sheer_mm": 3.468
+  },
+  {
+   "half_beam_mm": 52.213,
+   "below_sheer_mm": 2.973
+  },
+  {
+   "half_beam_mm": 52.444,
+   "below_sheer_mm": 2.619
+  },
+  {
+   "half_beam_mm": 52.675,
+   "below_sheer_mm": 2.359
+  }
+ ],
+ "stations": [
+  {
+   "x_mm": 0.0,
+   "keel_below_dwl_mm": 0.353,
+   "sheer_above_dwl_mm": 29.036,
+   "dwl_half_beam_mm": null,
+   "sheer_half_beam_mm": null
+  },
+  {
+   "x_mm": 10.0,
+   "keel_below_dwl_mm": 1.052,
+   "sheer_above_dwl_mm": 29.741,
+   "dwl_half_beam_mm": 9.599,
+   "sheer_half_beam_mm": 49.961
+  },
+  {
+   "x_mm": 20.0,
+   "keel_below_dwl_mm": 1.674,
+   "sheer_above_dwl_mm": 30.212,
+   "dwl_half_beam_mm": 18.805,
+   "sheer_half_beam_mm": 51.607
+  },
+  {
+   "x_mm": 30.0,
+   "keel_below_dwl_mm": 2.288,
+   "sheer_above_dwl_mm": 30.682,
+   "dwl_half_beam_mm": 23.435,
+   "sheer_half_beam_mm": 53.017
+  },
+  {
+   "x_mm": 40.0,
+   "keel_below_dwl_mm": 2.941,
+   "sheer_above_dwl_mm": 31.152,
+   "dwl_half_beam_mm": 27.048,
+   "sheer_half_beam_mm": 54.428
+  },
+  {
+   "x_mm": 50.0,
+   "keel_below_dwl_mm": 3.644,
+   "sheer_above_dwl_mm": 31.857,
+   "dwl_half_beam_mm": 30.207,
+   "sheer_half_beam_mm": 55.603
+  },
+  {
+   "x_mm": 60.0,
+   "keel_below_dwl_mm": 4.35,
+   "sheer_above_dwl_mm": 32.328,
+   "dwl_half_beam_mm": 32.834,
+   "sheer_half_beam_mm": 56.544
+  },
+  {
+   "x_mm": 70.0,
+   "keel_below_dwl_mm": 5.055,
+   "sheer_above_dwl_mm": 32.798,
+   "dwl_half_beam_mm": 35.037,
+   "sheer_half_beam_mm": 57.249
+  },
+  {
+   "x_mm": 80.0,
+   "keel_below_dwl_mm": 5.76,
+   "sheer_above_dwl_mm": 33.268,
+   "dwl_half_beam_mm": 36.796,
+   "sheer_half_beam_mm": 57.751
+  },
+  {
+   "x_mm": 90.0,
+   "keel_below_dwl_mm": 6.395,
+   "sheer_above_dwl_mm": 33.738,
+   "dwl_half_beam_mm": 38.174,
+   "sheer_half_beam_mm": 58.19
+  },
+  {
+   "x_mm": 100.0,
+   "keel_below_dwl_mm": 6.936,
+   "sheer_above_dwl_mm": 34.248,
+   "dwl_half_beam_mm": 39.207,
+   "sheer_half_beam_mm": 58.19
+  },
+  {
+   "x_mm": 110.0,
+   "keel_below_dwl_mm": 7.417,
+   "sheer_above_dwl_mm": 34.914,
+   "dwl_half_beam_mm": 39.889,
+   "sheer_half_beam_mm": 58.19
+  },
+  {
+   "x_mm": 120.0,
+   "keel_below_dwl_mm": 7.876,
+   "sheer_above_dwl_mm": 35.384,
+   "dwl_half_beam_mm": 40.321,
+   "sheer_half_beam_mm": 57.719
+  },
+  {
+   "x_mm": 130.0,
+   "keel_below_dwl_mm": 8.111,
+   "sheer_above_dwl_mm": 35.854,
+   "dwl_half_beam_mm": 40.321,
+   "sheer_half_beam_mm": 57.249
+  },
+  {
+   "x_mm": 140.0,
+   "keel_below_dwl_mm": 8.4,
+   "sheer_above_dwl_mm": 36.324,
+   "dwl_half_beam_mm": 40.086,
+   "sheer_half_beam_mm": 56.309
+  },
+  {
+   "x_mm": 150.0,
+   "keel_below_dwl_mm": 8.346,
+   "sheer_above_dwl_mm": 36.795,
+   "dwl_half_beam_mm": 39.577,
+   "sheer_half_beam_mm": 44.671
+  },
+  {
+   "x_mm": 160.0,
+   "keel_below_dwl_mm": 8.346,
+   "sheer_above_dwl_mm": 37.265,
+   "dwl_half_beam_mm": 38.766,
+   "sheer_half_beam_mm": 53.958
+  },
+  {
+   "x_mm": 170.0,
+   "keel_below_dwl_mm": 8.111,
+   "sheer_above_dwl_mm": 37.735,
+   "dwl_half_beam_mm": 37.681,
+   "sheer_half_beam_mm": 52.312
+  },
+  {
+   "x_mm": 180.0,
+   "keel_below_dwl_mm": 7.965,
+   "sheer_above_dwl_mm": 38.158,
+   "dwl_half_beam_mm": 36.34,
+   "sheer_half_beam_mm": 50.431
+  },
+  {
+   "x_mm": 190.0,
+   "keel_below_dwl_mm": 7.665,
+   "sheer_above_dwl_mm": 38.44,
+   "dwl_half_beam_mm": 34.739,
+   "sheer_half_beam_mm": 48.182
+  },
+  {
+   "x_mm": 200.0,
+   "keel_below_dwl_mm": 7.406,
+   "sheer_above_dwl_mm": 38.911,
+   "dwl_half_beam_mm": 32.863,
+   "sheer_half_beam_mm": 45.768
+  },
+  {
+   "x_mm": 210.0,
+   "keel_below_dwl_mm": 7.171,
+   "sheer_above_dwl_mm": 39.381,
+   "dwl_half_beam_mm": 30.737,
+   "sheer_half_beam_mm": 43.119
+  },
+  {
+   "x_mm": 220.0,
+   "keel_below_dwl_mm": 6.701,
+   "sheer_above_dwl_mm": 39.851,
+   "dwl_half_beam_mm": 28.345,
+   "sheer_half_beam_mm": 40.086
+  },
+  {
+   "x_mm": 230.0,
+   "keel_below_dwl_mm": 6.445,
+   "sheer_above_dwl_mm": 40.321,
+   "dwl_half_beam_mm": 25.727,
+   "sheer_half_beam_mm": 36.881
+  },
+  {
+   "x_mm": 240.0,
+   "keel_below_dwl_mm": 5.995,
+   "sheer_above_dwl_mm": 40.792,
+   "dwl_half_beam_mm": 22.845,
+   "sheer_half_beam_mm": 33.386
+  },
+  {
+   "x_mm": 250.0,
+   "keel_below_dwl_mm": 5.503,
+   "sheer_above_dwl_mm": 41.027,
+   "dwl_half_beam_mm": 19.723,
+   "sheer_half_beam_mm": 29.585
+  },
+  {
+   "x_mm": 260.0,
+   "keel_below_dwl_mm": 4.82,
+   "sheer_above_dwl_mm": 41.497,
+   "dwl_half_beam_mm": 16.39,
+   "sheer_half_beam_mm": 25.525
+  },
+  {
+   "x_mm": 270.0,
+   "keel_below_dwl_mm": 4.026,
+   "sheer_above_dwl_mm": 41.967,
+   "dwl_half_beam_mm": 12.816,
+   "sheer_half_beam_mm": 21.23
+  },
+  {
+   "x_mm": 280.0,
+   "keel_below_dwl_mm": 2.746,
+   "sheer_above_dwl_mm": 42.429,
+   "dwl_half_beam_mm": 9.033,
+   "sheer_half_beam_mm": 16.701
+  },
+  {
+   "x_mm": 290.0,
+   "keel_below_dwl_mm": 0.747,
+   "sheer_above_dwl_mm": 42.672,
+   "dwl_half_beam_mm": 5.071,
+   "sheer_half_beam_mm": 11.936
+  },
+  {
+   "x_mm": 300.0,
+   "keel_below_dwl_mm": -19.41,
+   "sheer_above_dwl_mm": 11.168,
+   "dwl_half_beam_mm": 0.901,
+   "sheer_half_beam_mm": 6.818
+  }
+ ]
+}
