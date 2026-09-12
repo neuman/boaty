@@ -26,26 +26,38 @@ Drill the 10.2 mm stuffing-tube hole through the hull bottom at x = 52 mm at 8 d
 
 Fill the stern compartment (inside `hull_aft`) and the bow compartment (inside `hull_bow`) with closed-cell foam, around the stuffing tube and the pushrod tube. **Closed cell, not open**: open-cell foam is a sponge and becomes ballast. Then bond `stem_plate` into the bow and `deck_bow` onto hull_bow's sheer. Those compartments never open again, and they are what makes a swamped boat recoverable rather than gone.
 
-## 5. Join the three segments
+## 5. Heat-set the inserts, before anything is glued
+
+Ten M3 brass inserts: 4 in the hatch coaming at its widened zones, 4 in the motor cradle ribs, 2 in the servo shelf rib, 2 in the pad on the inside of the transom. Drill 4.2 mm, 6 mm deep, then push each insert in with a soldering iron at about 220 C, square, and let it cool before you load it.
+
+Do it now, while every one of these is reachable with a straight arm. After the segments are joined, two of them are not.
+
+## 6. Join the three segments
 
 Two joints, both landing on a printed bulkhead face. Drill 2 mm pin holes through each joint face, three per joint, and dry-fit with 1.75 mm filament pins before any glue. Then CA the joints to tack them and epoxy-fillet each seam on the inside, through the hatch.
 
-## 6. Fit out the equipment bay
+## 7. Fit out the equipment bay
 
-- **servo** at x 178 mm, y -50 mm, z 30 mm above the keel
+- **servo** at x 178 mm, y -50 mm, z 34 mm above the keel
 - **motor** at x 215 mm, y +0 mm, z 32 mm above the keel
 - **esc** at x 268 mm, y +48 mm, z 40 mm above the keel
 - **battery** at x 292 mm, y +0 mm, z 24 mm above the keel
 - **switch** at x 312 mm, y +46 mm, z 46 mm above the keel
 - **radio** at x 318 mm, y -40 mm, z 36 mm above the keel
 
-The battery is STRAPPED, not glued. It is 292 mm from the transom in the model and sliding it is how you trim the boat: the model floats -1.27 degrees and every 10 mm of battery movement is worth roughly 0.1 degrees.
+The battery is STRAPPED, not glued. It is 292 mm from the transom in the model and sliding it is how you trim the boat: the model floats -0.88 degrees and every 10 mm of battery movement is worth roughly 0.1 degrees.
 
-## 7. Hatch
+## 8. Rudder and steering
+
+Bolt the rudder bracket to the transom with 2 x M3 stainless, through the two 3.4 mm holes, into the inserts in the transom pad. **Bed each screw in neutral-cure RTV under a nylon washer** -- these are the only two fasteners on the boat that go through the shell, and although they are 9 mm above the waterline they are 9 mm above the waterline in flat calm. Measure the bracket you are actually sent first: its hole spacing is not published.
+
+Then feed the pushrod through its tube, clevis at each end, and set the servo to centre before you connect it.
+
+## 9. Hatch
 
 Lay the foam tape on the coaming's top face -- the coaming is printed into `hull_mid`'s deck rails and continues across both bulkhead tops -- and screw `hatch_cover` down onto it with four M3 self-tappers. Silicone-grease the tape every session. **Never glue the hatch shut**: it is the only way back into the boat.
 
-## 8. Before the first sail
+## 10. Before the first sail
 
 - Set the ESC to **Forward/Reverse**, not Forward/Brake/Reverse.
 - Set **throttle failsafe to neutral**. A lost link with the throttle open is how boats end up in the reeds.

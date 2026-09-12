@@ -2,7 +2,7 @@
 
 # Print list
 
-**6 parts, 516 g of filament, 21.3 h estimated.**
+**7 parts, 586 g of filament, 24.2 h estimated.**
 
 Material PETG, 0.4 mm nozzle, 0.24 mm layers, 4 perimeters, 15% infill, 60 mm/s, on a 220 x 220 x 250 mm bed.
 
@@ -12,18 +12,51 @@ PETG needs four perimeters to be watertight untreated, which is why the shell is
 
 | Part | Print bbox mm | Mass g | Time h | Orientation | Support |
 |---|---|---|---|---|---|
-| `hull_mid` | 88 x 187 x 188 | 191 | 7.9 | standing on a transverse face | none |
-| `hull_aft` | 81 x 186 x 150 | 177 | 7.3 | standing on a transverse face | none |
+| `hull_mid` | 88 x 187 x 188 | 238 | 9.8 | standing on a transverse face | none |
+| `hull_aft` | 81 x 186 x 150 | 184 | 7.6 | standing on a transverse face | none |
 | `hull_bow` | 86 x 137 x 121 | 83 | 3.4 | standing on a transverse face | none |
 | `hatch_cover` | 200 x 120 x 2 | 43 | 1.8 | flat on the bed, flipped | none |
 | `deck_bow` | 121 x 137 x 1 | 18 | 0.7 | flat on the bed | none |
+| `motor_clamp` | 40 x 56 x 20 | 16 | 0.6 | flat on the bed, flipped | none |
 | `stem_plate` | 69 x 39 x 2 | 5 | 0.2 | standing on a transverse face | none |
 
 Largest footprint 200 mm against 208 mm of usable bed once the brim is on.
 
 ## Plates
 
-These 6 parts bin into **4 beds** of 220 mm (tools/render.py, shelf-packed, 8 mm between parts). Three of them are the full 186 mm beam of the boat on one axis, and two of those cannot share a 220 mm bed with anything, which is what sets the floor.
+These 7 parts bin into **4 beds** of 220 mm (tools/render.py, shelf-packed, 8 mm between parts). Three of them are the full 186 mm beam of the boat on one axis, and two of those cannot share a 220 mm bed with anything, which is what sets the floor.
+
+
+## Fasteners — where every screw goes
+
+**M3 throughout, into brass heat-set inserts, never threaded into the plastic.** A thread cut in printed PETG strips after a few cycles and the hatch is opened every session. Stainless or nylon screws, not zinc-plated: zinc beside brass in fresh water is a rust streak within a season.
+
+| Interface | Screws | Into | Blind? |
+|---|---|---|---|
+| hatch cover | 4 x M3 x 12 | inserts in the coaming, which widens to 8.6 mm at each screw | yes |
+| motor clamp | 4 x M3 x 10 | inserts in the two cradle ribs | yes |
+| servo | 2 x M3 x 10 | inserts in the servo shelf rib | yes |
+| rudder bracket | 2 x M3 x 8 | inserts in a thickened pad on the INSIDE of the transom | **no — through the transom** |
+| battery | none — hook-and-loop strap between two printed chocks | | |
+| ESC, receiver | none — double-sided tape or hook-and-loop | | |
+
+10 inserts, 12 screws. Set the inserts with a soldering iron at about 220 C, square to the boss, and let them cool before loading. **Every boss is blind except the rudder bracket's two**, which is the whole point of the next section.
+
+
+## Hull penetrations — every hole through a pressure boundary
+
+The boat floats at **32.0 mm** of draft. A hole below that line is a leak path, so the layout puts everything it can above it. `boat.hull_penetrations` is the gate that keeps it that way -- it compares against the waterline the hydrostatics produce on the run, not a number typed beside it.
+
+| Penetration | Through | Height above keel | vs waterline | Sealed by |
+|---|---|---|---|---|
+| `stuffing_tube_hull` | hull shell | 10 mm | **-23 mm — BELOW** | brass tube epoxy-filleted on BOTH faces of the shell and packed one third to one half full of marine grease from the propeller end |
+| `stuffing_tube_bulkhead` | watertight bulkhead (aft) | 23 mm | **-9 mm — BELOW** | same tube, epoxy-filleted on both faces of the bulkhead |
+| `pushrod_tube_bulkhead` | watertight bulkhead (aft) | 50 mm | +17 mm | brass tube epoxy-filleted on both faces |
+| `pushrod_tube_transom` | hull shell (transom) | 50 mm | +17 mm | same tube, epoxy fillet outside and in, plus a smear of neutral-cure RTV round the pushrod at the outer end |
+| `rudder_bracket_screws` | hull shell (transom) | 41 mm | +9 mm | M3 stainless through a neutral-cure RTV bead under the head and a nylon washer, into heat-set inserts in a thickened pad on the inside face of the transom |
+| `switch_rod_deck` | deck | 82 mm | +50 mm | bushing bedded in neutral-cure RTV; the switch body stays inside and only the actuating rod passes through |
+
+No wire pierces a watertight bulkhead: the motor, ESC, battery, receiver and servo are all between the two bulkheads, so all four runs stay inside the equipment bay. That is a layout decision, not luck.
 
 
 ## Holes to drill after printing
@@ -34,5 +67,7 @@ Nothing below is printed as a hole: a printed hole in a thin wall is a support p
 - **Pushrod tube**, through `bulkhead_aft` and `transom_plate` at the same height, above the waterline. 3.2 mm.
 - **Limber holes**, 6 mm, through the foot of the centre girder inside `hull_mid`, every 40 mm, so bilge water can reach one place instead of two.
 - **Hatch screws**, 4 x 2.5 mm pilot through the lid into the coaming for M3 self-tappers.
+- **Insert bores**, 4.2 mm, 6 mm deep: 4 in the hatch coaming (at its widened zones), 4 in the motor cradle ribs, 2 in the servo shelf rib, 2 in the transom pad. Ten in total.
+- **Clearance holes**, 3.4 mm: 4 through the hatch cover, 4 through the motor clamp's feet, 2 through the rudder bracket, 2 through the transom for the rudder bracket.
 - **Joint pins**, 2 mm through each of the two hull-to-hull joint faces, for 1.75 mm filament shear pins. Three per joint. There are only two joints left: the bulkheads that used to be loose plates are now printed into the segments.
 - **Rudder bracket**, to the transom, to suit the bracket you get: its hole spacing is not published by the vendor. Measure first.

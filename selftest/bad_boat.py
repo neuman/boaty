@@ -150,3 +150,14 @@ def bed_overflow(ctx):
     be a boat somebody could have drawn.
     """
     return _with(ctx, hull_scale=2.2)
+
+
+def pushrod_low(ctx):
+    """boat.hull_penetrations -- the pushrod run dropped to 18 mm above the keel.
+
+    A straighter line from the servo horn to the tiller, and exactly the reason
+    somebody would do it. At 18 mm it is below the loaded waterline, so the guide tube
+    where it leaves the transom becomes a second hole under water. Nothing else about
+    the boat changes.
+    """
+    return _with(ctx, pushrod_z_mm=18.0)

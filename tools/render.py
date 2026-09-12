@@ -41,6 +41,19 @@ ROLE = {
     "shaft":     ("#c58b8b", "driveline"),
     "hatch":     ("#cfe0ee", "deck and hatch"),
     "component": ("#8f8f98", "bought part"),
+    # Bought hardware, split by what a reader is looking for. The driveline is the
+    # thing the owner could not find in the first renders, so it gets the one colour
+    # that is not a shade of everything else.
+    "hw_propeller": ("#b8742f", "driveline"),
+    "hw_prop_shaft": ("#b8742f", "driveline"),
+    "hw_shaft_inboard": ("#b8742f", "driveline"),
+    "hw_stuffing_tube": ("#b8742f", "driveline"),
+    "hw_coupler": ("#b8742f", "driveline"),
+    "hw_rudder": ("#8c6239", "rudder and linkage"),
+    "hw_pushrod": ("#8c6239", "rudder and linkage"),
+    "hw_wire": ("#4a4a52", "wiring"),
+    "hw_fast": ("#d9d2c5", "M3 screws and inserts"),
+    "hw_": ("#8f8f98", "bought part"),
 }
 DEFAULT = ("#b9b9c2", "other")
 
@@ -50,7 +63,9 @@ DEFAULT = ("#b9b9c2", "other")
 #: drew the motor and the battery straight through the deck they are supposed to
 #: be hidden by.
 _RANK = ("hull", "girder", "bulkhead", "transom", "stem", "shaft",
-         "component", "deck", "hatch")
+         "component", "hw_wire", "hw_stuffing", "hw_coupler", "hw_shaft",
+         "hw_prop", "hw_rudder", "hw_pushrod", "hw_fast", "hw_",
+         "motor_clamp", "deck", "hatch")
 
 
 def DRAW_RANK(name: str) -> int:
@@ -61,10 +76,12 @@ def DRAW_RANK(name: str) -> int:
 
 
 def role_of(name: str):
+    # Longest prefix wins, so "hw_propeller" is driveline and not the generic "hw_".
+    best = None
     for key, value in ROLE.items():
-        if name.startswith(key):
-            return value
-    return DEFAULT
+        if name.startswith(key) and (best is None or len(key) > len(best[0])):
+            best = (key, value)
+    return best[1] if best else DEFAULT
 
 
 def load(directory: str) -> dict[str, trimesh.Trimesh]:
@@ -273,14 +290,19 @@ def main() -> int:
         sys.exit("no STLs in build/")
 
     print("rendering:")
-    n_printed = len([k for k in asm if not k.startswith("component")])
+    n_printed = len([k for k in asm
+                     if not k.startswith("component") and not k.startswith("hw_")])
     n_bought = len(asm) - n_printed
+    # Stern quarter, low. The first version looked down from forward, which is a
+    # flattering angle for a hull and hides the entire reason this render exists: the
+    # owner could not find the propeller in it, because it was behind the transom.
     draw(asm, os.path.join(OUT, "assembly.png"),
-         "Assembly — 480 mm LOA",
-         subtitle=f"{len(asm)} bodies: {n_printed} printed, {n_bought} bought parts shown "
-                  f"in place. Hull scaled 1.6x from the traced profile so it floats the "
-                  f"payload.")
-    draw({k: v for k, v in asm.items() if not k.startswith("component")},
+         "Assembly — 480 mm LOA", elev=14, azim=-118,
+         subtitle=f"{len(asm)} bodies: {n_printed} printed, {n_bought} bought. Driveline, "
+                  f"rudder, wiring and every M3 screw are modelled, so cad.clash sees "
+                  f"them and so does the reader.")
+    draw({k: v for k, v in asm.items()
+          if not k.startswith("component") and not k.startswith("hw_")},
          os.path.join(OUT, "structure.png"),
          "Printed structure",
          subtitle=f"{n_printed} printed parts. The transom, both bulkheads, the centre "
@@ -288,13 +310,18 @@ def main() -> int:
                   f"segments -- a bulkhead with no bond line cannot leak at the bond "
                   f"line.")
     draw(explode(asm), os.path.join(OUT, "exploded.png"),
-         "Exploded", elev=22, azim=-62,
-         subtitle="Bought parts pushed furthest — they are what the hull hides.")
-    draw({k: v for k, v in asm.items() if k.startswith("hull")},
-         os.path.join(OUT, "hull.png"),
-         "Hull shell", elev=18, azim=-64,
-         subtitle="Three printed segments, each with its own cross-wall printed in. "
-                  "The section is the traced profile, unchanged in form.", legend=False)
+         "Exploded", elev=16, azim=-112,
+         subtitle="Bought parts pushed furthest — they are what the hull hides. "
+                  "Driveline aft, wiring and M3 fasteners in the bay.")
+    draw({k: v for k, v in asm.items()
+          if k.startswith("hull") or k.startswith("hw_prop") or k.startswith("hw_stuff")
+          or k.startswith("hw_rudder") or k.startswith("hw_shaft")
+          or k.startswith("hw_coupler")},
+         os.path.join(OUT, "driveline.png"),
+         "Hull and driveline", elev=8, azim=-96,
+         subtitle="Propeller aft of the transom on an 8 degree shaft, rudder in its "
+                  "wash. The stuffing tube is the only hole below the waterline.",
+         legend=True)
     if printset:
         laid, n_plates = plate(printset)
         draw(laid, os.path.join(OUT, "print-plate.png"),

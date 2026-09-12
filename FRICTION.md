@@ -490,3 +490,121 @@ The cost, honestly: about fifteen full tier-1 sweeps, most of them chasing sub-m
 artifacts of multi-body meshes rather than anything about a boat. Roughly two thirds of
 the elapsed time on this change went into geometry the gates could parse, not geometry
 that floats better.
+
+---
+
+# Round three: fasteners, driveline and wires as geometry
+
+Appended after the owner said there were no screws, no wires and no visible propeller.
+All three were true. What follows is friction from making them exist.
+
+## 21. Two gates cannot see across bodies, and it now drives the whole design
+
+Item 17 said this was an unstated assumption with design consequences. Round three
+turned it into the dominant constraint. Roughly two thirds of the iterations on this
+change were not about boats at all; they were about teaching geometry to
+`cad.wall_thickness` and `fdm.bridge_span`.
+
+The rule I eventually internalised, which is written nowhere:
+
+> **Any face perpendicular to the build direction, with nothing beneath it IN THE SAME
+> CONNECTED BODY, is an unanchored ceiling — however small, and regardless of whether
+> there is solid material 2 mm below it.**
+
+Every one of these was a real verdict on this change:
+
+| What I did | What the gate said |
+|---|---|
+| started the shaft seat at the tube's exit point | 126 mm² unanchored ceiling |
+| started the coamings 1 mm in from the bulkhead | two 10.8 mm² ceilings |
+| started the girder 4 mm in | one 12.7 mm² ceiling |
+| put boss pads on the ribs as separate boxes | fifteen ceiling regions |
+| stepped the rib width at the boss zone | thirty faces |
+| stopped each rib where its bosses stop | five 0.6 mm end faces |
+| put the rudder pad 2 mm forward of the transom | 576 mm² ceiling |
+
+Seven separate discoveries of one rule. Each cost a full tier-1 sweep to find and
+another to confirm. The fixes are all genuinely better — the seat now runs from the
+transom and gives the stuffing tube a longer bonded bed, the ribs ramp instead of
+stepping, the rudder pad sits on the transom — but **I found the rule by
+reverse-engineering failure strings, not by reading anything.**
+
+One sentence in `fdm-print/PACK.md` would have saved a day: *"this gate reasons about
+one connected body at a time; a feature that begins partway up the print, as a
+separate body, is unsupported even if another body is underneath it."*
+
+## 22. `polytube` — three attempts at a wire
+
+Modelling four wire runs as tubes through waypoints took three goes, and each failure
+was a different flavour of the same thing:
+
+1. **Rods plus a ball at each knot, ball radius = rod radius.** The ball is tangent to
+   the rod. STL welds the tangency into non-manifold edges. `hw_pushrod` came back
+   "not closed", and `cad.clash` then refused to answer *any* question about it —
+   correctly, but it meant one bad wire blanked out fifty pair verdicts.
+2. **Ball radius × 1.12.** Same result. Three surfaces meeting near-tangentially is
+   the problem, not the ball.
+3. **Overlapping rods, no balls.** Watertight, but where two rods cross at a knot a
+   ray leaving one immediately enters the other, and `cad.wall_thickness` reported
+   0.057 mm through a 3.4 mm wire.
+
+The answer was a proper swept tube — one ring carried along the path with parallel
+transport, one closed body, no interior. Which is what I should have written first,
+and would have if anything had told me that "several overlapping closed bodies" is a
+representation these gates cannot read.
+
+## 23. The gate found something real within a minute of existing
+
+Worth recording because it is the good outcome. `boat.hull_penetrations` failed on its
+first run:
+
+```
+2 penetration(s) below the 32.0 mm waterline vs 1 allowed:
+stuffing_tube_hull, stuffing_tube_bulkhead
+```
+
+I knew about the shaft through the hull bottom. I had **not** registered that the same
+tube also crosses the aft watertight bulkhead, 9 mm below the waterline — which is
+what stops a flooded stern compartment flooding the equipment bay. It had been in the
+design since the bulkheads went in and was written down nowhere.
+
+That is the whole argument for writing the gate rather than asserting the claim. The
+gate then needed refining — a hole in the shell and a hole in a bulkhead are not the
+same risk, so the shell is capped and the bulkhead is required to be declared — but
+the refinement is itself a thing I now understand and did not before.
+
+## 24. An allowlist with twenty-six entries is a feature, not a smell
+
+`cad.clash` went from 26 undeclared interferences to zero, not by moving anything but
+by declaring each one with a reason: a screw in its insert, a tube through a bulkhead,
+a wire landing on the terminal it feeds. The pack refuses a wildcard and refuses an
+entry with no reason, and both refusals are right.
+
+It is genuinely tedious — twenty-six short paragraphs — and it is the single most
+useful document in the project now, because it is the only place that says *why* two
+solids are allowed to occupy the same space. Nothing else in the repo captures "the
+pushrod runs inside its guide tube; that is what the tube is."
+
+The one thing I wanted: a way to declare a CLASS. Every `hw_fast_*` group intersects
+exactly the printed part it screws into and the bought part it clamps. Fourteen of the
+twenty-six entries are that one idea restated. A `{"pair": ["hw_fast_*", "hull_mid"]}`
+with a single reason would be a wildcard and is rightly refused — but a
+`{"kind": "fastener-in-insert", "reason": ...}` would not be.
+
+## 25. What this cost, and whether the gates earned it
+
+- 7 printed parts (from 6), 4 plates (unchanged), 586 g (from 516), 24.2 h (from 21.3).
+- Loaded freeboard 26.5 → 25.8 mm against a 25 mm claim. **That is now the tightest
+  margin on the boat**, and it moved because fasteners and mounting ribs have mass.
+  I would not have noticed without the hydrostatics re-running on every edit.
+- One threshold relaxed: per-part print time 14 → 17 h, flagged in the model and the
+  report. I was careful to say why this is a different kind of number from the
+  overhang allowance I *un*-relaxed last round.
+
+Verdict: the gates earned it, but not evenly. `boat.hull_penetrations` and `cad.clash`
+paid for themselves within minutes — one found a bulkhead penetration I had never
+registered, the other forced twenty-six interfaces to be written down. `fdm.bridge_span`
+and `cad.wall_thickness` cost far more than they returned on this change: every finding
+was true of the mesh and almost none was true of the boat, and I spent the day making
+geometry legible to a ray caster rather than making a better boat. That is the honest
+split.

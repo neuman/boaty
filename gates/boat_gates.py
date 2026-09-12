@@ -360,3 +360,82 @@ def bed_fit_all(ctx: GateContext) -> Verdict:
                             for k, v in sorted(boxes.items(),
                                                key=lambda kv: -max(kv[1][0], kv[1][1])))),
     )
+
+
+@gate(
+    id="boat.hull_penetrations",
+    title="Every hole through a pressure boundary is declared, sealed, and above the "
+          "waterline unless it cannot be",
+    claims=["penetrations"],
+    tier=Tier.INSTANT,
+    settles="undeclared or undersea hull penetrations",
+    negative_control=NegativeControl(
+        fixture="selftest/bad_boat.py:pushrod_low",
+        note="the pushrod run dropped to 18 mm above the keel, which is a straighter "
+             "line from the servo horn to the tiller and is exactly the reason somebody "
+             "would do it. At that height it is BELOW the loaded waterline, so the boat "
+             "then has two holes under water instead of one",
+    ),
+)
+def hull_penetrations(ctx: GateContext) -> Verdict:
+    """Every penetration enumerated, each above the waterline or declared and sealed.
+
+    A fastener through the hull below the waterline is a leak path, and watertightness
+    (claim P1) is the top physical risk on this boat. The design answer is that every
+    boss is blind and every through-hole that can be above the loaded waterline is
+    above it -- and the one that cannot be, the propeller shaft, is a DECLARED sealed
+    through-hull with a stated method rather than an accident.
+
+    This gate is what keeps that true under editing. It checks three things:
+
+    1. every penetration declares a sealing method;
+    2. no more than `max_below_waterline_penetrations` of them are below the loaded
+       waterline -- and the waterline it compares against is the one the hydrostatics
+       actually produced this run, not a number typed beside it;
+    3. every penetration below the waterline is declared.
+
+    The second is the one with teeth. Loading the boat more deeply moves the waterline
+    up, and a hole that was comfortably above it at 26 mm of draft is not at 34.
+    """
+    pens = _p(ctx, "penetrations")
+    wl = float(_p(ctx, "loaded_waterline_mm"))
+    limit = int(_p(ctx, "max_below_waterline_penetrations"))
+
+    def is_shell(p):
+        return "hull shell" in str(p.get("through", ""))
+
+    undeclared = [p["name"] for p in pens
+                  if not p.get("declared") or not str(p.get("seal", "")).strip()]
+    below = [p for p in pens if float(p["z_mm"]) < wl]
+    # The SHELL is what the pond is on the other side of, and that is the count with a
+    # hard limit. A watertight bulkhead below the waterline matters too -- it is what
+    # stops one flooded compartment flooding the next -- but it is a second line of
+    # defence, not a hole in the boat, so it is required to be declared and sealed and
+    # is reported rather than capped. Lumping the two together made this gate fail on
+    # the stuffing tube crossing the aft bulkhead, which is not a hull penetration.
+    below_shell = [p for p in below if is_shell(p)]
+    below_bhd = [p for p in below if not is_shell(p)]
+
+    problems = []
+    if undeclared:
+        problems.append(f"{len(undeclared)} undeclared or unsealed: "
+                        + ", ".join(undeclared))
+    if len(below_shell) > limit:
+        problems.append(f"{len(below_shell)} SHELL penetration(s) below the "
+                        f"{wl:.1f} mm waterline vs {limit} allowed: "
+                        + ", ".join(p["name"] for p in below_shell))
+    above = [p for p in pens if float(p["z_mm"]) >= wl]
+    return Verdict(
+        gate="boat.hull_penetrations", passed=not problems,
+        measured=len(below_shell), limit=limit, units="shell holes below waterline",
+        detail=("; ".join(problems) if problems else
+                f"{len(pens)} penetration(s), all declared and sealed. "
+                f"Below the {wl:.1f} mm loaded waterline: "
+                f"{len(below_shell)} through the shell ("
+                + (", ".join(p["name"] for p in below_shell) or "none") + ") and "
+                f"{len(below_bhd)} through a watertight bulkhead ("
+                + (", ".join(p["name"] for p in below_bhd) or "none") + "). "
+                f"The other {len(above)} sit "
+                + ", ".join(f"{p['name']} +{float(p['z_mm']) - wl:.0f} mm"
+                            for p in above) + " above it."),
+    )

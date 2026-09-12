@@ -2,7 +2,7 @@
 
 # Buy list
 
-**19 lines, 374.50 USD total, budget 400 USD.**
+**21 lines, 397.50 USD total, budget 400 USD.**
 
 Prices are USD and Amazon US unless the line says otherwise. Amazon refused every product-page fetch during sourcing, so **only the lines marked `price VERIFIED` have a price checked on a page that could be loaded** -- the rest are estimates and the total is +/-25%, not a quote. Every ASIN came from a live `amazon.com/dp/` URL; none is invented. The search string is given for every line because a stale ASIN is worse than useless and a search is not.
 
@@ -25,10 +25,12 @@ Prices are USD and Amazon US unless the line says otherwise. Amazon refused ever
 | `rtv` | Permatex 82180 Ultra Black RTV, neutral cure, sensor safe | 1 | 9.00 | ASIN `B0002UEN1U` | price VERIFIED $8.99 Summit Racing |
 | `epoxy` | Smooth-On XTC-3D brush-on epoxy coating, 6.4 oz | 1 | 28.00 | ASIN `B09MSPD3MK` | coverage verified at Smooth-On; price estimated |
 | `coating` | MG Chemicals 422B silicone conformal coating, 55 mL with brushes | 1 | 24.00 | ASIN `B008O9YIV6` | class |
-| `fasteners` | M3 stainless screws and washers, hook-and-loop battery strap | 1 | 11.00 | search: *M3 stainless machine screw assortment* | class |
+| `fasteners` | M3 A2 stainless pan-head screws 6/8/10 mm, washers, hook-and-loop battery strap | 1 | 12.00 | search: *M3 A2 stainless pan head screw assortment 304* | class |
+| `inserts` | M3 brass heat-set threaded inserts, 4.6 mm OD x 5.7 mm long | 1 | 9.00 | search: *M3 brass heat set threaded insert 4.6mm OD 5.7mm knurled* | class |
+| `wire` | Silicone-insulated wire, 16 AWG and 22 AWG, plus a servo extension lead | 1 | 13.00 | search: *silicone wire 16 AWG 22 AWG flexible RC wire kit* | class |
 | `filament` | PETG filament, 1.75 mm, 1 kg spool, light colour | 1 | 22.00 | search: *PETG 1.75mm 1kg* | class |
 
-**Total 374.50 USD.**
+**Total 397.50 USD.**
 
 ## Why these, and what lost
 
@@ -114,6 +116,18 @@ THIS is what makes an FDM hull watertight. The printed seam is not the seal; the
 
 Brush-on bottle, not aerosol. MASK the ESC heatsink pad, the BEC header and every connector you will unplug. Coating measurably impedes heat dissipation, which is why the ESC is oversized instead of the coating thinned. It buys splash protection, not submersion.
 
+### `fasteners` — M3 A2 stainless pan-head screws 6/8/10 mm, washers, hook-and-loop battery strap
+
+STAINLESS or nylon, never zinc-plated. Zinc plating in fresh water beside brass inserts is a rust streak within a season, and four of these come out every time you change the battery. Twelve are used: 4 for the hatch, 4 for the motor clamp, 2 for the servo, 2 for the rudder bracket.
+
+### `inserts` — M3 brass heat-set threaded inserts, 4.6 mm OD x 5.7 mm long
+
+NOT screws threaded straight into PETG: a thread cut in printed plastic strips after a few cycles, and the hatch is the one interface opened every session. THE OD IS A DESIGN INPUT -- every boss on this boat is 4.6 mm plus 2 mm of wall each side, which is why the hatch coaming is 9 mm wide and not 5. Buy a different insert and the bosses are wrong. Ten are used; buy 50. Set them with a soldering iron at about 220 C, square, and let them cool before loading.
+
+### `wire` — Silicone-insulated wire, 16 AWG and 22 AWG, plus a servo extension lead
+
+Silicone, not PVC: it stays flexible in the cold and survives being pushed around inside a hull. All four runs stay inside the equipment bay -- motor, ESC, battery, receiver and servo are all between the two bulkheads -- so NO wire pierces a watertight bulkhead and none of them is a hull penetration. That is a layout decision, not luck.
+
 ### `filament` — PETG filament, 1.75 mm, 1 kg spool, light colour
 
 One spool covers the whole boat (about 480 g) with enough left to reprint the part you will get wrong. LIGHT COLOUR, not black: a dark hull in direct sun exceeds 50 C on the surface.
@@ -132,4 +146,4 @@ One spool covers the whole boat (about 480 g) with enough left to reprint the pa
 | switch | 12 | 312 |
 | radio | 9 | 318 |
 
-Printed structure 516 g + components 591 g + 8% contingency = **1195 g all-up**, which floats at **30.1 mm draft** with **26.4 mm of freeboard** once the trim is taken into account.
+Printed structure 586 g + components 630 g + 8% contingency = **1313 g all-up**, which floats at **32.0 mm draft** with **25.8 mm of freeboard** once the trim is taken into account.

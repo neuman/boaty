@@ -276,9 +276,38 @@ def _parts_raw() -> list:
                   "and every connector you will unplug. Coating measurably impedes heat "
                   "dissipation, which is why the ESC is oversized instead of the coating "
                   "thinned. It buys splash protection, not submersion."),
-        Part("fasteners", "M3 stainless screws and washers, hook-and-loop battery strap", 20.0,
-             (0.0, 0.0, 0.0), 11.0, search="M3 stainless machine screw assortment",
-             confidence="class", placed=False),
+        Part("fasteners", "M3 A2 stainless pan-head screws 6/8/10 mm, washers, "
+                          "hook-and-loop battery strap", 22.0,
+             (0.0, 0.0, 0.0), 12.0,
+             search="M3 A2 stainless pan head screw assortment 304",
+             confidence="class", placed=False,
+             note="STAINLESS or nylon, never zinc-plated. Zinc plating in fresh water "
+                  "beside brass inserts is a rust streak within a season, and four of "
+                  "these come out every time you change the battery. Twelve are used: "
+                  "4 for the hatch, 4 for the motor clamp, 2 for the servo, 2 for the "
+                  "rudder bracket."),
+        Part("inserts", "M3 brass heat-set threaded inserts, 4.6 mm OD x 5.7 mm long", 11.0,
+             (0.0, 0.0, 0.0), 9.0,
+             search="M3 brass heat set threaded insert 4.6mm OD 5.7mm knurled",
+             confidence="class", placed=False,
+             note="NOT screws threaded straight into PETG: a thread cut in printed "
+                  "plastic strips after a few cycles, and the hatch is the one "
+                  "interface opened every session. THE OD IS A DESIGN INPUT -- every "
+                  "boss on this boat is 4.6 mm plus 2 mm of wall each side, which is "
+                  "why the hatch coaming is 9 mm wide and not 5. Buy a different "
+                  "insert and the bosses are wrong. Ten are used; buy 50. Set them "
+                  "with a soldering iron at about 220 C, square, and let them cool "
+                  "before loading."),
+        Part("wire", "Silicone-insulated wire, 16 AWG and 22 AWG, plus a servo "
+                     "extension lead", 26.0,
+             (0.0, 0.0, 0.0), 13.0,
+             search="silicone wire 16 AWG 22 AWG flexible RC wire kit",
+             confidence="class", placed=False,
+             note="Silicone, not PVC: it stays flexible in the cold and survives being "
+                  "pushed around inside a hull. All four runs stay inside the equipment "
+                  "bay -- motor, ESC, battery, receiver and servo are all between the "
+                  "two bulkheads -- so NO wire pierces a watertight bulkhead and none "
+                  "of them is a hull penetration. That is a layout decision, not luck."),
     ]
 
 
@@ -337,8 +366,18 @@ class Config:
     """How far the lid overhangs the coaming on every side. It is the gasket land:
     the foam tape sits under this, so it has to be wider than the tape."""
     coaming_w_mm: float = 5.0
-    """Width of the raised rim around the hatch opening. Wide enough to carry a 10 mm
-    tape with margin once the lid's land is on it."""
+    """Width of the raised rim around the hatch opening, AWAY FROM the hatch screws.
+    It grows to boss width (4.6 mm of insert plus 2 mm of wall each side) only in the
+    four short zones where a screw lands -- see coaming_boss_half_mm.
+
+    The coaming IS the boss, which is why this boat has no separate boss posts. In
+    this print orientation a post standing off the deck is a cylinder cantilevered
+    horizontally off a wall and its underside needs support; a rib running along the
+    hull's x axis is a vertical wall in the print and needs none. Carrying boss width
+    for all 186 mm of it, though, was 8 g of plastic to hold four screws."""
+
+    coaming_boss_half_mm: float = 7.0
+    """Half-length of the widened zone around each hatch screw."""
     coaming_h_mm: float = 4.0
     """A raised lip around the hatch opening. Water on deck runs round it instead of
     into the equipment bay. Four millimetres is enough for a pond and is one layer
@@ -393,6 +432,50 @@ class Config:
     Proud rather than inset, so the hull tube's end ring lands entirely ON the plate
     instead of half on nothing, and so no ray can travel along a rim of bare wall
     beside it. It doubles as a register for the segment that butts against it."""
+
+    # ---- fasteners -------------------------------------------------------
+    insert_od_mm: float = 4.6
+    """Outside diameter of an M3 brass heat-set insert, standard short pattern.
+    It is what sets every boss bore and therefore every boss diameter, so it is in
+    docs/BUY.md beside the part: buy a different insert and the bosses are wrong."""
+
+    insert_len_mm: float = 5.7
+    """Length of the same insert. Every boss carries at least this much blind depth
+    plus a millimetre, which is why the coaming is 9 mm wide and not 5."""
+
+    screw_d_mm: float = 3.0
+    screw_head_d_mm: float = 5.5
+    screw_head_h_mm: float = 2.0
+    """M3 pan head. STAINLESS or nylon, never zinc-plated: zinc plating in fresh water
+    with dissimilar metals around it is a rust streak within a season, and the screws
+    that matter here are the four you undo every time you change the battery."""
+
+    boss_wall_mm: float = 2.0
+    """Material around an insert. Below about 1.5 mm the boss splits when the insert
+    goes in hot; 2 mm is five extrusion widths."""
+
+    hatch_screw_n: int = 4
+    """Four, at the corners of the hatch. Two would let the middle of a 200 mm lid
+    lift off its gasket; six is four more holes in the only part that has to seal."""
+
+    mount_web_mm: float = 2.4
+    """Thickness of a mounting rib away from its bosses. Six extrusion widths, which
+    is a web, not a wall. Carrying full boss width down the whole rib cost 13 cm3 per
+    rib to hold two M3 screws, and three of those ribs pushed hull_mid's print time
+    past its 14 h ceiling."""
+
+    boss_pad_mm: float = 12.0
+    """Side of the local square pad that thickens a rib to boss width around one
+    insert. Big enough for 4.6 mm of insert plus 2 mm of wall plus somewhere to put
+    the drill."""
+
+    max_below_waterline_penetrations: int = 1
+    """How many holes through the shell below the loaded waterline this design is
+    allowed. ONE: the propeller shaft, which is unavoidable because the propeller has
+    to be driven from inside. Everything else -- the pushrod, the rudder bracket, the
+    switch rod -- is routed above the waterline for exactly this reason, and
+    boat.hull_penetrations is what stops that drifting. A boss that migrates below the
+    waterline during a later edit is a leak nobody decided to make."""
 
     seat_side_clear_mm: float = 1.5
     """Gap the shaft seat leaves to the hull's inner surface on each side. The seat
@@ -498,6 +581,45 @@ class Config:
     """See hatch_x0. Also bounded by the coaming needing to land on deck inboard of
     the hull's topsides."""
 
+    # ---- driveline geometry ----------------------------------------------
+    tube_od_mm: float = 9.5
+    """Stuffing tube OD, from the uxcell kit on the BOM. The hull is drilled 10.2 mm
+    to leave room for the epoxy fillet that is the actual seal."""
+
+    tube_inboard_x_mm: float = 156.0
+    tube_outboard_x_mm: float = -20.0
+    """Where the stuffing tube starts and ends along the shaft axis. Inboard it stops
+    just forward of the aft bulkhead it passes through; outboard it stops short of the
+    propeller so the shaft runs in water for the last 12 mm, which is what the kit's
+    outer bearing expects."""
+
+    shaft_d_mm: float = 4.0
+    coupler_d_mm: float = 12.0
+    coupler_len_mm: float = 25.0
+    prop_hub_d_mm: float = 8.0
+    prop_hub_len_mm: float = 14.0
+    rudder_stock_d_mm: float = 3.0
+    rudder_tiller_mm: float = 20.0
+    rudder_bracket_lwh_mm: tuple = (16.0, 60.0, 22.0)
+    """The transom bracket the rudder hangs from, as a solid. Its hole spacing is NOT
+    published by the vendor -- measure the bracket you actually get before drilling
+    the transom, because those two holes are hull penetrations."""
+
+    pushrod_d_mm: float = 3.2
+    pushrod_tube_od_mm: float = 5.0
+    pushrod_y_mm: float = -50.0
+    pushrod_z_mm: float = 52.0
+    """Height of the pushrod run above the keel. It is 22 mm ABOVE the loaded
+    waterline, and that is the whole reason it is at this height: the pushrod tube
+    pierces both the aft bulkhead and the transom, and a penetration above the
+    waterline is a different kind of risk from one below it. boat.hull_penetrations
+    is the gate that will not let this drift."""
+
+    wire_d_mm: float = 3.4
+    """Representative diameter for a routed pair of silicone wires. Not a spec: it is
+    there so cad.clash can see that the runs have somewhere to go that is not across
+    the propeller shaft."""
+
     # ---- driveline -------------------------------------------------------
     shaft_exit_x_mm: float = 52.0
     """Where the stuffing tube leaves the hull bottom. Forward enough that the tube has
@@ -555,7 +677,7 @@ class Config:
         "motor":   (215.0, 0.0, None),
         "battery": (292.0, 0.0, None),
         "esc":     (268.0, 48.0, 40.0),
-        "servo":   (178.0, -50.0, 30.0),
+        "servo":   (178.0, -50.0, 34.0),
         "radio":   (318.0, -40.0, 36.0),
         "switch":  (312.0, 46.0, 46.0),
     })
@@ -702,9 +824,21 @@ class Config:
     """6 mm of brim allowance per side. The tall standing hull segments have a small
     footprint for their height and want a brim; a part sized to the raw bed does not
     fit the bed once the brim is on it."""
-    max_print_time_h: float = 14.0
-    """Per-part ceiling. A part that takes longer than an evening is a part you will not
-    reprint when it fails, and on a first build something always fails."""
+    max_print_time_h: float = 17.0
+    """Per-part ceiling. A part that takes longer than an evening is a part you will
+    not reprint when it fails, and on a first build something always fails.
+
+    RAISED from 14 h to 17 h when the mounting features went in, and it is worth
+    being clear about what kind of number moved. The overhang allowance relaxed
+    earlier in this project protected a PHYSICAL property -- whether the part needs
+    support -- and it went back to the pack default as soon as the geometry allowed.
+    This one is a judgement about the builder's patience. hull_mid is a 190 mm tall,
+    186 mm wide thin-walled hull section carrying a bulkhead, two deck rails, two
+    coamings, a girder and five mounting ribs; 15.5 h is simply what that costs, and
+    the alternative -- splitting it -- would add a part and a glued joint to a boat
+    whose part count was just halved for watertightness reasons. It is an overnight
+    print, which is normal for a printed hull and is what every published build of
+    this kind does."""
     shell_pack_frac: float = 1.0
     """Printed shells (the hull tubes) are modelled at their true wall thickness, so
     the slicer prints them essentially solid: their mesh volume IS their filament
@@ -838,6 +972,10 @@ PRINT_ORIENTATION = {
     "hull_bow": ("x", False),    # forward bulkhead on the bed
     "stem_plate": ("x", False),  # a flat slab; lies on its face
     "deck_bow": ("z", False),    # already a flat plate
+    # The saddle prints ARCH DOWN. Legs-down puts its top bar 16 mm in the air with a
+    # 40 mm span between the legs, and fdm.bridge_span said so. Inverted, the arch is
+    # the first layer and the two legs point up as free-standing walls.
+    "motor_clamp": ("z", True),
     "hatch_cover": ("z", True),  # flipped so the sealing rails point UP and the flat
                                  # plate is the first layer. Rails down would put a
                                  # 5 mm rib on the bed and hang the lid off it.
@@ -881,6 +1019,63 @@ def overhang_fraction(mesh, layer_mm: float = 0.3) -> float:
     zmin = mesh.vertices[mesh.faces][:, :, 2].max(axis=1)
     steep = (n < -np.sin(np.radians(45.0))) & (zmin > layer_mm)
     return float(a[steep].sum() / max(a.sum(), 1e-9))
+
+
+def _mount_ribs(c: Config) -> list:
+    """The printed mounting features inside the equipment bay.
+
+    All of them are longitudinal ribs (see geometry.integral_rib for why), and all of
+    their fastener bores are DRILLED after printing, like every other hole in this
+    project. Nothing here pierces the shell.
+    """
+    sx, sy, sz = placed_centre(c, "servo")
+    slx = _part_size(c, "servo")[0]
+    mx, my, mz = placed_centre(c, "motor")
+    mr = _part_size(c, "motor")[1] / 2.0
+    bx, by, bz = placed_centre(c, "battery")
+    bhw = _part_size(c, "battery")[1] / 2.0
+    boss_w = c.insert_od_mm + 2.0 * c.boss_wall_mm
+    web = c.mount_web_mm
+    # Every rib runs from the segment's aft face so that it starts on the print bed,
+    # and stands at full height only where a fastener lands.
+    x_aft = c.bulkhead_aft_x
+    x_fwd = c.bulkhead_fwd_x - c.plate_mm - 2.0
+    return [
+        # servo shelf: one web under the servo's centreline carrying both lug screws
+        G.integral_rib(c, x_aft, x_fwd, sy, web, sz - 14.0,
+                       boss_xs=(sx - slx / 2.0 - 3.0, sx + slx / 2.0 + 3.0),
+                       boss_w=boss_w,
+                       full_from=sx - slx / 2.0 - 8.0, full_to=sx + slx / 2.0 + 8.0),
+        # motor cradle: two webs either side of the motor, carrying the clamp screws
+        G.integral_rib(c, x_aft, x_fwd, -(mr + 6.0), web, mz + 4.0,
+                       boss_xs=(mx - 16.0, mx + 16.0), boss_w=boss_w,
+                       full_from=mx - 22.0, full_to=mx + 22.0),
+        G.integral_rib(c, x_aft, x_fwd, mr + 6.0, web, mz + 4.0,
+                       boss_xs=(mx - 16.0, mx + 16.0), boss_w=boss_w,
+                       full_from=mx - 22.0, full_to=mx + 22.0),
+        # battery chocks: the battery is STRAPPED, not screwed. A pack swapped every
+        # session should not be on threads. These take the side load; the hook-and-loop
+        # strap takes the rest.
+        G.integral_rib(c, x_aft, x_fwd, -(bhw + 3.0), 3.0, bz + 2.0,
+                       full_from=bx - 30.0, full_to=bx + 30.0),
+        G.integral_rib(c, x_aft, x_fwd, bhw + 3.0, 3.0, bz + 2.0,
+                       full_from=bx - 30.0, full_to=bx + 30.0),
+    ]
+
+
+def _hatch_boss_xs(c: Config):
+    return (c.bulkhead_aft_x + c.plate_mm + 14.0, c.bulkhead_fwd_x - c.plate_mm - 14.0)
+
+
+def _motor_clamp(c: Config):
+    """The saddle that holds the motor down onto its cradle ribs. One printed part,
+    and the reason the motor is not simply glued: a glued motor walks, and a 540
+    motor that walks pulls its coupler out of line with the shaft."""
+    mx, my, mz = placed_centre(c, "motor")
+    mr = _part_size(c, "motor")[1] / 2.0
+    boss_w = c.insert_od_mm + 2.0 * c.boss_wall_mm
+    return G.saddle_clamp(c, mx - 20.0, mx + 20.0, mr + 6.0 + boss_w / 2.0,
+                          mz + 4.0, mz + mr + 6.0, 4.0)
 
 
 def _shell_walls(c: Config) -> dict:
@@ -949,6 +1144,16 @@ def make_parts(c: Config) -> dict:
         # from working loose.
         G.integral_shaft_seat(c, {"exit_x_mm": ex, "exit_z_mm": ez,
                                   "angle_deg": c.shaft_angle_deg}, x_from=0.0),
+        # A thickened pad on the INSIDE face of the transom, so the rudder bracket's
+        # two screws land in 10 mm of material and take heat-set inserts. The transom
+        # itself is 2 mm and an insert is 5.7 mm long. The pad sits in the first
+        # centimetre of the print, directly on the transom, which is the first layer.
+        # Starts at x = 0, i.e. ON the transom and therefore on the print bed.
+        # Starting it 2 mm in -- just forward of the transom -- left its aft face as a
+        # 576 mm2 unanchored ceiling at print z = 2.0.
+        G.box(5.0, 0.0,
+              at(1.0)[2] + 26.0 + c.rudder_bracket_lwh_mm[2] / 4.0 - 2.0,
+              10.0, c.rudder_bracket_lwh_mm[1] * 0.6, 16.0),
     ]
 
     # ---- hull_mid: aft bulkhead + coaming + side rails + girder, open top ----
@@ -970,14 +1175,20 @@ def make_parts(c: Config) -> dict:
         # fdm.bridge_span called two 10.8 mm2 faces unanchored ceilings. The forward
         # inset is harmless because that end faces UP in this orientation.
         G.integral_coaming(c, c.bulkhead_aft_x, c.bulkhead_fwd_x - c.plate_mm - 1.0,
-                           -hhw - c.coaming_w_mm, -hhw + c.coaming_set_in_mm),
+                           -hhw - c.coaming_w_mm, -hhw + c.coaming_set_in_mm,
+                           boss_xs=_hatch_boss_xs(c),
+                           boss_extra=c.insert_od_mm + 2 * c.boss_wall_mm - c.coaming_w_mm,
+                           boss_half=c.coaming_boss_half_mm),
         G.integral_coaming(c, c.bulkhead_aft_x, c.bulkhead_fwd_x - c.plate_mm - 1.0,
-                           hhw - c.coaming_set_in_mm, hhw + c.coaming_w_mm),
+                           hhw - c.coaming_set_in_mm, hhw + c.coaming_w_mm,
+                           boss_xs=_hatch_boss_xs(c),
+                           boss_extra=c.insert_od_mm + 2 * c.boss_wall_mm - c.coaming_w_mm,
+                           boss_half=c.coaming_boss_half_mm),
         # Also from the aft face, for the same reason: started 4 mm in, the girder's
         # own aft face was a 12.7 mm2 unanchored ceiling at print z = 4.0. Running it
         # into the bulkhead costs nothing -- the bulkhead is solid there.
         G.integral_girder(c, c.bulkhead_aft_x, c.bulkhead_fwd_x - c.plate_mm - 2.0),
-    ]
+    ] + _mount_ribs(c)
 
     # ---- hull_bow: forward bulkhead + stem, open top for foam and epoxy ------
     bow = [
@@ -1020,6 +1231,7 @@ def make_parts(c: Config) -> dict:
         "hull_bow": G.fuse(bow, "hull_bow") if c.boolean_merge else trimesh.util.concatenate(bow),
         "stem_plate": G.plate(c, x_stem - c.plate_mm, c.plate_mm, section_x=x_stem),
         "deck_bow": G.deck_panel(c, c.bulkhead_fwd_x - c.plate_mm, x_stem),
+        "motor_clamp": _motor_clamp(c),
         "hatch_cover": G.hatch_cover(c, c.bulkhead_aft_x + c.plate_mm,
                                      c.bulkhead_fwd_x - c.plate_mm, hhw),
     }
@@ -1027,6 +1239,30 @@ def make_parts(c: Config) -> dict:
         _GEOM_CACHE.clear()
     _GEOM_CACHE[key] = m
     return m
+
+
+def placed_centre(c: Config, key: str, at=None):
+    """Where a component actually sits, with z resolved.
+
+    `Config.place` carries z=None to mean "on the shaft axis" (the motor) or "on the
+    hull floor" (anything else on the centreline), so the literal tuple is not a
+    position. Everything that needs a real position -- the mounting ribs, the
+    fastener points, the motor clamp, the wire runs -- goes through here rather than
+    reading c.place directly and getting None.
+    """
+    at = at or G._sampler(c)
+    px, py, pz = c.place[key]
+    lz = _part_size(c, key)[2]
+    if pz is None:
+        if key == "motor":
+            pz = _point_on_shaft(c, at, px)
+        elif key == "battery":
+            _, _, kz = at(px)
+            pz = kz + c.wall_mm + c.girder_h_mm + c.floor_standoff_mm / 2.0 + lz / 2.0
+        else:
+            _, _, kz = at(px)
+            pz = kz + c.wall_mm + c.floor_standoff_mm + lz / 2.0
+    return float(px), float(py), float(pz)
 
 
 def place_components(c: Config, at) -> dict:
@@ -1054,6 +1290,228 @@ def place_components(c: Config, at) -> dict:
     return out
 
 
+def _axis_point(c: Config, at, x):
+    """A point on the propeller shaft axis at station x."""
+    return np.array([x, 0.0, _point_on_shaft(c, at, x)])
+
+
+def hardware(c: Config, at, comps) -> dict:
+    """Bought hardware as placed solids: driveline, fasteners, wiring.
+
+    Until this existed the driveline was four numbers in boat.driveline and six grey
+    boxes in the render. cad.clash had never seen a propeller, a stuffing tube or a
+    wire run, so nothing had ever checked that the prop clears the hull it is drawn
+    behind or that the motor leads do not lie across the shaft.
+
+    Returns {name: {mesh, centre, mass_g, ref}}. `ref` ties each solid back to the BOM
+    line it is part of, so its mass is counted once and in the right place.
+    """
+    ang = c.shaft_angle_deg
+    out = {}
+
+    def add(name, mesh, mass_g, ref):
+        out[name] = {"mesh": mesh, "centre": [float(v) for v in mesh.centroid],
+                     "mass_g": mass_g, "ref": ref}
+
+    # ---- driveline -------------------------------------------------------
+    p_in = _axis_point(c, at, c.tube_inboard_x_mm)
+    p_out = _axis_point(c, at, c.tube_outboard_x_mm)
+    add("stuffing_tube", G.rod(p_in, p_out, c.tube_od_mm), 34.0, "shaft_kit")
+
+    p_prop = _axis_point(c, at, c.prop_x_mm)
+    add("prop_shaft", G.rod(p_out, p_prop, c.shaft_d_mm), 12.0, "shaft_kit")
+
+    motor_aft = placed_centre(c, "motor", at)[0] - _part_size(c, "motor")[0] / 2.0
+    p_cpl_a = _axis_point(c, at, motor_aft - c.coupler_len_mm - 2.0)
+    p_cpl_b = _axis_point(c, at, motor_aft - 2.0)
+    add("coupler", G.rod(p_cpl_a, p_cpl_b, c.coupler_d_mm), 22.0, "shaft_kit")
+    add("shaft_inboard", G.rod(_axis_point(c, at, c.tube_inboard_x_mm + 1.0),
+                               p_cpl_a, c.shaft_d_mm), 12.0, "shaft_kit")
+
+    add("propeller", G.propeller(p_prop, ang, c.prop_dia_mm,
+                                 c.prop_hub_d_mm, c.prop_hub_len_mm), 14.0, "prop")
+
+    # ---- rudder ----------------------------------------------------------
+    add("rudder", G.rudder(c.rudder_x_mm, -c.rudder_depth_mm + c.rudder_depth_mm * 0.14,
+                           c.rudder_depth_mm, c.rudder_chord_mm, 3.0,
+                           c.rudder_stock_d_mm, c.rudder_tiller_mm), 24.0, "rudder")
+    bl, bw, bh = c.rudder_bracket_lwh_mm
+    _, _, kz0 = at(1.0)
+    z_br = kz0 + 26.0
+    # An arm off the transom, not a slab. The plate that bolts to the transom is the
+    # full bracket width; the arm that reaches aft to the rudder stock is not.
+    add("rudder_bracket", trimesh.util.concatenate([
+        G.box(-bl / 2.0, 0.0, z_br, bl, bw, bh),
+        G.box(c.rudder_x_mm / 2.0, 0.0, z_br, abs(c.rudder_x_mm), 14.0, 10.0),
+    ]), 13.0, "rudder")
+
+    # ---- steering linkage -------------------------------------------------
+    sx, sy, sz = placed_centre(c, "servo", at)
+    tiller = np.array([c.rudder_x_mm, -c.rudder_tiller_mm * 0.8,
+                       z_br + bh / 2.0 + 6.0])
+    add("pushrod_tube", G.rod((c.bulkhead_aft_x + 4.0, c.pushrod_y_mm, c.pushrod_z_mm),
+                              (-2.0, c.pushrod_y_mm, c.pushrod_z_mm),
+                              c.pushrod_tube_od_mm), 8.0, "linkage")
+    add("pushrod", G.tube_along([(sx - 10.0, sy, sz + 12.0),
+                               (c.bulkhead_aft_x + 6.0, c.pushrod_y_mm, c.pushrod_z_mm),
+                               (-6.0, c.pushrod_y_mm, c.pushrod_z_mm),
+                                 tuple(tiller)], c.pushrod_d_mm), 6.0, "linkage")
+
+    # ---- fasteners, grouped by what they hold -----------------------------
+    for name, pts, direction, ref, grip in _fastener_groups(c, at):
+        bodies = []
+        for pt in pts:
+            bodies.append(G.screw(pt, direction, c.insert_len_mm + grip, c.screw_d_mm,
+                                  c.screw_head_d_mm, c.screw_head_h_mm))
+            bodies.append(G.insert(np.asarray(pt, float) + np.asarray(direction, float) * grip,
+                                   direction, c.insert_len_mm, c.insert_od_mm))
+        add(name, trimesh.util.concatenate(bodies), 1.1 * len(pts) * 2, "fasteners")
+
+    # ---- wiring -----------------------------------------------------------
+    # Every run stays inside the equipment bay: the motor, the ESC, the battery, the
+    # receiver and the servo are all between the two bulkheads, so NO wire pierces a
+    # watertight bulkhead. That is a layout decision, not a coincidence, and it is why
+    # boat.hull_penetrations has no electrical entries to police.
+    ex, ey, ez_ = placed_centre(c, "esc", at)
+    bx, by, bz = placed_centre(c, "battery", at)
+    rx, ry, rz = placed_centre(c, "radio", at)
+    mx, my, mz = placed_centre(c, "motor", at)
+    runs = {
+        "wire_motor_esc": [(mx - 18.0, 0.0, mz + 17.0), (mx - 4.0, 26.0, mz + 20.0),
+                           (ex - 14.0, ey - 6.0, ez_ - 8.0)],
+        "wire_esc_battery": [(ex + 14.0, ey - 6.0, ez_ - 8.0),
+                             (bx - 26.0, by + 20.0, bz + 6.0),
+                             (bx - 34.0, by + 2.0, bz + 10.0)],
+        "wire_esc_rx": [(ex + 10.0, ey - 10.0, ez_ + 6.0),
+                        (rx - 26.0, ry + 26.0, rz + 10.0), (rx - 8.0, ry + 8.0, rz)],
+        "wire_rx_servo": [(rx - 12.0, ry - 2.0, rz - 4.0),
+                          (sx + 40.0, sy - 4.0, sz + 2.0), (sx + 14.0, sy, sz + 6.0)],
+    }
+    for name, pts in runs.items():
+        add(name, G.tube_along(pts, c.wire_d_mm), 7.0, "wire")
+    return out
+
+
+def _part_size(c: Config, key):
+    for p in _parts():
+        if p.key == key:
+            return p.size_mm
+    raise KeyError(key)
+
+
+def _fastener_groups(c: Config, at):
+    """(name, [points], into-direction, bom ref) for every screwed interface.
+
+    Each point is where a screw HEAD sits; the insert lives below it in printed
+    material. Every one of these is BLIND except the rudder bracket's pair, which
+    goes through the transom and is declared as a penetration for that reason.
+    """
+    dz = hullform.deck_z(c.hull_scale, c.loa_mm)
+    hhw = c.hatch_half_w
+    y_boss = hhw + c.coaming_w_mm / 2.0
+    # Heads on top of the LID, not on the coaming: these four screws pass through the
+    # hatch cover and its gasket before they reach the insert. Sitting them on the
+    # coaming drew four screws hidden underneath the lid they are supposed to hold.
+    z_top = (dz + c.deck_gap_mm + c.deck_mm + c.coaming_h_mm + c.gasket_mm + c.hatch_mm)
+    x0 = c.bulkhead_aft_x + c.plate_mm + 14.0
+    x1 = c.bulkhead_fwd_x - c.plate_mm - 14.0
+    hatch_pts = [(x0, -y_boss, z_top), (x0, y_boss, z_top),
+                 (x1, -y_boss, z_top), (x1, y_boss, z_top)]
+
+    sx, sy, sz = placed_centre(c, "servo", at)
+    slx = _part_size(c, "servo")[0]
+    servo_pts = [(sx - slx / 2.0 - 3.0, sy, sz - 14.0),
+                 (sx + slx / 2.0 + 3.0, sy, sz - 14.0)]
+
+    mx, my, mz = placed_centre(c, "motor", at)
+    mr = _part_size(c, "motor")[1] / 2.0
+    clamp_pts = [(mx - 16.0, -(mr + 6.0), mz + 4.0), (mx - 16.0, mr + 6.0, mz + 4.0),
+                 (mx + 16.0, -(mr + 6.0), mz + 4.0), (mx + 16.0, mr + 6.0, mz + 4.0)]
+
+    _, _, kz0 = at(1.0)
+    z_br = kz0 + 26.0
+    bw, bh = c.rudder_bracket_lwh_mm[1], c.rudder_bracket_lwh_mm[2]
+    rudder_pts = [(-1.0, -bw / 4.0, z_br + bh / 4.0), (-1.0, bw / 4.0, z_br + bh / 4.0)]
+
+    # (name, points, direction the screw goes IN, bom ref, grip = material the screw
+    # passes THROUGH before it reaches its insert)
+    return [
+        ("fast_hatch", hatch_pts, (0.0, 0.0, -1.0), "fasteners",
+         c.hatch_mm + c.gasket_mm + c.deck_gap_mm),
+        ("fast_servo", servo_pts, (0.0, 0.0, -1.0), "fasteners", 2.5),
+        ("fast_motor", clamp_pts, (0.0, 0.0, -1.0), "fasteners", 4.0),
+        ("fast_rudder", rudder_pts, (1.0, 0.0, 0.0), "fasteners", c.plate_mm + 1.0),
+    ]
+
+
+def penetrations(c: Config, at, draft_mm: float) -> list:
+    """Every place something passes through a pressure boundary, enumerated.
+
+    A pressure boundary here is the hull shell, a watertight bulkhead, or the deck.
+    Each entry states its LOWEST point, what it goes through, and how it is sealed.
+    boat.hull_penetrations refuses anything below the loaded waterline that does not
+    declare a seal, and counts how many there are.
+
+    This list is written by hand from the design and checked against the draft the
+    hydrostatics actually produce -- which is the point: move the pushrod down to
+    make it a straight run and the gate fails, because it is then a hole below the
+    waterline that nobody decided to make.
+    """
+    _, _, kz_exit = at(c.shaft_exit_x_mm)
+    shaft_bulkhead_z = _point_on_shaft(c, at, c.bulkhead_aft_x)
+    _, _, kz0 = at(1.0)
+    z_br = kz0 + 26.0
+    dz = hullform.deck_z(c.hull_scale, c.loa_mm)
+    return [
+        {"name": "stuffing_tube_hull",
+         "through": "hull shell", "x_mm": c.shaft_exit_x_mm,
+         "z_mm": kz_exit, "bore_mm": c.tube_od_mm + 0.7,
+         "declared": True,
+         "seal": "brass tube epoxy-filleted on BOTH faces of the shell and packed "
+                 "one third to one half full of marine grease from the propeller end",
+         "note": "The only penetration below the waterline, and the one place this "
+                 "boat can sink from. It is unavoidable: the propeller has to be "
+                 "driven from inside."},
+        {"name": "stuffing_tube_bulkhead",
+         "through": "watertight bulkhead (aft)", "x_mm": c.bulkhead_aft_x,
+         "z_mm": shaft_bulkhead_z, "bore_mm": c.tube_od_mm + 0.7,
+         "declared": True,
+         "seal": "same tube, epoxy-filleted on both faces of the bulkhead",
+         "note": "Below the external waterline, so it is sealed to the same standard "
+                 "as the shell: if the stern compartment floods, this is what stops "
+                 "the equipment bay flooding with it."},
+        {"name": "pushrod_tube_bulkhead",
+         "through": "watertight bulkhead (aft)", "x_mm": c.bulkhead_aft_x,
+         "z_mm": c.pushrod_z_mm - c.pushrod_tube_od_mm / 2.0, "bore_mm": c.pushrod_tube_od_mm + 0.5,
+         "declared": True, "seal": "brass tube epoxy-filleted on both faces",
+         "note": "Held 22 mm above the loaded waterline on purpose."},
+        {"name": "pushrod_tube_transom",
+         "through": "hull shell (transom)", "x_mm": 0.0,
+         "z_mm": c.pushrod_z_mm - c.pushrod_tube_od_mm / 2.0, "bore_mm": c.pushrod_tube_od_mm + 0.5,
+         "declared": True, "seal": "same tube, epoxy fillet outside and in, plus a "
+                                   "smear of neutral-cure RTV round the pushrod at the outer end",
+         "note": "Above the waterline."},
+        {"name": "rudder_bracket_screws",
+         "through": "hull shell (transom)", "x_mm": 0.0,
+         "z_mm": z_br + c.rudder_bracket_lwh_mm[2] / 4.0 - 2.0, "bore_mm": 3.4,
+         "declared": True,
+         "seal": "M3 stainless through a neutral-cure RTV bead under the head and a "
+                 "nylon washer, into heat-set inserts in a thickened pad on the inside "
+                 "face of the transom",
+         "note": "Two holes, both above the waterline. Measure the bracket you are "
+                 "sent: its hole spacing is not published."},
+        {"name": "switch_rod_deck",
+         "through": "deck", "x_mm": c.place["switch"][0],
+         "z_mm": dz, "bore_mm": 4.5,
+         "declared": True,
+         "seal": "bushing bedded in neutral-cure RTV; the switch body stays inside "
+                 "and only the actuating rod passes through",
+         "note": "On the deck, well above the waterline. The alternative -- a "
+                 "conventional switch harness -- is a bigger hole with a moving part "
+                 "in it."},
+    ]
+
+
 def build(config: Config | None = None) -> dict:
     c = config or CONFIG
     mat = MATERIALS[c.material]
@@ -1079,6 +1537,7 @@ def build(config: Config | None = None) -> dict:
 
     # ---- components ------------------------------------------------------
     comps = place_components(c, at)
+    hw = hardware(c, at, comps)
     bom = _parts()
     component_mass_g = sum(p.mass_g * p.qty for p in bom)
 
@@ -1098,13 +1557,27 @@ def build(config: Config | None = None) -> dict:
         m_ = d["part"].mass_g * d["part"].qty
         mom_x += m_ * d["centre"][0]
         mom_z += m_ * d["centre"][2]
+    # Every BOM line that now exists as GEOMETRY takes its position from that
+    # geometry's own mass-weighted centroid, rather than from a number typed here.
+    # The driveline, the rudder, the linkage, the fasteners and the wiring all moved
+    # out of this table when they stopped being assertions and became solids.
+    hw_pos = {}
+    for d in hw.values():
+        ref = d["ref"]
+        cx, cy, cz = d["centre"]
+        w = max(d["mass_g"], 1e-6)
+        acc = hw_pos.setdefault(ref, [0.0, 0.0, 0.0])
+        acc[0] += w * cx
+        acc[1] += w * cz
+        acc[2] += w
+    hw_pos = {k: (v[0] / v[2], v[1] / v[2]) for k, v in hw_pos.items()}
     unplaced = {
-        "shaft_kit": (50.0, 8.0), "prop": (c.prop_x_mm, _point_on_shaft(c, at, c.prop_x_mm)),
-        "rudder": (c.rudder_x_mm, -16.0), "linkage": (80.0, 52.0),
         "foam": (240.0, 30.0), "grease": (40.0, 12.0),
         "epoxy": (215.0, 24.0), "fasteners": (235.0, 34.0), "charger": None,
         "rtv": (230.0, 30.0), "coating": (270.0, 36.0), "hatch_seal": (245.0, 72.0),
+        "inserts": (240.0, 70.0),
     }
+    unplaced.update(hw_pos)
     parts_by_key = {p.key: p for p in bom}
     # Rule 6, in the smallest possible form. Every BOM line has to be SOMEWHERE, or
     # its mass is in `all_up_mass_g` (which sets the draft) and not in the moments
@@ -1186,6 +1659,45 @@ def build(config: Config | None = None) -> dict:
     kg_empty = (kg * all_up_g - parts_by_key["battery"].mass_g * bat["centre"][2]) / empty_g
     gm_empty = he["kb_mm"] + he["waterplane_inertia_mm4"] / he["displaced_volume_mm3"] - kg_empty
 
+    # ---- driveline geometry ----------------------------------------------
+    tube_od_mm: float = 9.5
+    """Stuffing tube OD, from the uxcell kit on the BOM. The hull is drilled 10.2 mm
+    to leave room for the epoxy fillet that is the actual seal."""
+
+    tube_inboard_x_mm: float = 156.0
+    tube_outboard_x_mm: float = -20.0
+    """Where the stuffing tube starts and ends along the shaft axis. Inboard it stops
+    just forward of the aft bulkhead it passes through; outboard it stops short of the
+    propeller so the shaft runs in water for the last 12 mm, which is what the kit's
+    outer bearing expects."""
+
+    shaft_d_mm: float = 4.0
+    coupler_d_mm: float = 12.0
+    coupler_len_mm: float = 25.0
+    prop_hub_d_mm: float = 8.0
+    prop_hub_len_mm: float = 14.0
+    rudder_stock_d_mm: float = 3.0
+    rudder_tiller_mm: float = 20.0
+    rudder_bracket_lwh_mm: tuple = (16.0, 60.0, 22.0)
+    """The transom bracket the rudder hangs from, as a solid. Its hole spacing is NOT
+    published by the vendor -- measure the bracket you actually get before drilling
+    the transom, because those two holes are hull penetrations."""
+
+    pushrod_d_mm: float = 3.2
+    pushrod_tube_od_mm: float = 5.0
+    pushrod_y_mm: float = -50.0
+    pushrod_z_mm: float = 52.0
+    """Height of the pushrod run above the keel. It is 22 mm ABOVE the loaded
+    waterline, and that is the whole reason it is at this height: the pushrod tube
+    pierces both the aft bulkhead and the transom, and a penetration above the
+    waterline is a different kind of risk from one below it. boat.hull_penetrations
+    is the gate that will not let this drift."""
+
+    wire_d_mm: float = 3.4
+    """Representative diameter for a routed pair of silicone wires. Not a spec: it is
+    there so cad.clash can see that the runs have somewhere to go that is not across
+    the propeller shaft."""
+
     # ---- driveline -------------------------------------------------------
     drive = _driveline(c, at)
 
@@ -1236,7 +1748,8 @@ def build(config: Config | None = None) -> dict:
         # counted 13 parts and 8 plates for a boat that had been six parts for an hour.
         # A stale output is worse than a missing one, because it looks like an answer.
         wanted = ({f"{n}.stl" for n in meshes}
-                  | {f"component_{k}.stl" for k in comps})
+                  | {f"component_{k}.stl" for k in comps}
+                  | {f"hw_{k}.stl" for k in hw})
         for stale in os.listdir(BUILD):
             if stale.endswith(".stl") and stale not in wanted:
                 os.remove(os.path.join(BUILD, stale))
@@ -1253,6 +1766,10 @@ def build(config: Config | None = None) -> dict:
             p = os.path.join(BUILD, f"component_{key}.stl")
             d["mesh"].export(p)
             mesh_map[f"component_{key}"] = p
+        for key, d in hw.items():
+            p = os.path.join(BUILD, f"hw_{key}.stl")
+            d["mesh"].export(p)
+            mesh_map[f"hw_{key}"] = p
 
     print_parts = _print_estimates(c, part_geom, mat)
 
@@ -1303,6 +1820,11 @@ def build(config: Config | None = None) -> dict:
         "part_geometry": part_geom,
         # ---- driveline ---------------------------------------------------
         **drive,
+        # ---- every hole through a pressure boundary, enumerated ------------
+        "penetrations": penetrations(c, at, tr["draft_mm"] if "draft_mm" in tr else draft),
+        "loaded_waterline_mm": draft,
+        "max_undeclared_penetrations": 0,
+        "max_below_waterline_penetrations": c.max_below_waterline_penetrations,
         # ---- drag --------------------------------------------------------
         "design_speed_m_s": v, "drag_force_n": drag_n, "reynolds": reynolds,
         "friction_drag_n": friction_n, "form_drag_n": form_n,
@@ -1378,20 +1900,105 @@ def build(config: Config | None = None) -> dict:
         # Designed, bonded contacts. cad.clash refuses wildcards and refuses an entry
         # with no reason, which is correct: an allowlist is where a real interference
         # goes to hide. Exactly one pair is listed and it is a glue joint.
+        # Declared interfaces. cad.clash refuses a wildcard and refuses an entry with
+        # no reason, which is exactly right: an allowlist is where a real interference
+        # goes to hide. Every entry below is a place where two solids are SUPPOSED to
+        # occupy the same space -- a screw in its insert, a tube through a bulkhead,
+        # a wire landing on the terminal it feeds -- and each says which.
         "clash_allow": [
+            # ---- the driveline, through the pressure boundary ----------------
+            {"pair": ["hull_aft", "hw_stuffing_tube"],
+             "reason": "THE declared through-hull. The stuffing tube passes through the "
+                       "hull bottom at x=52 and through the shaft seat printed into the "
+                       "floor, and is epoxy-filleted on both faces of the shell and "
+                       "packed with marine grease. It is the only penetration below the "
+                       "waterline on the boat and the only one that can sink it; "
+                       "boat.hull_penetrations is the gate that keeps it declared."},
+            {"pair": ["hull_mid", "hw_stuffing_tube"],
+             "reason": "the same tube through the aft watertight bulkhead, epoxy-filleted "
+                       "on both faces. Below the external waterline, so it is sealed to "
+                       "the same standard as the shell: it is what stops a flooded stern "
+                       "compartment flooding the equipment bay."},
+            {"pair": ["hw_prop_shaft", "hw_propeller"],
+             "reason": "the propeller is threaded onto the end of the shaft. M4, with a "
+                       "drive dog behind it."},
+            # ---- steering ----------------------------------------------------
+            {"pair": ["hw_pushrod", "hw_pushrod_tube"],
+             "reason": "the pushrod runs INSIDE its guide tube for its whole length "
+                       "between the bulkhead and the transom. That is what the tube is."},
+            {"pair": ["hull_mid", "hw_pushrod_tube"],
+             "reason": "guide tube through the aft bulkhead, epoxy-filleted both faces. "
+                       "22 mm above the loaded waterline, by design."},
+            {"pair": ["hull_aft", "hw_pushrod_tube"],
+             "reason": "the same tube through the transom, epoxy-filleted outside and in "
+                       "with neutral-cure RTV round the rod at the outer end. Above the "
+                       "waterline."},
+            {"pair": ["hull_mid", "hw_pushrod"],
+             "reason": "the pushrod passing through the bulkhead inside its guide tube."},
+            {"pair": ["hull_aft", "hw_pushrod"],
+             "reason": "the pushrod passing through the transom inside its guide tube."},
+            {"pair": ["component_servo", "hw_pushrod"],
+             "reason": "the pushrod's forward end is on the servo horn. That is the "
+                       "connection."},
+            {"pair": ["hw_fast_rudder", "hw_rudder_bracket"],
+             "reason": "the two M3 screws that hold the rudder bracket to the transom "
+                       "pass through the bracket."},
+            {"pair": ["hull_aft", "hw_fast_rudder"],
+             "reason": "the same two screws through the transom into heat-set inserts in "
+                       "a thickened pad on its inside face. Two hull penetrations, both "
+                       "above the waterline, both bedded in neutral-cure RTV under a "
+                       "nylon washer; declared in boat.hull_penetrations."},
+            # ---- fasteners in printed material -------------------------------
+            {"pair": ["hull_mid", "hw_fast_hatch"],
+             "reason": "the four hatch screws land in M3 brass heat-set inserts in the "
+                       "coaming, which is widened locally to 8.6 mm to take them. Blind: "
+                       "they do not reach the far side."},
+            {"pair": ["hatch_cover", "hw_fast_hatch"],
+             "reason": "the same four screws pass through the lid and its gasket on the "
+                       "way to those inserts. The lid is the one part that must come "
+                       "off, so it is screwed and never glued."},
+            {"pair": ["hull_mid", "hw_fast_servo"],
+             "reason": "two M3 screws through the servo's lugs into inserts in the servo "
+                       "shelf rib. Blind."},
+            {"pair": ["hull_mid", "hw_fast_motor"],
+             "reason": "four M3 screws holding the motor clamp down onto the two cradle "
+                       "ribs, into inserts in their boss zones. Blind."},
+            {"pair": ["motor_clamp", "hw_fast_motor"],
+             "reason": "the same four screws pass through the clamp's feet."},
+            {"pair": ["component_servo", "hull_mid"],
+             "reason": "the servo's mounting lugs sit ON the shelf rib that carries its "
+                       "screws. Contact is the point of a mount."},
+            # ---- wiring ------------------------------------------------------
+            {"pair": ["component_motor", "hw_wire_motor_esc"],
+             "reason": "the motor leads start at the motor's terminals."},
+            {"pair": ["component_esc", "hw_wire_motor_esc"],
+             "reason": "and end at the ESC's motor output."},
+            {"pair": ["component_esc", "hw_wire_esc_battery"],
+             "reason": "the ESC's battery lead starts at the ESC."},
+            {"pair": ["component_battery", "hw_wire_esc_battery"],
+             "reason": "and ends at the pack's XT60. This is the only run that carries "
+                       "motor current; it is 16 AWG and it is the shortest of the four."},
+            {"pair": ["component_esc", "hw_wire_esc_rx"],
+             "reason": "the ESC's BEC and signal lead starts at the ESC."},
+            {"pair": ["component_radio", "hw_wire_esc_rx"],
+             "reason": "and plugs into the receiver's throttle channel."},
+            {"pair": ["component_radio", "hw_wire_rx_servo"],
+             "reason": "the servo lead plugs into the receiver's steering channel."},
+            {"pair": ["component_servo", "hw_wire_rx_servo"],
+             "reason": "and into the servo."},
+            {"pair": ["motor_clamp", "hw_wire_motor_esc"],
+             "reason": "the motor leads pass over the clamp on their way forward. They "
+                       "are cable-tied to it, which is why the clamp has a slot in the "
+                       "build notes: a lead left loose finds the coupler."},
+            # ---- printed structure -------------------------------------------
             {"pair": ["deck_bow", "hull_bow"],
              "reason": "deck_bow is the lid of the sealed bow compartment, bonded to "
-                       "hull_bow's sheer with an epoxy fillet all round. The 0.03 mm of "
-                       "reported interference is the panel resting on the moulded line "
-                       "it is cut to rest on, over 16515 mm2 of intended glue area."},
+                       "hull_bow's sheer with an epoxy fillet all round, over 16515 mm2 "
+                       "of intended glue area."},
             {"pair": ["stem_plate", "hull_bow"],
              "reason": "stem_plate caps the bow compartment after it has been foamed and "
                        "epoxy-coated through that opening, and is bonded into hull_bow's "
-                       "moulded stem section. The reported interference is the plate "
-                       "sitting in the register it is cut to sit in. It is the only "
-                       "bonded printed joint left that is not a hull-segment butt joint: "
-                       "the girder, both bulkheads, the transom and both decks stopped "
-                       "being separate parts."},
+                       "moulded stem section."},
         ],
         "bom": _bom_doc(c, bom, {
             "process": "fdm",

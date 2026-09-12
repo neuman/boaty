@@ -110,6 +110,43 @@ def prints():
                f"of 220 mm (tools/render.py, shelf-packed, 8 mm between parts). Three of "
                f"them are the full 186 mm beam of the boat on one axis, and two of those "
                f"cannot share a 220 mm bed with anything, which is what sets the floor.\n\n")
+    out.append("\n## Fasteners — where every screw goes\n\n"
+               "**M3 throughout, into brass heat-set inserts, never threaded into the "
+               "plastic.** A thread cut in printed PETG strips after a few cycles and "
+               "the hatch is opened every session. Stainless or nylon screws, not "
+               "zinc-plated: zinc beside brass in fresh water is a rust streak within "
+               "a season.\n\n")
+    out.append("| Interface | Screws | Into | Blind? |\n|---|---|---|---|\n")
+    out.append("| hatch cover | 4 x M3 x 12 | inserts in the coaming, which widens to "
+               "8.6 mm at each screw | yes |\n")
+    out.append("| motor clamp | 4 x M3 x 10 | inserts in the two cradle ribs | yes |\n")
+    out.append("| servo | 2 x M3 x 10 | inserts in the servo shelf rib | yes |\n")
+    out.append("| rudder bracket | 2 x M3 x 8 | inserts in a thickened pad on the "
+               "INSIDE of the transom | **no — through the transom** |\n")
+    out.append("| battery | none — hook-and-loop strap between two printed chocks | | |\n")
+    out.append("| ESC, receiver | none — double-sided tape or hook-and-loop | | |\n")
+    out.append("\n10 inserts, 12 screws. Set the inserts with a soldering iron at "
+               "about 220 C, square to the boss, and let them cool before loading. "
+               "**Every boss is blind except the rudder bracket's two**, which is the "
+               "whole point of the next section.\n\n")
+
+    out.append("\n## Hull penetrations — every hole through a pressure boundary\n\n")
+    out.append(f"The boat floats at **{B['draft_mm']:.1f} mm** of draft. A hole below "
+               f"that line is a leak path, so the layout puts everything it can above "
+               f"it. `boat.hull_penetrations` is the gate that keeps it that way -- it "
+               f"compares against the waterline the hydrostatics produce on the run, "
+               f"not a number typed beside it.\n\n")
+    out.append("| Penetration | Through | Height above keel | vs waterline | Sealed by |\n")
+    out.append("|---|---|---|---|---|\n")
+    for pn in B["penetrations"]:
+        rel = float(pn["z_mm"]) - B["draft_mm"]
+        tag = f"**{rel:+.0f} mm — BELOW**" if rel < 0 else f"{rel:+.0f} mm"
+        out.append(f"| `{pn['name']}` | {pn['through']} | {float(pn['z_mm']):.0f} mm | "
+                   f"{tag} | {pn['seal']} |\n")
+    out.append("\nNo wire pierces a watertight bulkhead: the motor, ESC, battery, "
+               "receiver and servo are all between the two bulkheads, so all four runs "
+               "stay inside the equipment bay. That is a layout decision, not luck.\n\n")
+
     out.append("\n## Holes to drill after printing\n\n"
                "Nothing below is printed as a hole: a printed hole in a thin wall is a "
                "support problem and a drill is four seconds.\n\n")
@@ -124,6 +161,12 @@ def prints():
                "two.\n")
     out.append("- **Hatch screws**, 4 x 2.5 mm pilot through the lid into the coaming "
                "for M3 self-tappers.\n")
+    out.append("- **Insert bores**, 4.2 mm, 6 mm deep: 4 in the hatch coaming (at its "
+               "widened zones), 4 in the motor cradle ribs, 2 in the servo shelf rib, "
+               "2 in the transom pad. Ten in total.\n")
+    out.append("- **Clearance holes**, 3.4 mm: 4 through the hatch cover, 4 through the "
+               "motor clamp's feet, 2 through the rudder bracket, 2 through the "
+               "transom for the rudder bracket.\n")
     out.append("- **Joint pins**, 2 mm through each of the two hull-to-hull joint faces, "
                "for 1.75 mm filament shear pins. Three per joint. There are only two "
                "joints left: the bulkheads that used to be loose plates are now printed "
@@ -169,12 +212,20 @@ def build_order():
                "and becomes ballast. Then bond `stem_plate` into the bow and `deck_bow` "
                "onto hull_bow's sheer. Those compartments never open again, and they are "
                "what makes a swamped boat recoverable rather than gone.\n\n")
-    out.append("## 5. Join the three segments\n\n"
+    out.append("## 5. Heat-set the inserts, before anything is glued\n\n"
+               "Ten M3 brass inserts: 4 in the hatch coaming at its widened zones, 4 in "
+               "the motor cradle ribs, 2 in the servo shelf rib, 2 in the pad on the "
+               "inside of the transom. Drill 4.2 mm, 6 mm deep, then push each insert "
+               "in with a soldering iron at about 220 C, square, and let it cool before "
+               "you load it.\n\n"
+               "Do it now, while every one of these is reachable with a straight arm. "
+               "After the segments are joined, two of them are not.\n\n")
+    out.append("## 6. Join the three segments\n\n"
                "Two joints, both landing on a printed bulkhead face. Drill 2 mm pin holes "
                "through each joint face, three per joint, and dry-fit with 1.75 mm "
                "filament pins before any glue. Then CA the joints to tack them and "
                "epoxy-fillet each seam on the inside, through the hatch.\n\n")
-    out.append("## 6. Fit out the equipment bay\n\n")
+    out.append("## 7. Fit out the equipment bay\n\n")
     at = boat.G._sampler(boat.Config())
     comps = boat.place_components(boat.Config(), at)
     for k, d in sorted(comps.items(), key=lambda kv: kv[1]["centre"][0]):
@@ -184,13 +235,23 @@ def build_order():
                f"from the transom in the model and sliding it is how you trim the boat: "
                f"the model floats {B['trim_deg']:+.2f} degrees and every 10 mm of battery "
                f"movement is worth roughly 0.1 degrees.\n\n")
-    out.append("## 7. Hatch\n\n"
+    out.append("## 8. Rudder and steering\n\n"
+               "Bolt the rudder bracket to the transom with 2 x M3 stainless, through "
+               "the two 3.4 mm holes, into the inserts in the transom pad. **Bed each "
+               "screw in neutral-cure RTV under a nylon washer** -- these are the only "
+               "two fasteners on the boat that go through the shell, and although they "
+               "are 9 mm above the waterline they are 9 mm above the waterline in "
+               "flat calm. Measure the bracket you are actually sent first: its hole "
+               "spacing is not published.\n\n"
+               "Then feed the pushrod through its tube, clevis at each end, and set the "
+               "servo to centre before you connect it.\n\n")
+    out.append("## 9. Hatch\n\n"
                "Lay the foam tape on the coaming's top face -- the coaming is printed "
                "into `hull_mid`'s deck rails and continues across both bulkhead tops -- "
                "and screw `hatch_cover` down onto it with four M3 self-tappers. "
                "Silicone-grease the tape every session. **Never glue the hatch shut**: it "
                "is the only way back into the boat.\n\n")
-    out.append("## 8. Before the first sail\n\n"
+    out.append("## 10. Before the first sail\n\n"
                "- Set the ESC to **Forward/Reverse**, not Forward/Brake/Reverse.\n"
                "- Set **throttle failsafe to neutral**. A lost link with the throttle open "
                "is how boats end up in the reeds.\n"

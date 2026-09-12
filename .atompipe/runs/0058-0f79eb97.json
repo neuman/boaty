@@ -1,0 +1,917 @@
+{
+  "index": 58,
+  "meta": {
+    "duration_s": 1.8069,
+    "inputs_hash": "862ca0d1d6d9",
+    "model_hash": "835797377f95",
+    "spine_version": "0.1.0",
+    "tier": 1,
+    "when": "2026-09-12T20:18:18Z"
+  },
+  "verdicts": [
+    {
+      "claims": [
+        "drag",
+        "resistance"
+      ],
+      "detail": "drag 0.28 N at 0.80 m/s vs 3.00 N budget (Cd 0.21, A 0.0041 m2, rho 998); Re 3.8e5 turbulent on L 0.480 m, nu from nu; model-supplied Cd (its regime is the model's to defend)",
+      "duration_s": 6.1e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fluid.drag",
+      "limit": 3.0,
+      "locators": [],
+      "measured": 0.2751,
+      "pack": "fluids-analytic",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "N"
+    },
+    {
+      "claims": [
+        "pressure-drop",
+        "head-loss",
+        "pipe-flow"
+      ],
+      "detail": "",
+      "duration_s": 1.8e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fluid.pipe_pressure_drop",
+      "limit": null,
+      "locators": [],
+      "measured": null,
+      "pack": "fluids-analytic",
+      "passed": false,
+      "skip_reason": "model provides no bore: one of pipe_diameter_m, inner_diameter_m, bore_m, hydraulic_diameter_m, duct_diameter_m, pipe_id_m (m, INTERNAL diameter - nominal pipe size is not a bore)",
+      "skipped": true,
+      "tier": 0,
+      "units": ""
+    },
+    {
+      "claims": [
+        "flow-regime",
+        "drag",
+        "resistance",
+        "pressure-drop",
+        "head-loss",
+        "pipe-flow"
+      ],
+      "detail": "regimes valid: external Re 3.8e5 turbulent, no table class declared - the model owns its Cd's valid range | rho 998 kg/m3, nu 1.00e-06 m2/s",
+      "duration_s": 2e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fluid.flow_regime",
+      "limit": null,
+      "locators": [],
+      "measured": 384000.0,
+      "pack": "fluids-analytic",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "Re"
+    },
+    {
+      "claims": [
+        "buoyancy",
+        "flotation",
+        "displacement"
+      ],
+      "detail": "floats: 1.3 kg needs 0.0014 m3 of the 0.0038 m3 watertight volume at rho 998 kg/m3 -> volume fraction 0.351 vs 0.55 limit (0.0025 m3 reserve buoyancy); this is a VOLUME fraction, not a draft fraction - see fluid.freeboard for draft",
+      "duration_s": 2.1e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fluid.buoyancy",
+      "limit": 0.55,
+      "locators": [],
+      "measured": 0.3512,
+      "pack": "fluids-analytic",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "V_displaced/V_hull"
+    },
+    {
+      "claims": [
+        "freeboard",
+        "reserve-buoyancy"
+      ],
+      "detail": "freeboard 0.049 m = depth 0.082 - draft 0.033 at 1.3 kg, vs 0.025 m minimum [stated min_freeboard_m]",
+      "duration_s": 1.1e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fluid.freeboard",
+      "limit": 0.025,
+      "locators": [],
+      "measured": 0.0491,
+      "pack": "fluids-analytic",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "m"
+    },
+    {
+      "claims": [
+        "stability",
+        "metacentric-height"
+      ],
+      "detail": "GM 0.061 m = BM 0.078 - BG 0.018, vs 0.015 m [stated min_gm_m]; positive GM is necessary NOT sufficient - it is the slope at 0 deg only",
+      "duration_s": 1.5e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fluid.metacentric",
+      "limit": 0.015,
+      "locators": [],
+      "measured": 0.0609,
+      "pack": "fluids-analytic",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "m"
+    },
+    {
+      "claims": [
+        "righting-arm",
+        "stability-margin"
+      ],
+      "detail": "GZ 0.0085 m at 8.0 deg (GM 0.061, BM 0.078), righting moment 0 N.m vs demand 0 N.m; limit 0.0020 m [stated min_righting_arm_m]; small-angle void past 10 deg",
+      "duration_s": 2.5e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fluid.righting_arm",
+      "limit": 0.002,
+      "locators": [],
+      "measured": 0.0085,
+      "pack": "fluids-analytic",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "m"
+    },
+    {
+      "claims": [
+        "geometry",
+        "envelope",
+        "packaging",
+        "mechanical",
+        "cad"
+      ],
+      "detail": "",
+      "duration_s": 1.1e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "cad.bounding",
+      "limit": null,
+      "locators": [],
+      "measured": null,
+      "pack": "cad-solid",
+      "passed": false,
+      "skip_reason": "bbox_mm is absent — nothing to compare, so nothing is claimed",
+      "skipped": true,
+      "tier": 0,
+      "units": ""
+    },
+    {
+      "claims": [
+        "geometry",
+        "mesh",
+        "cad",
+        "manufacturability"
+      ],
+      "detail": "2 bad edge(s) across 30 part(s), limit 0 — worst hw_pushrod: 0 open, 2 non-manifold of 304 faces; 30 part(s) welded at 0.0001 mm on load (component_battery, component_esc, component_motor...) — a soup format has no vertex identity of its own",
+      "duration_s": 0.070573,
+      "error": "",
+      "evidence": [
+        "/home/neuman/Documents/work/boaty/.atompipe/out/cad-solid/watertight.json"
+      ],
+      "gate": "cad.watertight",
+      "limit": 0.0,
+      "locators": [
+        {
+          "kind": "part",
+          "label": "0 open, 2 non-manifold edge(s) of 304 faces",
+          "position": null,
+          "severity": "",
+          "target": "hw_pushrod",
+          "value": 2.0,
+          "view": "assembly"
+        }
+      ],
+      "measured": 2.0,
+      "pack": "cad-solid",
+      "passed": false,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 1,
+      "units": "edges"
+    },
+    {
+      "claims": [
+        "geometry",
+        "mesh",
+        "cad",
+        "manufacturability"
+      ],
+      "detail": "1 of 30 part(s) are not volumes, limit 0 — hw_pushrod: not closed; 30 part(s) welded at 0.0001 mm on load (component_battery, component_esc, component_motor...) — a soup format has no vertex identity of its own",
+      "duration_s": 0.059487,
+      "error": "",
+      "evidence": [
+        "/home/neuman/Documents/work/boaty/.atompipe/out/cad-solid/is_volume.json"
+      ],
+      "gate": "cad.is_volume",
+      "limit": 0.0,
+      "locators": [
+        {
+          "kind": "part",
+          "label": "not closed",
+          "position": null,
+          "severity": "",
+          "target": "hw_pushrod",
+          "value": 1888.4801012868083,
+          "view": "assembly"
+        }
+      ],
+      "measured": 1.0,
+      "pack": "cad-solid",
+      "passed": false,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 1,
+      "units": "parts"
+    },
+    {
+      "claims": [
+        "geometry",
+        "mesh",
+        "cad",
+        "manufacturability"
+      ],
+      "detail": "0 repair(s) needed across 30 part(s), limit 0 — worst component_battery: welded 0 vertex/vertices at 0.0001 mm, dropped 0 face(s) below 1e-08 mm^2 over 1 pass(es); 30 part(s) welded at 0.0001 mm on load (component_battery, component_esc, component_motor...) — a soup format has no vertex identity of its own",
+      "duration_s": 0.047129,
+      "error": "",
+      "evidence": [],
+      "gate": "cad.degenerate_faces",
+      "limit": 0.0,
+      "locators": [],
+      "measured": 0.0,
+      "pack": "cad-solid",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 1,
+      "units": "repairs"
+    },
+    {
+      "claims": [
+        "geometry",
+        "mesh",
+        "cad",
+        "manufacturability",
+        "wall"
+      ],
+      "detail": "",
+      "duration_s": 1.33583,
+      "error": "",
+      "evidence": [],
+      "gate": "cad.wall_thickness",
+      "limit": null,
+      "locators": [],
+      "measured": null,
+      "pack": "cad-solid",
+      "passed": false,
+      "skip_reason": "part 'hw_pushrod' is not watertight, so a ray cast from inside it can escape and thickness is undefined — settle cad.watertight first",
+      "skipped": true,
+      "tier": 1,
+      "units": ""
+    },
+    {
+      "claims": [
+        "geometry",
+        "fit",
+        "assembly",
+        "interference",
+        "mechanical",
+        "cad"
+      ],
+      "detail": "51 interfering pair(s) of 435 — worst reported unmeasurable mm^3 on component_battery/hw_pushrod vs 0.2 mm^3 / 0.01 mm tolerance: hw_pushrod is not a volume; the boolean's answer about this pair is meaningless",
+      "duration_s": 0.284401,
+      "error": "",
+      "evidence": [
+        "/home/neuman/Documents/work/boaty/.atompipe/out/cad-solid/clash_pairs.json"
+      ],
+      "gate": "cad.clash",
+      "limit": 0.0,
+      "locators": [
+        {
+          "kind": "part",
+          "label": "interference unmeasurable against hw_pushrod — hw_pushrod is not a volume; the boolean's answer about this ",
+          "position": null,
+          "severity": "",
+          "target": "component_battery",
+          "value": null,
+          "view": "assembly"
+        },
+        {
+          "kind": "part",
+          "label": "interference unmeasurable against component_battery — hw_pushrod is not a volume; the boolean's answer about this ",
+          "position": null,
+          "severity": "",
+          "target": "hw_pushrod",
+          "value": null,
+          "view": "assembly"
+        },
+        {
+          "kind": "part",
+          "label": "interference unmeasurable against hw_pushrod — hw_pushrod is not a volume; the boolean's answer about this ",
+          "position": null,
+          "severity": "",
+          "target": "component_esc",
+          "value": null,
+          "view": "assembly"
+        },
+        {
+          "kind": "part",
+          "label": "interference unmeasurable against component_esc — hw_pushrod is not a volume; the boolean's answer about this ",
+          "position": null,
+          "severity": "",
+          "target": "hw_pushrod",
+          "value": null,
+          "view": "assembly"
+        },
+        {
+          "kind": "part",
+          "label": "interference unmeasurable against hw_pushrod — hw_pushrod is not a volume; the boolean's answer about this ",
+          "position": null,
+          "severity": "",
+          "target": "component_motor",
+          "value": null,
+          "view": "assembly"
+        },
+        {
+          "kind": "part",
+          "label": "interference unmeasurable against component_motor — hw_pushrod is not a volume; the boolean's answer about this ",
+          "position": null,
+          "severity": "",
+          "target": "hw_pushrod",
+          "value": null,
+          "view": "assembly"
+        },
+        {
+          "kind": "part",
+          "label": "interference unmeasurable against hw_pushrod — hw_pushrod is not a volume; the boolean's answer about this ",
+          "position": null,
+          "severity": "",
+          "target": "component_radio",
+          "value": null,
+          "view": "assembly"
+        },
+        {
+          "kind": "part",
+          "label": "interference unmeasurable against component_radio — hw_pushrod is not a volume; the boolean's answer about this ",
+          "position": null,
+          "severity": "",
+          "target": "hw_pushrod",
+          "value": null,
+          "view": "assembly"
+        },
+        {
+          "kind": "part",
+          "label": "interference unmeasurable against hw_pushrod — hw_pushrod is not a volume; the boolean's answer about this ",
+          "position": null,
+          "severity": "",
+          "target": "component_servo",
+          "value": null,
+          "view": "assembly"
+        },
+        {
+          "kind": "part",
+          "label": "interference unmeasurable against component_servo — hw_pushrod is not a volume; the boolean's answer about this ",
+          "position": null,
+          "severity": "",
+          "target": "hw_pushrod",
+          "value": null,
+          "view": "assembly"
+        },
+        {
+          "kind": "part",
+          "label": "interference unmeasurable against hw_pushrod — hw_pushrod is not a volume; the boolean's answer about this ",
+          "position": null,
+          "severity": "",
+          "target": "component_switch",
+          "value": null,
+          "view": "assembly"
+        },
+        {
+          "kind": "part",
+          "label": "interference unmeasurable against component_switch — hw_pushrod is not a volume; the boolean's answer about this ",
+          "position": null,
+          "severity": "",
+          "target": "hw_pushrod",
+          "value": null,
+          "view": "assembly"
+        }
+      ],
+      "measured": 51.0,
+      "pack": "cad-solid",
+      "passed": false,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 1,
+      "units": "pairs"
+    },
+    {
+      "claims": [
+        "manufacturability",
+        "fdm",
+        "additive",
+        "printability"
+      ],
+      "detail": "worst supportable face 0.0 deg vs 45 deg limit; 0 faces past it covering 0.0 mm^2 = 0.00% of surface (allowance 0.50%); steepest downward face on the part 90.0 deg, 2 at or past 80 deg excluded as ceilings — they are fdm.bridge_span's",
+      "duration_s": 0.002266,
+      "error": "",
+      "evidence": [
+        "/home/neuman/Documents/work/boaty/.atompipe/out/fdm-overhang.txt"
+      ],
+      "gate": "fdm.overhang",
+      "limit": 0.005,
+      "locators": [],
+      "measured": 0.0,
+      "pack": "fdm-print",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 1,
+      "units": "area fraction"
+    },
+    {
+      "claims": [
+        "manufacturability",
+        "fdm",
+        "additive",
+        "printability"
+      ],
+      "detail": "worst unsupported span 40.0 mm vs 30 mm limit (BRIDGE, 4 anchored edge(s) around it) on a 1924 mm^2 ceiling at 15.8 mm; 1 ceiling region(s) from 2 faces, bridges judged at 30 mm and cantilevers at 2 mm",
+      "duration_s": 0.002072,
+      "error": "",
+      "evidence": [
+        "/home/neuman/Documents/work/boaty/.atompipe/out/fdm-bridge-span.txt"
+      ],
+      "gate": "fdm.bridge_span",
+      "limit": 30.0,
+      "locators": [],
+      "measured": 40.0,
+      "pack": "fdm-print",
+      "passed": false,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 1,
+      "units": "mm"
+    },
+    {
+      "claims": [
+        "manufacturability",
+        "fdm",
+        "additive",
+        "printability"
+      ],
+      "detail": "40x56x20 mm vs 208x208 usable (220x220 bed - 2x6.0 brim) x 250 Z; as modelled, worst util 0.27 in XY",
+      "duration_s": 4.1e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fdm.bed_fit",
+      "limit": 1.0,
+      "locators": [],
+      "measured": 0.27,
+      "pack": "fdm-print",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "utilisation"
+    },
+    {
+      "claims": [
+        "manufacturability",
+        "fdm",
+        "additive",
+        "printability"
+      ],
+      "detail": "thinnest section 1.40 mm = 3.0 beads vs 1.38 mm minimum (3 x 0.46 mm line width)",
+      "duration_s": 1.4e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fdm.min_wall",
+      "limit": 1.38,
+      "locators": [],
+      "measured": 1.4,
+      "pack": "fdm-print",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "mm"
+    },
+    {
+      "claims": [
+        "manufacturability",
+        "fdm",
+        "additive",
+        "structural",
+        "printability"
+      ],
+      "detail": "load at 0 deg to the layer plane (build axis from the model): stress utilisation 0.12 (utilisation) / knockdown 1.00 = 0.12 vs 1.00 (layer-normal strength 0.55x in-plane)",
+      "duration_s": 5.9e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fdm.layer_alignment",
+      "limit": 1.0,
+      "locators": [],
+      "measured": 0.12,
+      "pack": "fdm-print",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "derated utilisation"
+    },
+    {
+      "claims": [
+        "manufacturability",
+        "fdm",
+        "additive",
+        "cost",
+        "printability"
+      ],
+      "detail": "ESTIMATE ~1.3 h of 14 h, ~18 g of 1000 g (14.0 cm^3 at 15% infill, 4x0.46 mm shell on 11185 mm^2) — 0.24 mm layers at 60 mm/s x 0.55 duty; time is the binding one at 0.09 of its ceiling. Not a slice.",
+      "duration_s": 4.9e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fdm.print_time_est",
+      "limit": 1.0,
+      "locators": [],
+      "measured": 0.092,
+      "pack": "fdm-print",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "of limit"
+    },
+    {
+      "claims": [
+        "manufacturability",
+        "fdm",
+        "additive",
+        "printability",
+        "structural",
+        "process-validity"
+      ],
+      "detail": "process model applies — extent 56 mm reads as millimetres; volume fills 0.32 of the bbox; layer/nozzle 0.60 inside 0.1-0.75; width/nozzle 1.15 inside 0.8-2.0; thinnest section 3.5 beads wide",
+      "duration_s": 4.5e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "fdm.process_model_valid",
+      "limit": 0.0,
+      "locators": [],
+      "measured": 0.0,
+      "pack": "fdm-print",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "problems"
+    },
+    {
+      "claims": [
+        "sourcing",
+        "procurement",
+        "bom",
+        "cost",
+        "availability",
+        "supply-chain"
+      ],
+      "detail": "0 of 21 lines not orderable (limit 0) — every line has a part number, a quantity and a usable price",
+      "duration_s": 0.000278,
+      "error": "",
+      "evidence": [
+        "/home/neuman/Documents/work/boaty/.atompipe/out/bom_complete.json"
+      ],
+      "gate": "bom.complete",
+      "limit": 0.0,
+      "locators": [],
+      "measured": 0.0,
+      "pack": "sourcing",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "lines"
+    },
+    {
+      "claims": [
+        "cost",
+        "build-cost",
+        "budget",
+        "unit-cost"
+      ],
+      "detail": "397.50 USD/unit at qty 1 vs 400.00 USD budget; parts 397.50 USD + minimums 0.00 USD + one-time 0.00 USD (0.00 USD/unit amortised) = 397.50 USD run",
+      "duration_s": 0.00046,
+      "error": "",
+      "evidence": [
+        "/home/neuman/Documents/work/boaty/.atompipe/out/bom_cost.json"
+      ],
+      "gate": "bom.cost",
+      "limit": 400.0,
+      "locators": [],
+      "measured": 397.5,
+      "pack": "sourcing",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "USD/unit"
+    },
+    {
+      "claims": [
+        "availability",
+        "lead-time",
+        "ship-date",
+        "stock"
+      ],
+      "detail": "longest lead 0 wk (motor); vs 3 wk budget; 0 unknown, 0 EOL, 0 flagged",
+      "duration_s": 0.000508,
+      "error": "",
+      "evidence": [
+        "/home/neuman/Documents/work/boaty/.atompipe/out/bom_availability.json"
+      ],
+      "gate": "bom.availability",
+      "limit": 3.0,
+      "locators": [],
+      "measured": 0.0,
+      "pack": "sourcing",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "weeks"
+    },
+    {
+      "claims": [
+        "moq",
+        "minimum-order",
+        "overbuy",
+        "inventory"
+      ],
+      "detail": "idle capital 0.00 USD vs 39.75 USD (10% of the 397.50 parts spend); no line buys more than the build consumes; 0 line(s) past 3x",
+      "duration_s": 0.000461,
+      "error": "",
+      "evidence": [
+        "/home/neuman/Documents/work/boaty/.atompipe/out/bom_moq.json"
+      ],
+      "gate": "bom.moq",
+      "limit": 39.75,
+      "locators": [],
+      "measured": 0.0,
+      "pack": "sourcing",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "USD"
+    },
+    {
+      "claims": [
+        "process-rules",
+        "vendor-capability",
+        "manufacturability",
+        "dfm"
+      ],
+      "detail": "0 violation(s) of 3 project-supplied rule(s) (limit 0) — design is inside every stated capability",
+      "duration_s": 0.000229,
+      "error": "",
+      "evidence": [
+        "/home/neuman/Documents/work/boaty/.atompipe/out/bom_process_rules.json"
+      ],
+      "gate": "bom.process_rules",
+      "limit": 0.0,
+      "locators": [],
+      "measured": 0.0,
+      "pack": "sourcing",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "violations"
+    },
+    {
+      "claims": [
+        "single-source",
+        "supply-risk",
+        "second-source",
+        "supply-chain-risk"
+      ],
+      "detail": "0 unrecorded single-source line(s) vs limit 0 (13 behind one source in total, 0 with a qualified alternate, 13 accepted in writing)",
+      "duration_s": 0.000319,
+      "error": "",
+      "evidence": [
+        "/home/neuman/Documents/work/boaty/.atompipe/out/bom_single_source.json"
+      ],
+      "gate": "bom.single_source",
+      "limit": 0.0,
+      "locators": [],
+      "measured": 0.0,
+      "pack": "sourcing",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "lines"
+    },
+    {
+      "claims": [
+        "currency",
+        "fx",
+        "price-currency",
+        "cost"
+      ],
+      "detail": "0 of 21 line(s) priced in a currency this document cannot convert (limit 0) — base USD (the document's 'currency'), every line quoted in the base currency",
+      "duration_s": 0.00018,
+      "error": "",
+      "evidence": [
+        "/home/neuman/Documents/work/boaty/.atompipe/out/bom_currency.json"
+      ],
+      "gate": "bom.currency",
+      "limit": 0.0,
+      "locators": [],
+      "measured": 0.0,
+      "pack": "sourcing",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "lines"
+    },
+    {
+      "claims": [
+        "trim",
+        "longitudinal-stability"
+      ],
+      "detail": "trim -0.83 deg (-6.9 mm bow-to-stern) vs 1.50 limit; freeboard 25.5 mm after trim vs 25 mm required (level flotation would have reported 28.4 mm, so trim costs 3.0 mm); LCG 201.4 vs LCB 210.8 mm",
+      "duration_s": 3.8e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "boat.trim",
+      "limit": 1.5,
+      "locators": [],
+      "measured": 0.826,
+      "pack": "",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "deg"
+    },
+    {
+      "claims": [
+        "free-surface"
+      ],
+      "detail": "GM 60.9 mm solid, minus 3.6 mm of free surface = 57.3 mm vs 10 mm; the girder divides the bilge into 53 mm cells -- undivided the correction would be 14.2 mm",
+      "duration_s": 2.1e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "boat.free_surface",
+      "limit": 10.0,
+      "locators": [],
+      "measured": 57.3,
+      "pack": "",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "mm"
+    },
+    {
+      "claims": [
+        "swamped",
+        "reserve-buoyancy-sealed"
+      ],
+      "detail": "sealed compartments support 1827 g against an all-up 1348 g -> +479 g margin with the equipment bay full. Foam-filled, so the reserve fails gracefully rather than closed-loop",
+      "duration_s": 1.7e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "boat.swamped",
+      "limit": 0.0,
+      "locators": [],
+      "measured": 479.1,
+      "pack": "",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "g"
+    },
+    {
+      "claims": [
+        "loading-cases"
+      ],
+      "detail": "empty GM 61.6 mm (KG 38.8 mm vs 37.7 loaded) at 31.0 mm draft, vs 10 mm",
+      "duration_s": 1.9e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "boat.empty",
+      "limit": 10.0,
+      "locators": [],
+      "measured": 61.57,
+      "pack": "",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "mm"
+    },
+    {
+      "claims": [
+        "driveline"
+      ],
+      "detail": "shaft exits the bottom at x=52 mm at 8.0 deg; prop clears the hull by 17.4 mm and leads the rudder by 12.7 mm; prop tip sits 19.8 mm below the keel",
+      "duration_s": 1.8e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "boat.driveline",
+      "limit": 0,
+      "locators": [],
+      "measured": 0,
+      "pack": "",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "violations"
+    },
+    {
+      "claims": [
+        "mesh-agreement"
+      ],
+      "detail": "worst disagreement 6.4% on hull_bow (1.498 mm from mesh volume/area vs 1.60 mm specified); all shells: hull_aft 1.566, hull_bow 1.498, hull_mid 1.565",
+      "duration_s": 3e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "boat.wall_agreement",
+      "limit": 0.15,
+      "locators": [],
+      "measured": 0.064,
+      "pack": "",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "fraction"
+    },
+    {
+      "claims": [
+        "envelope",
+        "packaging"
+      ],
+      "detail": "assembled 480 x 186 x 87 mm vs 560 x 230 x 170 mm envelope (worst axis 86%)",
+      "duration_s": 2.6e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "boat.envelope",
+      "limit": 1.0,
+      "locators": [],
+      "measured": 0.857,
+      "pack": "",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "fraction"
+    },
+    {
+      "claims": [
+        "fdm-multipart"
+      ],
+      "detail": "7 part(s); worst is hatch_cover at 96% of 208 x 208 x 250 mm usable (220 x 220 bed less 6 mm of brim a side): hatch_cover 200 mm, hull_mid 187 mm, hull_aft 186 mm, hull_bow 137 mm, deck_bow 137 mm, stem_plate 69 mm, motor_clamp 56 mm",
+      "duration_s": 6.7e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "boat.bed_fit_all",
+      "limit": 1.0,
+      "locators": [],
+      "measured": 0.962,
+      "pack": "",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "fraction"
+    }
+  ]
+}

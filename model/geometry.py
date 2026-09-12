@@ -656,7 +656,8 @@ def integral_shaft_seat(cfg, spec, x_from=None):
     return _sweep(secs)
 
 
-def integral_coaming(cfg, x0, x1, y_lo, y_hi):
+def integral_coaming(cfg, x0, x1, y_lo, y_hi, boss_xs=(), boss_extra=0.0,
+                     boss_half=7.0):
     """The raised lip around the hatch opening, sitting ON the deck rail.
 
     Deliberately NOT the same z range as the rail it stands on. The first version
@@ -670,12 +671,292 @@ def integral_coaming(cfg, x0, x1, y_lo, y_hi):
     dz = deck_z(cfg.hull_scale, cfg.loa_mm)
     z0 = dz + cfg.deck_mm - cfg.merge_bite_mm
     z1 = dz + cfg.deck_mm + cfg.coaming_h_mm
-    n = max(4, int((x1 - x0) / cfg.mesh_dx_mm) + 1)
+    xs = sorted(set(list(np.linspace(x0, x1, max(4, int((x1 - x0) / cfg.mesh_dx_mm) + 1)))
+                    + [bx + s * boss_half for bx in boss_xs for s in (-1.0, 1.0)]
+                    + [bx + s * (boss_half + 4.0) for bx in boss_xs for s in (-1.0, 1.0)]))
+    xs = [x for x in xs if x0 - 1e-9 <= x <= x1 + 1e-9]
+    outboard = y_hi > 0
     secs = []
-    for x in np.linspace(x0, x1, n):
+    for x in xs:
         hb = max(at(x)[0] - cfg.merge_inset_mm, 0.8)
-        lo, hi = max(y_lo, -hb), min(y_hi, hb)
+        # Widened only where the hatch screws land. The coaming IS the boss, but it
+        # does not have to be boss-width for all 186 mm of it to hold four screws.
+        grow = 0.0
+        if boss_xs and boss_extra:
+            d = min(abs(x - bx) for bx in boss_xs)
+            if d <= boss_half:
+                grow = boss_extra
+            elif d <= boss_half + 4.0:
+                grow = boss_extra * (boss_half + 4.0 - d) / 4.0
+        lo = max(y_lo - (grow if not outboard else 0.0), -hb)
+        hi = min(y_hi + (grow if outboard else 0.0), hb)
         if hi - lo < 0.6:
             hi = lo + 0.6
         secs.append((float(x), np.array([[lo, z0], [hi, z0], [hi, z1], [lo, z1]])))
     return _sweep(secs)
+
+
+# --------------------------------------------------------------------------- #
+# Bought hardware, as solids.
+#
+# These are representative, not scale models of the vendors' parts: a propeller is
+# a hub and three pitched blades, not an aerofoil. The point is that they OCCUPY
+# SPACE. Until this existed the driveline was four numbers in boat.driveline, and
+# cad.clash had never seen a propeller, a rudder or a stuffing tube -- so nothing
+# had ever checked that the prop clears the hull it is drawn behind, or that a wire
+# run does not lie across the shaft.
+# --------------------------------------------------------------------------- #
+def rod(p0, p1, d, sections=16):
+    """A cylinder between two 3D points. The workhorse for shafts, tubes and wire."""
+    p0 = np.asarray(p0, float)
+    p1 = np.asarray(p1, float)
+    v = p1 - p0
+    L = float(np.linalg.norm(v))
+    if L < 1e-6:
+        L, v = 1e-3, np.array([0.0, 0.0, 1.0])
+    m = trimesh.creation.cylinder(radius=d / 2.0, height=L, sections=sections)
+    zaxis = np.array([0.0, 0.0, 1.0])
+    u = v / L
+    if np.allclose(u, zaxis):
+        R = np.eye(4)
+    elif np.allclose(u, -zaxis):
+        R = trimesh.transformations.rotation_matrix(np.pi, [1, 0, 0])
+    else:
+        axis = np.cross(zaxis, u)
+        R = trimesh.transformations.rotation_matrix(
+            float(np.arccos(np.clip(np.dot(zaxis, u), -1, 1))), axis)
+    m.apply_transform(R)
+    m.apply_translation((p0 + p1) / 2.0)
+    return m
+
+
+def polytube(points, d, sections=12):
+    """A run of rod segments through a polyline, with a ball at each interior knot so
+    the corners are closed. Used for wire runs and the pushrod."""
+    pts = [np.asarray(p, float) for p in points]
+    # Segments are EXTENDED past each interior knot so consecutive rods interpenetrate,
+    # and there are no knot balls at all. A ball sized to the rod is tangent to it, and
+    # a tangent pair welds on STL load into non-manifold edges -- hw_pushrod came back
+    # "not closed", which then made cad.clash refuse to answer any question about it.
+    # Sizing the ball larger did not help: three surfaces meeting near-tangentially is
+    # the problem, not the ball. Overlapping cylinders are several closed bodies that
+    # share no surface, which is all this has ever needed to be.
+    parts = []
+    for i, (a, b) in enumerate(zip(pts[:-1], pts[1:])):
+        u = b - a
+        L = float(np.linalg.norm(u))
+        if L < 1e-6:
+            continue
+        u = u / L
+        a2 = a - u * (d * 0.5 if i > 0 else 0.0)
+        b2 = b + u * (d * 0.5 if i < len(pts) - 2 else 0.0)
+        parts.append(rod(a2, b2, d, sections))
+    return trimesh.util.concatenate(parts)
+
+
+def screw(p, direction, length, shank_d, head_d, head_h):
+    """A pan-head machine screw: shank from `p` along `direction`, head on top of it.
+
+    Modelled head-first-at-p, i.e. `p` is where the head sits on the surface and the
+    shank goes INTO the material along `direction`.
+    """
+    p = np.asarray(p, float)
+    u = np.asarray(direction, float)
+    u = u / max(float(np.linalg.norm(u)), 1e-9)
+    shank = rod(p, p + u * length, shank_d)
+    head = rod(p - u * head_h, p, head_d)
+    return trimesh.util.concatenate([shank, head])
+
+
+def insert(p, direction, length, od):
+    """A brass heat-set insert, sunk from `p` along `direction`."""
+    p = np.asarray(p, float)
+    u = np.asarray(direction, float)
+    u = u / max(float(np.linalg.norm(u)), 1e-9)
+    return rod(p, p + u * length, od)
+
+
+def propeller(centre, axis_deg, dia, hub_d, hub_l, blades=3, pitch_deg=28.0,
+              blade_t=1.6):
+    """Hub plus `blades` pitched blades, on an axis `axis_deg` below the x axis.
+
+    Recognisable as a propeller in a render, and the right size in every direction
+    that matters: the disc diameter is what sets the clearance to the hull and to the
+    rudder, and boat.driveline checks both.
+    """
+    c = np.asarray(centre, float)
+    hub = rod(c - np.array([hub_l / 2.0, 0, 0]), c + np.array([hub_l / 2.0, 0, 0]), hub_d)
+    out = [hub]
+    r_in, r_out = hub_d / 2.0, dia / 2.0
+    for i in range(blades):
+        th = 2.0 * np.pi * i / blades
+        b = trimesh.creation.box(extents=(blade_t, r_out - r_in, dia * 0.34))
+        b.apply_transform(trimesh.transformations.rotation_matrix(
+            np.radians(pitch_deg), [0, 1, 0]))
+        b.apply_translation((0.0, (r_in + r_out) / 2.0, 0.0))
+        b.apply_transform(trimesh.transformations.rotation_matrix(th, [1, 0, 0]))
+        b.apply_translation(c)
+        out.append(b)
+    prop = trimesh.util.concatenate(out)
+    prop.apply_transform(trimesh.transformations.rotation_matrix(
+        np.radians(-axis_deg), [0, 1, 0], point=c))
+    return prop
+
+
+def rudder(x, z_top, depth, chord, thickness, stock_d, tiller_len):
+    """Blade, stock and tiller arm. The blade hangs below `z_top`; the stock runs up
+    past it to the tiller, which is what the pushrod pulls on."""
+    blade = trimesh.creation.box(extents=(chord, thickness, depth))
+    blade.apply_translation((x, 0.0, z_top - depth / 2.0))
+    stock = rod((x, 0.0, z_top - depth), (x, 0.0, z_top + 26.0), stock_d)
+    tiller = trimesh.creation.box(extents=(thickness + 1.0, tiller_len, 4.0))
+    tiller.apply_translation((x, -tiller_len / 2.0, z_top + 24.0))
+    return trimesh.util.concatenate([blade, stock, tiller])
+
+
+def integral_rib(cfg, x0, x1, y_centre, width, z_top, z_from=None,
+                 boss_xs=(), boss_w=None, boss_half=7.0, ramp=8.0,
+                 full_from=None, full_to=None):
+    """A longitudinal rib rising from the hull floor to `z_top`.
+
+    Longitudinal, always. In this print orientation the hull's x axis is the build
+    direction, so a rib running along x is a VERTICAL WALL in the print and needs no
+    support, while the same feature as a discrete post would be a cylinder
+    cantilevered horizontally off a wall. Every mounting boss on this boat is
+    therefore a rib with a drilled bore, not a post.
+    """
+    at = _sampler(cfg)
+    xs = sorted(set(list(np.linspace(x0, x1, max(4, int((x1 - x0) / cfg.mesh_dx_mm) + 1)))
+                    + [bx + s * boss_half for bx in boss_xs for s in (-1.0, 1.0)]
+                    + [bx + s * (boss_half + 4.0) for bx in boss_xs for s in (-1.0, 1.0)]))
+    xs = [x for x in xs if x0 - 1e-9 <= x <= x1 + 1e-9]
+    secs = []
+    for x in xs:
+        hb, dep, kz = at(x)
+        iy, iz = _inner_u(hb, dep, kz, cfg.wall_mm, cfg.section_points)
+        # The rib stands on the hull's inner surface AT ITS OWN y, not on the lowest
+        # point of the whole section. Using iz.min() drew every rib from the keel,
+        # so a rib sitting 24 mm off the centreline started inside the hull wall and
+        # carried tens of millimetres of plastic that held nothing up.
+        m = cfg.section_points
+        half_y, half_z = iy[m:], iz[m:]
+        order = np.argsort(half_y)
+        base = float(np.interp(abs(y_centre), half_y[order], half_z[order]))
+        z0 = (base - cfg.merge_bite_mm) if z_from is None else z_from
+        # The rib's top RAMPS down to its own base over `ramp` at each end, so it has
+        # no end face at all. A rib that simply stops has a face perpendicular to the
+        # build direction with nothing under it, and fdm.bridge_span counts every one
+        # as an unanchored ceiling -- five ribs, ten faces. Running each rib the full
+        # length of the bay instead would anchor them on the bed and cost three times
+        # the plastic to hold the same ten screws.
+        # Full height only over [full_from, full_to] -- the bit that actually carries
+        # a fastener -- ramping down to a 0.8 mm plinth outside it. The rib itself
+        # runs all the way back to the segment's aft face, so its aft end is ON THE
+        # BED and is not a face at all. Stopping the rib where its bosses stop left a
+        # 0.6 mm end face perpendicular to the build direction, and fdm.bridge_span
+        # counts any such face as an unanchored ceiling however small it is. Carrying
+        # it aft as a plinth costs 0.8 mm of height and fixes it.
+        a = x0 if full_from is None else full_from
+        b = x1 if full_to is None else full_to
+        if x < a:
+            f = min(1.0, max(0.0, (x - x0) / ramp)) if ramp > 0 else 1.0
+            f = min(f, min(1.0, max(0.0, (x - (a - ramp)) / ramp)) if ramp > 0 else 1.0)
+        elif x > b:
+            f = min(1.0, max(0.0, (b + ramp - x) / ramp)) if ramp > 0 else 1.0
+            f = min(f, min(1.0, max(0.0, (x1 - x) / ramp)) if ramp > 0 else 1.0)
+        else:
+            f = 1.0
+        top = max(z0 + 0.8 + (z_top - z0 - 0.8) * f, z0 + 0.8)
+        # Boss width only where a fastener actually lands. Carrying it the whole
+        # length cost 13 cm3 per rib to hold two M3 screws, and three of those put
+        # hull_mid past its print-time ceiling. Varying the sweep's width keeps it
+        # ONE body -- separate pad boxes were extra bodies whose aft faces read as
+        # unanchored ceilings to fdm.bridge_span.
+        # RAMPED, not stepped. A step in the swept width is a face perpendicular to
+        # the build direction with nothing under it, and fdm.bridge_span counted
+        # thirty of them as unanchored ceilings. Four millimetres of ramp for about
+        # three of width is a 38 degree transition.
+        w = width
+        if boss_xs and boss_w:
+            d = min(abs(x - bx) for bx in boss_xs)
+            if d <= boss_half:
+                w = boss_w
+            elif d <= boss_half + 4.0:
+                t = (boss_half + 4.0 - d) / 4.0
+                w = width + (boss_w - width) * t
+        half = w / 2.0
+        secs.append((float(x), np.array([[y_centre - half, z0], [y_centre + half, z0],
+                                         [y_centre + half, top], [y_centre - half, top]])))
+    return _sweep(secs)
+
+
+def saddle_clamp(cfg, x0, x1, y_half, z_land, z_over, wall):
+    """An upside-down U that arches over a cylindrical component and lands on two
+    ribs either side of it. Swept along x as ONE closed profile, so it is a single
+    body with no internal faces."""
+    poly = np.array([
+        [-y_half, z_over], [y_half, z_over], [y_half, z_land],
+        [y_half - wall, z_land], [y_half - wall, z_over - wall],
+        [-(y_half - wall), z_over - wall], [-(y_half - wall), z_land],
+        [-y_half, z_land],
+    ], float)
+    return _sweep([(float(x0), poly), (float(x1), poly)])
+
+
+def tube_along(points, d, sections=12, samples_per_seg=4):
+    """A single closed tube swept along a polyline. ONE body, no knots.
+
+    polytube() emits overlapping cylinders, which is fine for a pushrod inside a
+    guide tube but not for anything cad.wall_thickness looks at: where two cylinders
+    cross at a knot, a ray leaving one immediately enters the other and the gate
+    reports the gap. It measured 0.057 mm through a 3.4 mm wire.
+
+    This sweeps a ring along the path instead, so there is one surface and no
+    interior. The frame is carried along the path rather than recomputed per segment,
+    which keeps the ring from spinning at a corner and folding the tube.
+    """
+    pts = [np.asarray(p, float) for p in points]
+    path = []
+    for a, b in zip(pts[:-1], pts[1:]):
+        for t in np.linspace(0.0, 1.0, samples_per_seg, endpoint=False):
+            path.append(a + (b - a) * t)
+    path.append(pts[-1])
+    path = np.asarray(path, float)
+
+    tangents = np.gradient(path, axis=0)
+    tangents /= np.maximum(np.linalg.norm(tangents, axis=1)[:, None], 1e-9)
+    ref = np.array([0.0, 0.0, 1.0])
+    if abs(float(np.dot(tangents[0], ref))) > 0.9:
+        ref = np.array([0.0, 1.0, 0.0])
+    normal = np.cross(tangents[0], ref)
+    normal /= max(float(np.linalg.norm(normal)), 1e-9)
+
+    rings = []
+    for i, (p, t) in enumerate(zip(path, tangents)):
+        normal = normal - t * float(np.dot(normal, t))       # parallel transport
+        normal /= max(float(np.linalg.norm(normal)), 1e-9)
+        binormal = np.cross(t, normal)
+        ang = np.linspace(0.0, 2.0 * np.pi, sections, endpoint=False)
+        rings.append(p + (d / 2.0) * (np.cos(ang)[:, None] * normal
+                                      + np.sin(ang)[:, None] * binormal))
+
+    verts = np.vstack(rings)
+    n = sections
+    faces = []
+    for i in range(len(rings) - 1):
+        a, b = i * n, (i + 1) * n
+        for j in range(n):
+            k = (j + 1) % n
+            faces.append([a + j, a + k, b + k])
+            faces.append([a + j, b + k, b + j])
+    # end caps, as fans from an added centre vertex each
+    verts = np.vstack([verts, path[0], path[-1]])
+    c0, c1 = len(verts) - 2, len(verts) - 1
+    last = (len(rings) - 1) * n
+    for j in range(n):
+        k = (j + 1) % n
+        faces.append([c0, k, j])
+        faces.append([c1, last + j, last + k])
+    m = trimesh.Trimesh(vertices=verts, faces=np.array(faces), process=True)
+    m.fix_normals()
+    return m

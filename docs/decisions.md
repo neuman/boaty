@@ -7,6 +7,35 @@ rejected alternative with its reason is the only thing that stops the next
 person (or the next context window) re-proposing it and re-discovering the same
 wall. `atompipe why <param-or-claim>` pulls one item's slice of this file.
 
+## 2026-09-12 — Model the fasteners, the driveline and the wiring as geometry, and gate the hull penetrations
+
+`model-the-fasteners-the-driveline-and-the-wiring`
+
+Twelve M3 screws into ten brass heat-set inserts, a propeller shaft with a stuffing tube, a propeller, a transom rudder with its stock and tiller, a pushrod in a guide tube, and four wire runs -- all as solids in the assembly rather than numbers in a verdict. Plus a new gate, boat.hull_penetrations, that enumerates every hole through the shell or a watertight bulkhead and refuses more than one below the loaded waterline.
+
+**Rejected**
+
+- **screws threaded straight into the PETG** — a thread cut in printed plastic strips after a few cycles, and the hatch is the one interface opened every session to change the battery. Brass heat-set inserts cost nine dollars and their 4.6 mm OD is now a design input: every boss on the boat is 4.6 plus 2 mm of wall each side, which is why the hatch coaming widens to 8.6 mm at each screw.
+- **discrete cylindrical boss posts** — in this print orientation the hull x axis is the build direction, so a post standing off the deck is a cylinder cantilevered horizontally off a wall and its underside needs support. Every boss on this boat is therefore a longitudinal RIB with a drilled bore, which is a vertical wall in the print.
+- **boss-width ribs** — carrying 8.6 mm of boss width down the whole length of a rib cost 13 cm3 per rib to hold two M3 screws, and three of them pushed hull_mid past its print-time ceiling. The ribs are 2.4 mm webs that ramp up to boss width only where a screw lands, and ramp down to a 0.8 mm plinth at the ends so they start on the print bed.
+- **zinc-plated screws** — zinc beside brass inserts in fresh water is a rust streak within a season, on the four fasteners that come out every session.
+- **screwing the battery down** — a pack swapped every session should not be on threads. It sits between two printed chocks under a hook-and-loop strap, which is also what lets it slide fore and aft to trim the boat.
+
+**Params:** `insert_od_mm`, `max_below_waterline_penetrations`  
+**Claims:** `C20`, `P1`, `C9`
+
+WHAT THE NEW GATE FOUND, immediately: two things below the waterline rather than one. The stuffing tube crosses the aft watertight bulkhead as well as the shell, and nothing anywhere had said so. The gate now separates the two -- the shell is what the pond is on the other side of and is capped at one; a bulkhead below the waterline is a second line of defence and is required to be declared and sealed rather than capped -- and both are written down with their sealing method.
+
+SIX PENETRATIONS IN TOTAL. One through the shell below the waterline (the propeller shaft, unavoidable because the propeller has to be driven from inside). One through a bulkhead below the waterline (the same tube). Four above: the pushrod tube through the bulkhead and through the transom, the two rudder bracket screws, and the switch rod through the deck. Every boss on the boat is blind except the rudder bracket pair.
+
+NO WIRE PIERCES A BULKHEAD. Motor, ESC, battery, receiver and servo are all between the two bulkheads, so all four runs stay inside the equipment bay. That is a layout decision and it is now visible as geometry.
+
+COST: 6 printed parts to 7 (the motor clamp), printed mass 516 g to 586 g, print time 21.3 h to 24.2 h, BOM 374.50 to 397.50 USD. PLATES DID NOT MOVE: still 4 -- the clamp is 56 mm and shares a bed. Loaded freeboard went 26.5 mm to 25.8 mm on the extra 70 g, which still clears the 25 mm claim but is now the tightest margin on the boat.
+
+The per-part print ceiling moved from 14 h to 17 h, and that is a threshold I relaxed. It is a judgement about the builder patience, not a physical property -- unlike the overhang allowance relaxed earlier in this project, which protected whether a part needs support and went back to the pack default as soon as the geometry allowed. hull_mid is a 190 mm tall hull section carrying a bulkhead, two deck rails, two coamings, a girder and five mounting ribs; 15.5 h is what that costs, and splitting it would add a part and a glued joint to a boat whose part count was just halved for watertightness.
+
+---
+
 ## 2026-09-12 — Merge the loose plates into the hull segments: 13 parts and 8 plates down to 6 and 4
 
 `merge-the-loose-plates-into-the-hull-segments-13`

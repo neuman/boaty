@@ -14,7 +14,7 @@ generated from the same STLs the gates measure — `python tools/render.py`.</su
 | | |
 |---|---|
 | [`docs/BUY.md`](docs/BUY.md) | what to order, with prices and ASINs |
-| [`docs/PRINT.md`](docs/PRINT.md) | what to print (**6 parts, 4 beds**), in what orientation, and what to drill |
+| [`docs/PRINT.md`](docs/PRINT.md) | what to print (**7 parts, 4 beds**), in what orientation, every screw, every hole to drill |
 | [`docs/BUILD.md`](docs/BUILD.md) | the assembly order, arranged so mistakes stay cheap |
 | [`docs/decisions.md`](docs/decisions.md) | every design decision and what LOST |
 | [`FRICTION.md`](FRICTION.md) | an unflattering log of using the tool |
@@ -40,7 +40,7 @@ reserve.
 | ![Hull shell](renders/hull.png) | **The hull shell**, in three printed segments. The section is the traced profile, unchanged in form and scaled 1.6x. |
 | ![Print set](renders/print-plate.png) | **Eight plates, not one.** Two parts are 190 and 186 mm wide, so they share a 220 mm bed with nothing. |
 
-## Six parts, two glued joints
+## Seven parts, two glued joints
 
 The transom, both watertight bulkheads, the centre girder, the shaft seat and the aft
 deck are printed INTO the hull segments rather than glued on. That is not tidiness: a
@@ -53,6 +53,21 @@ Two merges were rejected and both are in the decision log: the stem cap, and the
 deck. Both would have roofed an open cavity at the top of a print, and both being
 separate is also what leaves the bow compartment open until its foam and interior
 epoxy are in.
+
+## One hole below the waterline
+
+The driveline, the rudder, twelve M3 screws, ten brass inserts and four wire runs are
+all modelled as solids, so `cad.clash` sees them and so does the render. Every boss is
+blind except the two that bolt the rudder bracket to the transom.
+
+`boat.hull_penetrations` enumerates every hole through the hull shell or a watertight
+bulkhead, states how each is sealed, and refuses more than one below the loaded
+waterline — comparing against the waterline the hydrostatics produced on that run, not
+a number typed beside it. There is exactly one: the propeller shaft, which is
+unavoidable because the propeller has to be driven from inside.
+
+The gate found a second one the minute it existed — the same stuffing tube also
+crosses the aft bulkhead, 9 mm under water, and nothing had ever said so.
 
 ## Layout
 
