@@ -4,27 +4,31 @@
 
 Written in the order that lets you find a mistake while it is still cheap.
 
-## 1. Print and leak-test the shells BEFORE anything else
+Six printed parts, two glued hull joints. The transom, both watertight bulkheads, the centre girder, the shaft seat and the aft deck are printed into the hull segments rather than glued on -- a bulkhead with no bond line cannot leak at the bond line.
 
-Print `hull_aft`, `hull_mid`, `hull_bow` and the four plates. Then, and this is the step every source agrees on and everybody skips: **fill each hull segment with water, stand it on a dry towel, and leave it for two or three hours.** Mark every damp spot. Coat only what leaked, coat it from the inside, and re-test.
+## 1. Print and leak-test the three hull segments BEFORE anything else
+
+Print `hull_aft`, `hull_mid` and `hull_bow`. Then, and this is the step every source agrees on and everybody skips: **fill each segment with water, stand it on a dry towel, and leave it two or three hours.** Mark every damp spot. Coat only what leaked, from the inside, and re-test.
 
 Doing this now costs an evening. Doing it after the electronics are in costs the electronics.
 
 ## 2. Seal the inside
 
-One or two thin brush coats of XTC-3D on the INSIDE of every segment, seams first. Thin coats: pooled epoxy adds mass without adding sealing, and mass is the budget this hull spends its freeboard out of. The printed seam is not the seal; the fillet over it is.
+One or two thin brush coats of XTC-3D on the INSIDE of every segment, seams first. Thin coats: pooled epoxy adds mass without adding sealing, and mass is the budget this hull spends its freeboard out of.
 
-## 3. Driveline, before the bulkheads go in
+`hull_aft` is open at its forward end and `hull_bow` at its bow end, which is how you get a brush into both sealed compartments. That access is the reason `stem_plate` and `deck_bow` are still separate parts.
 
-Drill the 10.2 mm stuffing-tube hole through the hull bottom at x = 52 mm at 8 degrees. Bond `shaft_block` to the hull floor on that line, pass the tube through both, and **epoxy-fillet the tube on BOTH sides, inside and out**. Pack the tube one third to one half full of marine grease from the propeller end. This is the only penetration below the waterline and it is where boats actually sink.
+## 3. Driveline, while hull_aft is still open
 
-## 4. Bulkheads, girder, transom, stem
+Drill the 10.2 mm stuffing-tube hole through the hull bottom at x = 52 mm at 8 degrees, and ream the matching bore through the shaft seat that is printed into the hull floor on that line. Pass the tube through both and **epoxy-fillet it on BOTH sides, inside and out**. Pack it one third to one half full of marine grease from the propeller end. This is the only penetration below the waterline and it is where boats actually sink.
 
-Drill 2 mm pin holes through each joint face, three per joint. Dry-fit everything with filament pins before any glue. Then CA the joints to tack them and epoxy-fillet every seam on the inside. Bond the girder down the centreline of the equipment bay and drill its limber holes.
+## 4. Foam the ends, then close them
 
-## 5. Foam the ends, then close them
+Fill the stern compartment (inside `hull_aft`) and the bow compartment (inside `hull_bow`) with closed-cell foam, around the stuffing tube and the pushrod tube. **Closed cell, not open**: open-cell foam is a sponge and becomes ballast. Then bond `stem_plate` into the bow and `deck_bow` onto hull_bow's sheer. Those compartments never open again, and they are what makes a swamped boat recoverable rather than gone.
 
-Fill the bow and stern compartments with closed-cell foam, around the stuffing tube and the pushrod tube. **Closed cell, not open**: open-cell foam is a sponge and becomes ballast. Then bond `deck_aft` and `deck_bow` down. Those two compartments never open again, and they are what makes a swamped boat recoverable rather than gone.
+## 5. Join the three segments
+
+Two joints, both landing on a printed bulkhead face. Drill 2 mm pin holes through each joint face, three per joint, and dry-fit with 1.75 mm filament pins before any glue. Then CA the joints to tack them and epoxy-fillet each seam on the inside, through the hatch.
 
 ## 6. Fit out the equipment bay
 
@@ -32,14 +36,14 @@ Fill the bow and stern compartments with closed-cell foam, around the stuffing t
 - **motor** at x 215 mm, y +0 mm, z 32 mm above the keel
 - **esc** at x 268 mm, y +48 mm, z 40 mm above the keel
 - **battery** at x 292 mm, y +0 mm, z 24 mm above the keel
+- **switch** at x 312 mm, y +46 mm, z 46 mm above the keel
 - **radio** at x 318 mm, y -40 mm, z 36 mm above the keel
-- **switch** at x 322 mm, y +46 mm, z 46 mm above the keel
 
-The battery is STRAPPED, not glued. It is 292 mm from the transom in the model and sliding it is how you trim the boat: the model floats -1.22 degrees and every 10 mm of battery movement is worth roughly 0.1 degrees.
+The battery is STRAPPED, not glued. It is 292 mm from the transom in the model and sliding it is how you trim the boat: the model floats -1.27 degrees and every 10 mm of battery movement is worth roughly 0.1 degrees.
 
-## 7. Deck and hatch
+## 7. Hatch
 
-Bond `deck_mid` on. Lay the foam tape on the coaming's top face, and screw `hatch_cover` down onto it with four M3 self-tappers. Silicone-grease the tape every session. **Never glue the hatch shut** -- it is the only way back into the boat.
+Lay the foam tape on the coaming's top face -- the coaming is printed into `hull_mid`'s deck rails and continues across both bulkhead tops -- and screw `hatch_cover` down onto it with four M3 self-tappers. Silicone-grease the tape every session. **Never glue the hatch shut**: it is the only way back into the boat.
 
 ## 8. Before the first sail
 

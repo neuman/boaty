@@ -7,6 +7,33 @@ rejected alternative with its reason is the only thing that stops the next
 person (or the next context window) re-proposing it and re-discovering the same
 wall. `atompipe why <param-or-claim>` pulls one item's slice of this file.
 
+## 2026-09-12 — Merge the loose plates into the hull segments: 13 parts and 8 plates down to 6 and 4
+
+`merge-the-loose-plates-into-the-hull-segments-13`
+
+The transom, both bulkheads, the centre girder, the shaft seat and two of the three deck panels stopped being separate parts and are now printed as part of the hull segment they used to be glued to. Each hull segment prints on a transverse face with its one solid cross-wall ON THE BED, which is what makes the merge possible at all: put a cross-wall at the far end of a segment and it becomes a 186 mm horizontal plate at the top of the print.
+
+**Rejected**
+
+- **merging the STEM CAP into hull_bow** — at the top of a bulkhead-down print it roofs the open cavity. fdm.bridge_span measured an 85 mm unsupported span across 2649 mm2. Printing that segment stem-down only moves the problem to the bulkhead, which is 132 mm wide rather than 85. It stays a separate 69 x 39 mm plate.
+- **merging the BOW DECK into hull_bow** — it prints fine as a longitudinal wall, but hull_bow will not fuse to a single body, and as a separate body inside the same part its underside roofs the cavity with nothing in the same body beneath it: fdm.bridge_span, 19 mm, UNANCHORED. As its own part it lies flat on the bed and the question does not arise. Rejecting it also keeps the bow compartment open until the foam and the interior epoxy are in, and sealed air with no foam fails closed-loop.
+- **putting each bulkhead on the segment it closes** — bulkhead_aft belongs to hull_mid and bulkhead_fwd to hull_bow, not to hull_aft and hull_mid. A bulkhead only merges into the segment whose print puts it on the BED.
+- **a boolean union to make each merged part a single solid** — attempted, measured and rejected. Blender unions the bodies correctly by volume (0.95-0.98 of the inputs) but the result never survives the normalisation cad-solid applies on load: 2 non-manifold edges and 11 degenerate faces on hull_aft. manifold3d returns a watertight body in milliseconds whose STL round-trip is not watertight. geometry.fuse still tries and its guard still catches it, so the parts ship as overlapping bodies.
+
+**Params:** `plate_proud_mm`, `merge_bite_mm`  
+**Claims:** `C7`, `P1`
+
+WHY IT IS AN IMPROVEMENT, not a convenience: a watertight bulkhead printed integral with its hull has no bond line to fail, and watertightness is the top physical risk on this boat (claim P1, one of five only water can settle). Seven glued joints became two.
+
+WHAT IT COST, stated:
+* Printed mass 480 g -> 516 g and print time 19.8 h -> 21.3 h. About 10 g of that is not real: overlapping bodies double-count their overlap, which inflates the modelled mass by roughly 2% in the conservative direction. The other ~26 g is: the integral decks are 2.0 mm where the loose panels were 1.4 mm, and the plates now cover the full section and stand 0.3 mm proud instead of being inset.
+* An integral bulkhead can no longer be epoxy-filleted from both sides. It does not need to be, because it has no joint, but the hull-to-hull seam beside it is now filleted from one side only.
+* hull_mid ships as seven overlapping bodies rather than one solid, and cad.wall_thickness measures 0.24 mm across an internal face between two of them. That gate was already failing before this change, on deck_mid, for the same reason.
+
+Loaded freeboard moved 27.3 mm -> 26.5 mm and trim -1.22 -> -1.27 degrees on the extra 39 g. Both still pass. No claim that passed before this change fails after it.
+
+---
+
 ## 2026-09-12 — Print every part standing on a transverse face or flat; no supports except at the stem
 
 `print-every-part-standing-on-a-transverse-face-o`

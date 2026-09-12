@@ -1,4 +1,4 @@
-# boaty — readiness (v0.1, 2026-09-12T02:47:58Z)
+# boaty — readiness (v0.1, 2026-09-12T17:50:26Z)
 
 **v0.1 is NOT ready: 1 of 32 critical claims is unsettled — 1 failing (C8).** 18 of 32 claims are machine-verified against the current model. It is unverified in physical hardware: 5 claims need a real object (P1, P2, P3, P4, +1 more).
 
@@ -6,24 +6,24 @@
 
 | Claim | Acceptance | Measured | Gate | Evidence |
 |---|---|---|---|---|
-| **C1** Floats at all-up mass consuming no more than 55% of the watertight hull volume | displaced volume fraction <= 0.55 | 0.3014 V_displaced/V_hull | `fluid.buoyancy` | *none written* |
-| **C2** Deck edge stands at least 25 mm above the loaded waterline at the lowest point | freeboard >= 25.0 mm | 0.0523 m | `fluid.freeboard` | *none written* |
-| **C3** Initial metacentric height GM is at least 15 mm at the loaded waterline | GM >= 15.0 mm | 0.067 m | `fluid.metacentric` | *none written* |
-| **C4** Righting arm GZ at 8 degrees of heel is at least 2 mm | GZ at 8 deg >= 2.0 mm | 0.0093 m | `fluid.righting_arm` | *none written* |
-| **C5** Hull drag at the 0.8 m/s design speed is inside the static thrust the motor and propeller produce | drag force <= 3.0 N | 0.2508 N; 384000 Re | `fluid.drag`, `fluid.flow_regime` | *none written* |
+| **C1** Floats at all-up mass consuming no more than 55% of the watertight hull volume | displaced volume fraction <= 0.55 | 0.3115 V_displaced/V_hull | `fluid.buoyancy` | *none written* |
+| **C2** Deck edge stands at least 25 mm above the loaded waterline at the lowest point | freeboard >= 25.0 mm | 0.0517 m | `fluid.freeboard` | *none written* |
+| **C3** Initial metacentric height GM is at least 15 mm at the loaded waterline | GM >= 15.0 mm | 0.0655 m | `fluid.metacentric` | *none written* |
+| **C4** Righting arm GZ at 8 degrees of heel is at least 2 mm | GZ at 8 deg >= 2.0 mm | 0.0091 m | `fluid.righting_arm` | *none written* |
+| **C5** Hull drag at the 0.8 m/s design speed is inside the static thrust the motor and propeller produce | drag force <= 3.0 N | 0.2558 N; 384000 Re | `fluid.drag`, `fluid.flow_regime` | *none written* |
 | **C6** The drag correlation is being used inside the Reynolds range it was fitted over | Reynolds validity == 1.0 | 384000 Re | `fluid.flow_regime` | *none written* |
-| **C7** Every printed part fits a 220x220x250 mm build volume with brim, carries at least 3 extrusion widths of wall, bridges n… | printability == 1.0 | 0.913 utilisation; 1.4 mm; 0.12 derated utilisation; 0.514 of limit; 0 problems; 0.00817 area fraction; 0 mm | `fdm.bed_fit`, `fdm.min_wall`, `fdm.layer_alignment`, `fdm.print_time_est`, `fdm.process_model_valid`, `fdm.overhang`, `fdm.bridge_span` | `/home/neuman/Documents/work/boaty/.atompipe/out/fdm-overhang.txt` |
+| **C7** Every printed part fits a 220x220x250 mm build volume with brim, carries at least 3 extrusion widths of wall, bridges n… | printability == 1.0 | 0.895 utilisation; 1.4 mm; 0.12 derated utilisation; 0.859 of limit; 0 problems; 0 area fraction; 0 mm | `fdm.bed_fit`, `fdm.min_wall`, `fdm.layer_alignment`, `fdm.print_time_est`, `fdm.process_model_valid`, `fdm.overhang`, `fdm.bridge_span` | `/home/neuman/Documents/work/boaty/.atompipe/out/fdm-overhang.txt` |
 | **C9** No interference between the hull, the deck, and the placed motor, battery, ESC, servo, receiver and driveline | part interference == 0.0 clashing pairs | 0 pairs | `cad.clash` | `/home/neuman/Documents/work/boaty/.atompipe/out/cad-solid/clash_pairs.json` |
 | **C10** The assembled boat fits inside a 560 x 230 x 170 mm envelope | bounding box <= 560.0 mm | 0.857 fraction | `boat.envelope` — **PARTIAL**: `cad.bounding` bbox_mm is absent — nothing to compare, so nothing is claimed. This row rests on 1 of 2 covering gates. | *none written* |
 | **C11** Every BOM line is orderable, priced in one currency, and has a known ship date | unorderable lines == 0.0 lines | 0 lines; 0 weeks; 0 lines | `bom.complete`, `bom.availability`, `bom.currency` | `/home/neuman/Documents/work/boaty/.atompipe/out/bom_complete.json`, `/home/neuman/Documents/work/boaty/.atompipe/out/bom_availability.json`, `/home/neuman/Documents/work/boaty/.atompipe/out/bom_currency.json` |
 | **C12** Total build cost, excluding the printer, is at most 400 USD | rolled-up build cost <= 400.0 USD | 374.5 USD/unit | `bom.cost` | `/home/neuman/Documents/work/boaty/.atompipe/out/bom_cost.json` |
 | **C13** No line forces a minimum-order overbuy worth more than 25 USD, and single-source risk is counted | MOQ overbuy <= 25.0 USD | 0 USD; 0 violations; 0 lines | `bom.moq`, `bom.process_rules`, `bom.single_source` | `/home/neuman/Documents/work/boaty/.atompipe/out/bom_moq.json`, `/home/neuman/Documents/work/boaty/.atompipe/out/bom_process_rules.json`, `/home/neuman/Documents/work/boaty/.atompipe/out/bom_single_source.json` |
-| **C14** The wall thickness of every generated hull shell, measured from the exported mesh itself, matches the wall the model sp… | generated-vs-specified wall disagreement <= 0.15 fraction | 0.0771 fraction | `boat.wall_agreement` | *none written* |
-| **C15** The boat floats within 1.5 degrees of level, and the freeboard that survives the trim is still at least 25 mm | trim angle <= 1.5 deg | 1.225 deg | `boat.trim` | *none written* |
+| **C14** The wall thickness of every generated hull shell, measured from the exported mesh itself, matches the wall the model sp… | generated-vs-specified wall disagreement <= 0.15 fraction | 0.064 fraction | `boat.wall_agreement` | *none written* |
+| **C15** The boat floats within 1.5 degrees of level, and the freeboard that survives the trim is still at least 25 mm | trim angle <= 1.5 deg | 1.271 deg | `boat.trim` | *none written* |
 | **C16** The propeller shaft line leaves the hull through the hull bottom, the propeller disc clears the hull and the rudder, an… | driveline geometry violations == 0.0 violations | 0 violations | `boat.driveline` | *none written* |
-| **C17** GM corrected for the free surface of bilge water in the equipment bay stays at least 10 mm | GM after free-surface correction >= 10.0 mm | 62.85 mm | `boat.free_surface` | *none written* |
-| **C18** With the equipment bay completely flooded, the sealed fore and aft compartments still support the all-up mass plus the… | swamped freeboard >= 0.0 mm | 670.1 g | `boat.swamped` | *none written* |
-| **C19** The hull is upright-stable and adequately floating in the EMPTY condition too, not only at design load | empty-condition GM >= 10.0 mm | 68.89 mm | `boat.empty` | *none written* |
+| **C17** GM corrected for the free surface of bilge water in the equipment bay stays at least 10 mm | GM after free-surface correction >= 10.0 mm | 61.46 mm | `boat.free_surface` | *none written* |
+| **C18** With the equipment bay completely flooded, the sealed fore and aft compartments still support the all-up mass plus the… | swamped freeboard >= 0.0 mm | 631.3 g | `boat.swamped` | *none written* |
+| **C19** The hull is upright-stable and adequately floating in the EMPTY condition too, not only at design load | empty-condition GM >= 10.0 mm | 67.05 mm | `boat.empty` | *none written* |
 
 Every row above is backed by at least one gate that actually ran and returned a pass — a skipped, errored or never-run gate can never be the evidence for a row. Where another gate also covers the claim and did **not** produce a pass, the row is marked **PARTIAL** and names it with the reason: the claim stands on the gates that ran, and you can see which ones did not.
 
@@ -91,10 +91,10 @@ A number nobody can defend is a number the next agent will change — and then r
 
 ### [FAIL ] C8 — Every exported solid is a closed, correctly-wound, non-degenerate volume with no wall thinner than 1.2 mm  *(fail, critical)*
 - **Acceptance:** mesh validity == 1.0
-- `[ok  ] cad.watertight : 0 bad edge(s) across 19 part(s), limit 0 — worst bulkhead_aft: 0 open, 0 non-manifold of 224 faces; 19 part(s) welded at 0.0001 mm on load (bulkhead_aft, bulkhead_fwd, component_battery...) — a soup format has no vertex identity of its own`
-- `[ok  ] cad.is_volume : 0 of 19 part(s) are not volumes, limit 0 (total 573798 mm^3 enclosed); 19 part(s) welded at 0.0001 mm on load (bulkhead_aft, bulkhead_fwd, component_battery...) — a soup format has no vertex identity of its own`
-- `[ok  ] cad.degenerate_faces : 0 repair(s) needed across 19 part(s), limit 0 — worst bulkhead_aft: welded 0 vertex/vertices at 0.0001 mm, dropped 0 face(s) below 1e-08 mm^2 over 1 pass(es); 19 part(s) welded at 0.0001 mm on load (bulkhead_aft, bulkhead_fwd, component_battery...) — a soup format has no vertex identity of its own`
-- `[FAIL] cad.wall_thickness : thinnest wall 0.003 mm on deck_mid at (320.289, 73.128, 83.082) vs 1.400 mm minimum (14878/14932 inward face-normal rays hit; sampler, not a proof)`
+- `[ok  ] cad.watertight : 0 bad edge(s) across 12 part(s), limit 0 — worst component_battery: 0 open, 0 non-manifold of 12 faces; 12 part(s) welded at 0.0001 mm on load (component_battery, component_esc, component_motor...) — a soup format has no vertex identity of its own`
+- `[ok  ] cad.is_volume : 0 of 12 part(s) are not volumes, limit 0 (total 583339 mm^3 enclosed); 12 part(s) welded at 0.0001 mm on load (component_battery, component_esc, component_motor...) — a soup format has no vertex identity of its own`
+- `[ok  ] cad.degenerate_faces : 0 repair(s) needed across 12 part(s), limit 0 — worst component_battery: welded 0 vertex/vertices at 0.0001 mm, dropped 0 face(s) below 1e-08 mm^2 over 1 pass(es); 12 part(s) welded at 0.0001 mm on load (component_battery, component_esc, component_motor...) — a soup format has no vertex identity of its own`
+- `[FAIL] cad.wall_thickness : thinnest wall 0.240 mm on hull_mid at (151.333, 38.538, 6.19) vs 1.400 mm minimum (12756/12816 inward face-normal rays hit; sampler, not a proof)`
   - evidence: `/home/neuman/Documents/work/boaty/.atompipe/out/cad-solid/wall_thickness.json`
 
 ### Gates that produced no proof
@@ -133,7 +133,7 @@ atompipe check --only fdm.process_model_valid    # manufacturability, fdm, addit
 atompipe check --only bom.complete               # sourcing, procurement, bom, cost, availability, supply-chain
 atompipe check --only bom.cost                   # cost, build-cost, budget, unit-cost
 atompipe check --only bom.availability           # availability, lead-time, ship-date, stock
-# ... and 18 more; `atompipe gate list` prints them all
+# ... and 19 more; `atompipe gate list` prints them all
 ```
 
 And prove the gates above can actually fail, which is the only reason their passes mean anything:
@@ -143,7 +143,7 @@ atompipe gate selftest           # runs every negative control; a gate that pass
                                  # own known-bad fixture is a logger, not a gate
 ```
 
-Run reproduced here: recorded 2026-09-12T02:47:58Z, tier 1 (build), 38s, model `e037c1754189`, inputs `862ca0d1d6d9`, atompipe 0.1.0.
+Run reproduced here: recorded 2026-09-12T17:50:26Z, tier 1 (build), 1.5s, model `6450049827af`, inputs `862ca0d1d6d9`, atompipe 0.1.0.
 A different model hash reproduces a different claim, not a different result.
 
 ---

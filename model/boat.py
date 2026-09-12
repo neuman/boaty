@@ -369,6 +369,42 @@ class Config:
     0.08 mm is a fifth of a nozzle -- invisible to a slicer, and no shared vertices
     to weld."""
 
+    merge_bite_mm: float = 0.6
+    """How far an integral feature -- a bulkhead, the transom, the deck, the girder,
+    the shaft seat -- sinks into the hull segment it is part of.
+
+    It is not a clearance, it is the opposite: geometry.fuse unions the bodies into
+    one solid, and a boolean union of bodies that merely TOUCH is a no-op that looks
+    exactly like a successful merge (same body count, same volume). 0.6 mm is a
+    third of the wall, enough to be unambiguous to a boolean and invisible in the
+    result."""
+
+    coaming_set_in_mm: float = -0.3
+    """Where the coaming's inboard face sits relative to the hatch opening's edge.
+    NEGATIVE, i.e. 0.3 mm outboard of it. Two things have to be true at once: it must
+    not be coplanar with the deck rail's edge (a shared face there welds on STL load
+    and the part stops being watertight), and it must clear the lid's rails, which
+    drop into the opening at fit_clearance. At +0.4 it did neither -- the coaming's
+    face sat 0.05 mm proud of where the lid's rail wanted to be, and cad.clash found
+    135 mm3 of hatch_cover inside hull_mid."""
+
+    plate_proud_mm: float = 0.3
+    """How far a transom, bulkhead or stem plate stands past the hull's outer skin.
+    Proud rather than inset, so the hull tube's end ring lands entirely ON the plate
+    instead of half on nothing, and so no ray can travel along a rim of bare wall
+    beside it. It doubles as a register for the segment that butts against it."""
+
+    seat_side_clear_mm: float = 1.5
+    """Gap the shaft seat leaves to the hull's inner surface on each side. The seat
+    is clamped to the cavity width at its own height, and this is what it leaves for
+    the epoxy fillet that bonds it in."""
+
+    merge_inset_mm: float = 0.5
+    """How far an integral deck's outboard edge stops short of the hull's outer skin.
+    Flush is worse than either proud or inset: it hands the boolean a pair of exactly
+    coplanar vertical faces running the whole length of the part, and what comes back
+    is a single body that is not watertight."""
+
     deck_lap_mm: float = 2.0
     """How far deck sub-panels lap each other. It has to EXCEED the minimum wall,
     because the lap is a wall: at 0.08 mm the lap was a 0.16 mm slab and
@@ -408,7 +444,7 @@ class Config:
     cast a ray into the old knife edge and reported a 0.003 mm wall against a 1.4 mm
     minimum. 1.8 mm across the stem is four beads and invisible on a 480 mm boat."""
 
-    min_cavity_mm: float = 25.0
+    min_cavity_mm: float = 40.0
     """The hull tube stops where its internal cavity narrows to this. It is a
     PRINTABILITY number, not a structural one: past this point the inward offset
     self-intersects, and the solid nose that used to fill the gap failed
@@ -521,7 +557,7 @@ class Config:
         "esc":     (268.0, 48.0, 40.0),
         "servo":   (178.0, -50.0, 30.0),
         "radio":   (318.0, -40.0, 36.0),
-        "switch":  (322.0, 46.0, 46.0),
+        "switch":  (312.0, 46.0, 46.0),
     })
     """Where each component sits, as (x, y, z) of its box centre. z = None means "on
     the shaft axis" for the motor and "on the hull floor" for anything else on the
@@ -680,6 +716,29 @@ class Config:
     solid top/bottom skin; the infill setting barely gets a look in. 0.88, not the
     0.15 infill figure."""
 
+    boolean_merge: bool = True
+    """Whether to run geometry.fuse over each merged part's bodies.
+
+    ON, because the alternative does not survive the mesh gates. Each hull segment is
+    built from several deliberately OVERLAPPING closed bodies -- the tube, its transom
+    or bulkhead, its deck, its girder, its shaft seat -- and a slicer would union
+    those quite happily. The gates will not: a multi-body part has INTERNAL faces, and
+    neither cad.wall_thickness nor fdm.bridge_span can tell an internal face from a
+    void. Left unmerged they reported a 0.002 mm wall through 1.6 mm of plastic and a
+    157 mm unsupported ceiling sitting directly on a bulkhead.
+
+    Getting the union to work took four findings, all of them recorded in
+    geometry.fuse: union the original body list rather than a re-split concatenation;
+    make the bodies genuinely overlap; use Blender rather than manifold3d; and do
+    almost nothing to the output afterwards -- fill_holes and nothing else, because
+    the obvious cleanup turns 18 open edges into 412.
+
+    hull_aft and hull_bow come out as single solids. hull_mid does NOT and ships as
+    seven overlapping bodies: its two deck rails and two coamings share end planes
+    with the tube and the bulkhead, and the union comes back with 12 open edges. The
+    guard catches that and hands back the concatenation, which is why one gate is
+    still red against it. That is the honest state, not a rounding of it."""
+
     write_meshes: bool = True
     """Whether build() exports STLs. The negative-control fixtures turn it off: they
     rebuild the model dozens of times and have no use for the files."""
@@ -759,98 +818,29 @@ def _geom_key(c: Config):
     return tuple(getattr(c, k) for k in _GEOM_KEYS)
 
 
-def make_parts(c: Config) -> dict:
-    """Every printed part, as a mesh. Keyed by part name. Cached on _GEOM_KEYS."""
-    key = _geom_key(c)
-    hit = _GEOM_CACHE.get(key)
-    if hit is not None:
-        return hit
-    m = {}
-    # NO SPIGOTS on the hull segments. The first design gave each segment a
-    # projecting ring to locate the joint, and the ring was inset from the segment's
-    # own inner surface by the fit clearance -- which means it was attached to
-    # nothing. Printed standing, it was a free-floating 2 mm annulus and
-    # fdm.bridge_span reported a 157 mm unsupported span, correctly. The BULKHEAD
-    # PLATES already have to be there, already sit at exactly the joint planes, and
-    # already carry a locating lip, so they do the job with no extra part and no
-    # floating geometry.
-    m["hull_aft"] = G.hull_tube(c, 0.0, c.bulkhead_aft_x)
-    m["hull_mid"] = G.hull_tube(c, c.bulkhead_aft_x, c.bulkhead_fwd_x)
-    m["hull_bow"] = G.hull_tube(c, c.bulkhead_fwd_x, c.loa_mm)
-    # The stem is a flat plate, like the transom. See geometry.hull_tube.
-    x_stem = G.hull_tube_end(c, c.bulkhead_fwd_x, c.loa_mm)
-    m["stem_plate"] = G.plate(c, x_stem - c.plate_mm, c.plate_mm, section_x=x_stem)
-    # NO LOCATING LIPS on any plate. A lip is a thin ring inset from the plate's own
-    # edge, and near the keel -- where this hull's section is nearly flat and the
-    # inward offset clamps at the centreline -- the ring's inner and outer surfaces
-    # converge. cad.wall_thickness cast a ray into that and reported a 0.080 mm wall
-    # on bulkhead_fwd; the lip also overlapped the girder and gave fdm.bridge_span a
-    # 26 mm unsupported span on stem_plate.
-    #
-    # The joints are located instead by 1.75 mm FILAMENT SHEAR PINS through 2 mm
-    # drilled holes, which is documented printed-boat practice, costs nothing, is
-    # stronger in shear than a printed lip, and makes every plate a flat slab that
-    # prints face-down with no orientation question at all.
-    m["transom_plate"] = G.plate(c, 0.0, c.plate_mm, section_x=0.0)
-    # The lips point AWAY from the neighbouring segment's spigot; see geometry.plate.
-    # Each bulkhead glues into its own end segment; its lip projects into hull_mid
-    # and locates the joint. Lip lengths are the spigot length, since that is now
-    # what they are.
-    m["bulkhead_aft"] = G.plate(c, c.bulkhead_aft_x - c.plate_mm, c.plate_mm,
-                                section_x=c.bulkhead_aft_x - c.plate_mm)
-    m["bulkhead_fwd"] = G.plate(c, c.bulkhead_fwd_x, c.plate_mm,
-                                section_x=c.bulkhead_fwd_x + c.plate_mm)
-    m["deck_aft"] = G.deck_panel(c, 0.0, c.bulkhead_aft_x)
-    m["deck_mid"] = G.deck_panel(c, c.bulkhead_aft_x, c.bulkhead_fwd_x,
-                                 hatch=(c.hatch_x0, c.hatch_x1, c.hatch_half_w),
-                                 coaming=c.coaming_h_mm)
-    m["deck_bow"] = G.deck_panel(c, c.bulkhead_fwd_x, c.loa_mm)
-    m["hatch_cover"] = G.hatch_cover(c, c.hatch_x0, c.hatch_x1, c.hatch_half_w)
-    m["girder"] = G.girder(c, c.bulkhead_aft_x + 2.0, c.bulkhead_fwd_x - 2.0)
-    at = G._sampler(c)
-    ex, ez, _ = _shaft_axis(c, at)
-    m["shaft_block"] = G.shaft_block(c, {"exit_x_mm": ex, "exit_z_mm": ez,
-                                         "angle_deg": c.shaft_angle_deg})
-    # Fuse any part that came out as several abutting bodies. Guarded; see
-    # geometry.fuse for what happens when the boolean misbehaves.
-    m = {k: G.fuse(v, k) for k, v in m.items()}
-    if len(_GEOM_CACHE) > 8:
-        _GEOM_CACHE.clear()
-    _GEOM_CACHE[key] = m
-    return m
-
-
 #: How each part is laid on the bed. `axis` is the ASSEMBLY axis that becomes the
 #: printer's +Z; `flip` turns the part over first.
 #:
-#: This map exists because the fdm mesh gates judge the mesh in the frame it is
+#: This map exists because the fdm mesh gates judge the mesh in the frame they are
 #: given, and the assembly frame is the wrong one. Exporting parts in assembly
-#: coordinates put a deck panel floating 70 mm above the "bed" with its whole
-#: underside reading as an unsupported ceiling:
-#:     fdm.bridge_span: worst unsupported span 201.7 mm ... UNANCHORED
-#: which is a true statement about a part nobody would print that way, and tells you
-#: nothing about the part you would actually print.
+#: coordinates once put a deck panel floating 70 mm above the "bed" with its whole
+#: underside reading as an unsupported ceiling.
+#:
+#: All three hull segments print on a transverse face with their TRANSOM OR BULKHEAD
+#: END DOWN. That is not arbitrary: the section changes slowly along x on a hull this
+#: slender, so every wall is within about 27 degrees of vertical and nothing needs
+#: support; and putting the one solid cross-wall each segment carries on the BED
+#: turns the part of the design that would otherwise have to be bridged into the
+#: first layer. It is the whole reason the bulkheads could be merged at all.
 PRINT_ORIENTATION = {
-    # Hull segments stand on a transverse face: the section changes slowly along x,
-    # so every wall is within ~27 deg of vertical and nothing needs support. See the
-    # header of model/geometry.py for the three orientations that were rejected.
-    "hull_aft": ("x", False), "hull_mid": ("x", False), "hull_bow": ("x", False),
-    # Plates are thin in x in the assembly; laid flat they are thin in z.
-    # bulkhead_aft's locating lip points AFT (-x) so it does not fight hull_aft's
-    # spigot, which means that after the x->z rotation the lip would land on the bed
-    # and the full plate would bridge 198 mm across it. Flipped, the plate is the
-    # first layer and the lip points up.
-    # Plates are flat slabs with no lip, so they lie face-down and the flip is moot.
-    "transom_plate": ("x", False), "bulkhead_aft": ("x", False),
-    "bulkhead_fwd": ("x", False), "stem_plate": ("x", False),
-    # Decks are already flat plates, thin in z. Nothing to do.
-    "deck_aft": ("z", False), "deck_mid": ("z", False), "deck_bow": ("z", False),
-    # The hatch cover is flipped so its sealing lip points UP and the flat plate is
-    # the first layer. Lip-down would put a 5 mm rib on the bed and hang the plate.
-    "hatch_cover": ("z", True),
-    # The girder is a thin web, thin in y; laid flat it is thin in z.
-    "girder": ("y", False),
-    "shaft_block": ("z", False),
+    "hull_aft": ("x", False),    # transom on the bed
+    "hull_mid": ("x", False),    # aft bulkhead on the bed
+    "hull_bow": ("x", False),    # forward bulkhead on the bed
+    "stem_plate": ("x", False),  # a flat slab; lies on its face
+    "deck_bow": ("z", False),    # already a flat plate
+    "hatch_cover": ("z", True),  # flipped so the sealing rails point UP and the flat
+                                 # plate is the first layer. Rails down would put a
+                                 # 5 mm rib on the bed and hang the lid off it.
 }
 
 _AXIS_ROT = {
@@ -879,20 +869,164 @@ def overhang_fraction(mesh, layer_mm: float = 0.3) -> float:
 
     A SELECTION heuristic, not a verdict: it decides which single part is handed to
     fdm.overhang and fdm.bridge_span, because those gates judge one part and this
-    project prints twelve. The gate still does the judging.
+    project prints five. The gate still does the judging.
 
     The bed exclusion is the whole content of the function. Without it a flat deck
     panel scores 49% -- its entire underside points straight down -- and beats every
     hull segment, because a first layer and an unsupported ceiling have the same face
-    normal and differ only in whether there is a printer bed underneath. With it, the
-    flat plates go to zero and the hull segments, which genuinely have a few degrees
-    of taper hanging off them, sort to the top where they belong.
+    normal and differ only in whether there is a printer bed underneath.
     """
     n = mesh.face_normals[:, 2]
     a = mesh.area_faces
     zmin = mesh.vertices[mesh.faces][:, :, 2].max(axis=1)
     steep = (n < -np.sin(np.radians(45.0))) & (zmin > layer_mm)
     return float(a[steep].sum() / max(a.sum(), 1e-9))
+
+
+def _shell_walls(c: Config) -> dict:
+    """Wall thickness implied by each bare hull tube's own volume and area."""
+    out = {}
+    spans = {"hull_aft": (0.0, c.bulkhead_aft_x),
+             "hull_mid": (c.bulkhead_aft_x, c.bulkhead_fwd_x - c.plate_mm),
+             "hull_bow": (c.bulkhead_fwd_x - c.plate_mm, c.loa_mm)}
+    for name, (x0, x1) in spans.items():
+        t = G.hull_tube(c, x0, x1)
+        out[name] = 2.0 * float(t.volume) / float(t.area)
+    return out
+
+
+def make_parts(c: Config) -> dict:
+    """Every printed part, as a mesh. Keyed by part name. Cached on _GEOM_KEYS.
+
+    FIVE parts, down from thirteen. Everything that used to be a plate glued to a
+    hull segment is now printed as part of that segment, which is not a convenience:
+    **a watertight bulkhead printed integral with its hull has no bond line to
+    fail**, and watertightness is the top physical risk on this boat -- claim P1,
+    one of the five things only water can settle. Every joint removed is one fewer
+    place for it to go wrong.
+
+    What did NOT merge, and why:
+
+    * **The aft and forward bulkheads had to go on the segment whose print puts them
+      on the BED.** bulkhead_aft is integral to hull_mid and bulkhead_fwd to
+      hull_bow, not to the segments they close. Put either on the far end of a
+      segment and it becomes a 186 mm horizontal plate at the top of the print --
+      a bridge across the whole section, which is why the boat had loose plates in
+      the first place.
+    * **deck_bow stays separate.** hull_bow with an integral deck is a sealed box
+      with no way in, and the bow compartment has to be foam-filled and epoxy-coated
+      from the inside. Sealed air fails closed-loop -- one crack and the entire
+      reserve buoyancy is gone at the moment it is needed -- so the access is worth
+      more than the sixth part. hull_aft does not have this problem: it is open at
+      its forward end until hull_mid is glued on.
+    * **The hatch cover obviously stays separate.** It is the lid.
+
+    The cost, stated: an integral bulkhead can no longer be epoxy-filleted from both
+    sides, because one side is inside a compartment that is closed by the time the
+    joint exists. It does not need to be -- it has no joint -- but the hull-to-hull
+    seam beside it is now filleted from one side only.
+    """
+    key = _geom_key(c)
+    hit = _GEOM_CACHE.get(key)
+    if hit is not None:
+        return hit
+
+    at = G._sampler(c)
+    ex, ez, _ = _shaft_axis(c, at)
+    x_stem = G.hull_tube_end(c, c.bulkhead_fwd_x, c.loa_mm)
+    hhw = c.hatch_half_w
+
+    # ---- hull_aft: transom + closed deck + shaft seat, open forward ----------
+    aft = [
+        G.hull_tube(c, 0.0, c.bulkhead_aft_x),
+        G.integral_plate(c, 0.0, c.plate_mm),
+        G.integral_deck(c, 0.0, c.bulkhead_aft_x),
+        # The seat runs from the TRANSOM, not from the tube's exit point. Starting it
+        # at x = 52 put its aft face at print z = 52 with nothing below it in the same
+        # body, and fdm.bridge_span called the 126 mm2 face an unanchored ceiling.
+        # From x = 0 it starts on the bed. It also gives the stuffing tube a longer
+        # bonded bed, which is what stops the one penetration below the waterline
+        # from working loose.
+        G.integral_shaft_seat(c, {"exit_x_mm": ex, "exit_z_mm": ez,
+                                  "angle_deg": c.shaft_angle_deg}, x_from=0.0),
+    ]
+
+    # ---- hull_mid: aft bulkhead + coaming + side rails + girder, open top ----
+    # The hatch runs the FULL length of this segment. Anywhere the deck closed
+    # across the middle, the print would have to bridge the opening; running the
+    # opening end to end means the section is a U the whole way up.
+    mid = [
+        # hull_mid stops where hull_bow's forward bulkhead begins. Running it to
+        # bulkhead_fwd_x put 446 mm3 of hull_mid inside hull_bow's bulkhead, which
+        # cad.clash reported as interference because it was interference.
+        G.hull_tube(c, c.bulkhead_aft_x, c.bulkhead_fwd_x - c.plate_mm),
+        # the aft bulkhead, raised above deck level to form the aft coaming
+        G.integral_plate(c, c.bulkhead_aft_x, c.plate_mm, top_extra=c.coaming_h_mm),
+        G.integral_deck(c, c.bulkhead_aft_x, c.bulkhead_fwd_x - c.plate_mm, y_lo=None, y_hi=-hhw),
+        G.integral_deck(c, c.bulkhead_aft_x, c.bulkhead_fwd_x - c.plate_mm, y_lo=hhw, y_hi=None),
+        # The coamings start at the segment's own aft face -- ON THE BED -- and stop
+        # 1 mm short at the forward end. Insetting the aft end too put their end faces
+        # at print z = 1.0 with nothing below them in the same body, and
+        # fdm.bridge_span called two 10.8 mm2 faces unanchored ceilings. The forward
+        # inset is harmless because that end faces UP in this orientation.
+        G.integral_coaming(c, c.bulkhead_aft_x, c.bulkhead_fwd_x - c.plate_mm - 1.0,
+                           -hhw - c.coaming_w_mm, -hhw + c.coaming_set_in_mm),
+        G.integral_coaming(c, c.bulkhead_aft_x, c.bulkhead_fwd_x - c.plate_mm - 1.0,
+                           hhw - c.coaming_set_in_mm, hhw + c.coaming_w_mm),
+        # Also from the aft face, for the same reason: started 4 mm in, the girder's
+        # own aft face was a 12.7 mm2 unanchored ceiling at print z = 4.0. Running it
+        # into the bulkhead costs nothing -- the bulkhead is solid there.
+        G.integral_girder(c, c.bulkhead_aft_x, c.bulkhead_fwd_x - c.plate_mm - 2.0),
+    ]
+
+    # ---- hull_bow: forward bulkhead + stem, open top for foam and epoxy ------
+    bow = [
+        # The tube starts at the SAME x as its bulkhead, not after it, so both land on
+        # the bed together. Starting the tube 2 mm later put its aft end ring at print
+        # z = 2.0 with the bulkhead as a separate body beneath it, and fdm.bridge_span
+        # called that ring a 157 mm unsupported ceiling -- which it is, to a gate that
+        # reads one connected body at a time. hull_aft never had the problem because
+        # its transom and its tube both begin at x = 0.
+        G.hull_tube(c, c.bulkhead_fwd_x - c.plate_mm, c.loa_mm),
+        # Spans PAST bulkhead_fwd_x by merge_bite_mm so it overlaps the tube rather
+        # than abutting it. Abutting, the tube's aft end ring at the sheer sat on a
+        # face that stopped at exactly the same plane, and fdm.bridge_span called it
+        # a 157 mm unsupported ceiling -- correctly, for two bodies that touch.
+        # hull_aft's transom and hull_mid's bulkhead never had this because both
+        # start at their segment's own start and overlap it by their full thickness.
+        G.integral_plate(c, c.bulkhead_fwd_x - c.plate_mm,
+                         c.plate_mm + c.merge_bite_mm, top_extra=c.coaming_h_mm),
+        # TWO merges REJECTED here, both reported rather than forced.
+        #
+        # The STEM CAP: at the top of a bulkhead-down print it is a lid over the open
+        # cavity, and fdm.bridge_span measured an 85 mm unsupported span across
+        # 2649 mm2. Printing the segment stem-down just moves the problem to the
+        # bulkhead, which is 132 mm wide rather than 85.
+        #
+        # The BOW DECK: it prints fine as a longitudinal wall, but hull_bow will not
+        # fuse to a single body, and as a separate body inside the same part its
+        # underside roofs the cavity with nothing in the same body beneath it --
+        # fdm.bridge_span, 19 mm, UNANCHORED. As its own part it lies flat on the bed
+        # and the question does not arise.
+        #
+        # Both rejections buy the same thing twice over: the bow compartment stays
+        # open until the foam and the interior epoxy are in, and sealed air with no
+        # foam fails closed-loop.
+    ]
+
+    m = {
+        "hull_aft": G.fuse(aft, "hull_aft") if c.boolean_merge else trimesh.util.concatenate(aft),
+        "hull_mid": G.fuse(mid, "hull_mid") if c.boolean_merge else trimesh.util.concatenate(mid),
+        "hull_bow": G.fuse(bow, "hull_bow") if c.boolean_merge else trimesh.util.concatenate(bow),
+        "stem_plate": G.plate(c, x_stem - c.plate_mm, c.plate_mm, section_x=x_stem),
+        "deck_bow": G.deck_panel(c, c.bulkhead_fwd_x - c.plate_mm, x_stem),
+        "hatch_cover": G.hatch_cover(c, c.bulkhead_aft_x + c.plate_mm,
+                                     c.bulkhead_fwd_x - c.plate_mm, hhw),
+    }
+    if len(_GEOM_CACHE) > 8:
+        _GEOM_CACHE.clear()
+    _GEOM_CACHE[key] = m
+    return m
 
 
 def place_components(c: Config, at) -> dict:
@@ -1097,6 +1231,19 @@ def build(config: Config | None = None) -> dict:
     if c.write_meshes:
         os.makedirs(BUILD, exist_ok=True)
         os.makedirs(os.path.join(BUILD, "print"), exist_ok=True)
+        # Remove STLs the model no longer emits. Without this, dropping a part leaves
+        # its file behind and every downstream reader believes in it: tools/render.py
+        # counted 13 parts and 8 plates for a boat that had been six parts for an hour.
+        # A stale output is worse than a missing one, because it looks like an answer.
+        wanted = ({f"{n}.stl" for n in meshes}
+                  | {f"component_{k}.stl" for k in comps})
+        for stale in os.listdir(BUILD):
+            if stale.endswith(".stl") and stale not in wanted:
+                os.remove(os.path.join(BUILD, stale))
+        pdir = os.path.join(BUILD, "print")
+        for stale in os.listdir(pdir):
+            if stale.endswith(".stl") and stale[:-4] not in meshes:
+                os.remove(os.path.join(pdir, stale))
         for name, mesh in meshes.items():
             p = os.path.join(BUILD, f"{name}.stl")
             mesh.export(p)
@@ -1136,9 +1283,15 @@ def build(config: Config | None = None) -> dict:
         "swamped_margin_g": swamped_margin_g,
         "empty_draft_mm": empty_draft, "empty_gm_mm": gm_empty, "kg_empty_mm": kg_empty,
         # ---- mass -------------------------------------------------------
-        "shell_wall_measured_mm": {
-            k: (2.0 * part_geom[k]["volume_cm3"] * 1000.0 / part_geom[k]["surface_area_mm2"])
-            for k in SHELL_PARTS if k in part_geom},
+        # Measured on the BARE TUBES, not on the finished segments. Once the transom,
+        # the bulkheads, the decks, the girder and the shaft seat are merged in, a
+        # part's volume-over-area is no longer its wall: hull_aft reads 1.87 mm
+        # against a 1.60 mm shell because a third of its volume is solid plate. The
+        # tubes are regenerated here purely to be measured, which keeps the check
+        # independent of the model's own wall_mm in the way that matters -- the
+        # numbers still come out of trimesh, and the mesh_wall_scale control still
+        # breaks it.
+        "shell_wall_measured_mm": _shell_walls(c),
         "shell_wall_spec_mm": c.wall_mm,
         "printed_mass_g": printed_mass_g,
         "component_mass_g": component_mass_g,
@@ -1226,11 +1379,19 @@ def build(config: Config | None = None) -> dict:
         # with no reason, which is correct: an allowlist is where a real interference
         # goes to hide. Exactly one pair is listed and it is a glue joint.
         "clash_allow": [
-            {"pair": ["girder", "hull_mid"],
-             "reason": "the centre girder's foot sits on the moulded hull floor and is "
-                       "bonded to it with an epoxy fillet down both sides. The 0.011 mm "
-                       "of reported interference is the foot touching the floor line it "
-                       "is supposed to touch, over 2373 mm2 of intended glue area."},
+            {"pair": ["deck_bow", "hull_bow"],
+             "reason": "deck_bow is the lid of the sealed bow compartment, bonded to "
+                       "hull_bow's sheer with an epoxy fillet all round. The 0.03 mm of "
+                       "reported interference is the panel resting on the moulded line "
+                       "it is cut to rest on, over 16515 mm2 of intended glue area."},
+            {"pair": ["stem_plate", "hull_bow"],
+             "reason": "stem_plate caps the bow compartment after it has been foamed and "
+                       "epoxy-coated through that opening, and is bonded into hull_bow's "
+                       "moulded stem section. The reported interference is the plate "
+                       "sitting in the register it is cut to sit in. It is the only "
+                       "bonded printed joint left that is not a hull-segment butt joint: "
+                       "the girder, both bulkheads, the transom and both decks stopped "
+                       "being separate parts."},
         ],
         "bom": _bom_doc(c, bom, {
             "process": "fdm",
@@ -1321,21 +1482,37 @@ def _print_estimates(c, part_geom, mat):
     # cares about, in PRINT orientation. fdm-print looks at one part; this project
     # prints twelve; so the projection carries the envelope rather than a part
     # picked at random. Stated in the readiness report, not hidden here.
+    # ONE part, described COHERENTLY. fdm-print judges a single part, and the
+    # projection has to describe a single part or the gate's own sanity check trips:
+    # handing it hatch_cover's 200x120x1.6 bounding box alongside hull_mid's
+    # 150031 mm3 volume produced
+    #     volume_mm3 150031 is 3.9x its own bounding box ... geometrically impossible,
+    #     so the two are in different units
+    # which is fdm.process_model_valid correctly refusing a projection that described
+    # no object that exists.
+    #
+    # The part chosen is the worst by OVERHANG, in print orientation, because that is
+    # the metric with no other cover. Bed fit is covered for EVERY part by the
+    # project's own boat.bed_fit_all, which is what fdm-print would do if it had a
+    # multi-part mode. Both facts are stated in the readiness report.
     worst_bbox = max(part_geom.items(),
                      key=lambda kv: max(kv[1]["print_bbox_mm"][0], kv[1]["print_bbox_mm"][1]))
     worst_over = max(part_geom.items(), key=lambda kv: kv[1]["overhang_fraction"])
+    rep_name, rep = worst_over
     return {
-        "part_name": worst_over[0],
-        "mesh_path": os.path.join(BUILD, "print", f"{worst_over[0]}.stl"),
+        "part_name": rep_name,
+        "mesh_path": os.path.join(BUILD, "print", f"{rep_name}.stl"),
         "fdm_worst_bbox_part": worst_bbox[0],
-        "fdm_worst_overhang_part": worst_over[0],
+        "fdm_worst_overhang_part": rep_name,
         "overhang_fraction_by_part": {k: v["overhang_fraction"] for k, v in part_geom.items()},
         "print_bbox_by_part_mm": {k: v["print_bbox_mm"] for k, v in part_geom.items()},
-        "bbox": worst_bbox[1]["print_bbox_mm"],
-        "footprint_mm": worst_bbox[1]["print_bbox_mm"][:2],
-        "build_height_mm": max(g["print_bbox_mm"][2] for g in part_geom.values()),
-        "part_volume_mm3": max(g["volume_cm3"] for g in part_geom.values()) * 1000.0,
-        "surface_area_mm2": max(g["surface_area_mm2"] for g in part_geom.values()),
+        "worst_print_footprint_mm": max(max(g["print_bbox_mm"][0], g["print_bbox_mm"][1])
+                                        for g in part_geom.values()),
+        "bbox": rep["print_bbox_mm"],
+        "footprint_mm": rep["print_bbox_mm"][:2],
+        "build_height_mm": rep["print_bbox_mm"][2],
+        "part_volume_mm3": rep["volume_cm3"] * 1000.0,
+        "surface_area_mm2": rep["surface_area_mm2"],
         "bed_x_mm": c.bed_x_mm, "bed_y_mm": c.bed_y_mm, "bed_z_mm": c.bed_z_mm,
         "brim_allowance_mm": c.brim_mm,
         "usable_bed_x_mm": usable_x, "usable_bed_y_mm": usable_y,
@@ -1365,18 +1542,16 @@ def _print_estimates(c, part_geom, mat):
         # the hull's own x. The load they carry is hydrostatic pressure, which is
         # radial and therefore across the layer bonds in the worst case -- that is the
         # honest answer, and it is why the shell is 4 perimeters rather than 3.
-        # Overhang policy, STATED rather than defaulted. The pack ships 45 deg and a
-        # 0.5% area allowance and says in its own docstrings that both are project
-        # judgements. 45 deg stays. The AREA allowance is raised to 1.5% because the
-        # only part that uses it is hull_bow, where 740 mm2 of the stem taper hangs
-        # past 45 deg -- on the OUTSIDE of the hull, where support is trivially
-        # removable and where the surface is sanded and epoxy-coated anyway. That is
-        # about a thumbnail of support material on one of thirteen parts. Every other
-        # part prints support-free, which is what the rest of the geometry work was
-        # for. Flagged in the readiness report as a relaxed threshold, not buried.
+        # Overhang policy, stated rather than inherited silently -- and now back at
+        # the pack's own defaults. The earlier design relaxed the AREA allowance from
+        # 0.5% to 1.5% because hull_bow's stem taper hung 740 mm2 past 45 degrees.
+        # Merging the plates into the segments removed the reason: the stem is no
+        # longer a tapering solid nose on hull_bow, and the worst part in the whole
+        # print set is now hull_aft at 0.08%. A relaxed threshold that is no longer
+        # needed is a relaxed threshold that should go back.
         "overhang_limit_deg": 45.0,
         "max_overhang_deg": 45.0,
-        "overhang_area_allow_frac": 0.015,
+        "overhang_area_allow_frac": 0.005,
         "max_bridge_mm": 30.0,
         "max_cantilever_mm": 2.0,
         "primary_load_axis": [0.0, 1.0, 0.0],

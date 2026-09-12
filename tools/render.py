@@ -273,24 +273,28 @@ def main() -> int:
         sys.exit("no STLs in build/")
 
     print("rendering:")
+    n_printed = len([k for k in asm if not k.startswith("component")])
+    n_bought = len(asm) - n_printed
     draw(asm, os.path.join(OUT, "assembly.png"),
          "Assembly — 480 mm LOA",
-         subtitle="19 bodies: 13 printed, 6 bought parts shown in place. "
-                  "Hull scaled 1.6x from the traced profile so it floats the payload.")
+         subtitle=f"{len(asm)} bodies: {n_printed} printed, {n_bought} bought parts shown "
+                  f"in place. Hull scaled 1.6x from the traced profile so it floats the "
+                  f"payload.")
     draw({k: v for k, v in asm.items() if not k.startswith("component")},
          os.path.join(OUT, "structure.png"),
          "Printed structure",
-         subtitle="13 printed parts. Bulkheads and the centre girder divide the bilge "
-                  "into 53 mm cells, which is what holds the free-surface correction "
-                  "to 4.2 mm of GM.")
+         subtitle=f"{n_printed} printed parts. The transom, both bulkheads, the centre "
+                  f"girder, the shaft seat and the aft deck are printed INTO the hull "
+                  f"segments -- a bulkhead with no bond line cannot leak at the bond "
+                  f"line.")
     draw(explode(asm), os.path.join(OUT, "exploded.png"),
          "Exploded", elev=22, azim=-62,
          subtitle="Bought parts pushed furthest — they are what the hull hides.")
     draw({k: v for k, v in asm.items() if k.startswith("hull")},
          os.path.join(OUT, "hull.png"),
          "Hull shell", elev=18, azim=-64,
-         subtitle="Three printed segments. The section is the traced profile, "
-                  "unchanged in form.", legend=False)
+         subtitle="Three printed segments, each with its own cross-wall printed in. "
+                  "The section is the traced profile, unchanged in form.", legend=False)
     if printset:
         laid, n_plates = plate(printset)
         draw(laid, os.path.join(OUT, "print-plate.png"),
@@ -298,8 +302,10 @@ def main() -> int:
              f"{'s' if n_plates != 1 else ''} of 220 mm",
              elev=90, azim=-90, legend=False,
              subtitle="Each part in the orientation every printability verdict was "
-                      "made against. Largest footprint 190 mm against 208 mm usable "
-                      "once the brim is on.")
+                      f"made against. Largest footprint "
+                      f"{max(max(m.extents[0], m.extents[1]) for m in printset.values()):.0f} mm "
+                      f"against 208 mm usable once the brim is on. Every part prints "
+                      f"support-free.")
     return 0
 
 

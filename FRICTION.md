@@ -337,3 +337,156 @@ negative controls, cross-representation checks, adversarial lenses — found rea
 problems I would have shipped. The parts that made me write things down were tedious
 and correct. The parts that got in the way were all in the packs' shared vocabulary,
 not in the method.
+
+---
+
+# Round two: merging thirteen parts into six
+
+Appended after the owner said the boat had too many pieces. Everything below is
+friction that showed up *because of that change*, not a re-run of the list above.
+
+## 15. `tools/build_geometry.py` was in the instructions and not in the repo
+
+I was told to regenerate with `python tools/build_geometry.py`. There was no such
+file — the STLs were being written as a side effect of `atompipe check` calling
+`build()`. `tools/render.py` even says `no build/ — run tools/build_geometry.py
+first`, pointing at a script nobody had written. I wrote it.
+
+Not atompipe's fault, but it is the same failure mode the tool exists to catch: a
+documented step that does not exist, discovered by the next person to follow the
+document.
+
+## 16. Generated files are outputs — but nothing deletes them
+
+This one cost me a wrong answer, in public, for about an hour.
+
+`build()` writes an STL per part. When the part count went from thirteen to six, the
+seven dead STLs **stayed on disk**, and every downstream reader believed in them.
+`tools/render.py` cheerfully reported
+
+```
+PLATES: 8  parts: 13
+```
+
+for a boat that had been six parts for an hour. The plate count is the scoreboard for
+this whole exercise, and it was reading a boat that no longer existed.
+
+METHOD rule 1 says "generated files are outputs, not sources" and the whole project
+is built around that. But an output directory that is only ever *added to* is not
+regenerated, it is accumulated. atompipe knows exactly which files its model emits —
+it could prune, or at minimum warn that `build/` contains files the current model does
+not produce. `atompipe doctor` would be the natural place.
+
+I fixed it in my own model (`build()` now removes STLs it no longer emits, with a
+comment naming this incident), but every atompipe project that emits geometry has this
+hole and each one will discover it separately.
+
+## 17. The mesh gates cannot see across bodies in one part, and that shapes the design
+
+This is the big one, and it is not a bug so much as an unstated assumption with real
+design consequences.
+
+A printed part made of several overlapping closed bodies is completely normal — every
+slicer unions them and prints one object. Two atompipe gates cannot:
+
+* `cad.wall_thickness` casts a ray from a face, and a face where two bodies overlap is
+  an *internal* face. The ray leaves body A and immediately enters body B, and the gate
+  reports the gap between them. Measured 0.002 mm through 1.6 mm of solid plastic.
+* `fdm.bridge_span` looks for what supports a downward face, and finds only geometry in
+  the same connected body. A hull segment's end ring sitting *directly on* its own
+  bulkhead was reported as a 157 mm `UNANCHORED` ceiling. I cast a ray straight down
+  from that face myself: it hits material 2 mm below. The gate is not wrong about the
+  mesh it was handed; it is answering a question about connectivity, not about support.
+
+The consequence is that the gates pushed the DESIGN, not just the file format. Chasing
+those two verdicts is what produced:
+
+- every segment printing with its cross-wall on the bed,
+- the shaft seat running from the transom instead of starting mid-print,
+- the coamings and the girder starting at the segment's own aft face,
+- plates standing 0.3 mm proud instead of inset.
+
+**Every one of those is a genuine improvement** — better adhesion, a longer bonded bed
+for the stuffing tube, a register at each joint. So I am not complaining about the
+outcome. But I got there by reverse-engineering two gates' notions of connectivity from
+their failure strings, over roughly fifteen iterations, and nothing in either pack's
+PACK.md mentions that a multi-body part is a different thing to them than to a slicer.
+One sentence in `fdm-print/PACK.md` and one in `cad-solid/PACK.md` would have saved all
+of it.
+
+## 18. The boolean union: four hours, four findings, still off
+
+I tried to make each merged part a single solid so the two gates above would be
+satisfied honestly rather than worked around. It does not work on this geometry, and
+the way it fails is worth writing down because every one of these looked like success:
+
+1. **`union(mesh.split())` and `union([a, b, c])` give different answers.** Same engine,
+   same geometry. The first round-trips through concatenate/split and its output did
+   not survive STL; the direct call's did.
+2. **A union of bodies that merely touch is a silent no-op** — same body count, same
+   volume, and it looks exactly like a successful merge. The bodies have to genuinely
+   overlap. I shipped a "merge" that had merged nothing for two iterations.
+3. **manifold3d is fast and wrong here.** Watertight single body in milliseconds, whose
+   STL round-trip is not watertight. Blender takes two seconds and survives. The fast
+   answer that fails the check is worse than no answer.
+4. **Cleaning up the union destroys it.** Dropping degenerate faces and re-merging
+   vertices — the obvious hygiene — turned 18 open edges into 412, and turned
+   `hull_bow`'s union, which was *already watertight*, into a mesh with 324 open edges.
+   `fill_holes` and nothing else was the answer.
+
+And after all four, `hull_aft`'s union still comes back from `cad-solid`'s own
+normalisation with 2 non-manifold edges. **My guard was more lenient than the gate**,
+which is its own lesson: a guard that accepts what the gate rejects is not a guard, and
+I only noticed because the gate went red on a mesh my own check had blessed. The guard
+now runs the gate's normalisation.
+
+What I wanted and did not have: a way to ask a pack "would you accept this mesh?"
+without running a whole sweep. `atompipe check --only cad.watertight` still rebuilds
+every part and re-exports every STL.
+
+## 19. A gate that judges one part will quietly change which part
+
+`fdm-print` judges a single part. The model picks the worst one by overhang and hands
+it over. Across this change the chosen part moved between `hull_bow`, `bulkhead_aft`,
+`stem_plate`, `hull_mid` and `hull_aft` — five times — because fixing one part's
+overhang promotes another. So the verdict line changed subject repeatedly while
+looking like a continuous measurement of the same thing.
+
+Worse, I had the projection describe the worst part by *overhang* and the worst part by
+*bounding box* at the same time, and `fdm.process_model_valid` caught it:
+
+```
+volume_mm3 150031 is 3.9x its own bounding box (200x120x1.6 = 38400)
+— geometrically impossible, so the two are in different units
+```
+
+That gate is guessing at a units slip and the real cause was a projection describing
+two different objects at once — but **it caught a real incoherence I had introduced**,
+which is the point, and its message got me there in one read. Good gate.
+
+The fix was to describe one part coherently and write `boat.bed_fit_all` to cover bed
+fit for all six, which is the multi-part mode `fdm-print` does not have. That is the
+third project gate I have written to cover a pack's single-part assumption.
+
+## 20. Was this change worth the tool overhead? Yes, and differently from round one
+
+Round one, the method found bugs. Round two, the method mostly **stopped me lying to
+myself about a simplification**:
+
+- The instruction was "minimise plates". The scoreboard read 8 plates for an hour
+  because of stale files. Without a regenerate-and-measure loop I would have reported
+  a number I had not measured.
+- Two merges had to be REJECTED, and the gates are what told me which two. Left to my
+  own judgement I would have merged the bow deck — it prints beautifully as a
+  longitudinal wall — and only found out when the stem end of a sealed compartment had
+  no way to get foam into it.
+- The relaxed overhang threshold from round one turned out to be **no longer needed**
+  after the merge, and I would not have noticed if the number were not sitting in the
+  model with a comment saying why it had been relaxed. It is back at the pack default.
+  That is rule 3 paying rent: a constant with its reason written down gets revisited
+  when the reason expires.
+
+The cost, honestly: about fifteen full tier-1 sweeps, most of them chasing sub-millimetre
+artifacts of multi-body meshes rather than anything about a boat. Roughly two thirds of
+the elapsed time on this change went into geometry the gates could parse, not geometry
+that floats better.

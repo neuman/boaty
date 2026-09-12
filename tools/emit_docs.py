@@ -13,6 +13,7 @@ import sys
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(HERE, "model"))
+sys.path.insert(0, os.path.join(HERE, "tools"))
 import boat  # noqa: E402
 
 B = boat.build(boat.Config())
@@ -101,6 +102,14 @@ def prints():
                    f"{times[k]:.1f} | {ori} | {sup} |\n")
     out.append(f"\nLargest footprint {max(max(g['print_bbox_mm'][:2]) for g in pg.values()):.0f} mm "
                f"against {C['bed_x_mm'] - 2*C['brim_mm']:.0f} mm of usable bed once the brim is on.\n")
+    out.append("\n## Plates\n\n")
+    import render  # noqa: E402
+    ps = render.load(os.path.join(HERE, "build", "print"))
+    _, n_plates = render.plate(ps)
+    out.append(f"These {len(ps)} parts bin into **{n_plates} bed{'s' if n_plates != 1 else ''}** "
+               f"of 220 mm (tools/render.py, shelf-packed, 8 mm between parts). Three of "
+               f"them are the full 186 mm beam of the boat on one axis, and two of those "
+               f"cannot share a 220 mm bed with anything, which is what sets the floor.\n\n")
     out.append("\n## Holes to drill after printing\n\n"
                "Nothing below is printed as a hole: a printed hole in a thin wall is a "
                "support problem and a drill is four seconds.\n\n")
@@ -110,12 +119,15 @@ def prints():
                f"9.5 mm tube plus an epoxy fillet.\n")
     out.append("- **Pushrod tube**, through `bulkhead_aft` and `transom_plate` at the "
                "same height, above the waterline. 3.2 mm.\n")
-    out.append("- **Limber holes**, 6 mm, through the bottom of `girder` every 40 mm, so "
-               "bilge water can reach one place instead of two.\n")
+    out.append("- **Limber holes**, 6 mm, through the foot of the centre girder inside "
+               "`hull_mid`, every 40 mm, so bilge water can reach one place instead of "
+               "two.\n")
     out.append("- **Hatch screws**, 4 x 2.5 mm pilot through the lid into the coaming "
                "for M3 self-tappers.\n")
-    out.append("- **Joint pins**, 2 mm through each bulkhead-to-hull joint face, for "
-               "1.75 mm filament shear pins. Three per joint.\n")
+    out.append("- **Joint pins**, 2 mm through each of the two hull-to-hull joint faces, "
+               "for 1.75 mm filament shear pins. Three per joint. There are only two "
+               "joints left: the bulkheads that used to be loose plates are now printed "
+               "into the segments.\n")
     out.append("- **Rudder bracket**, to the transom, to suit the bracket you get: its "
                "hole spacing is not published by the vendor. Measure first.\n")
     return "".join(out)
@@ -123,39 +135,45 @@ def prints():
 
 def build_order():
     out = [BANNER, "# Build order\n\n",
-           "Written in the order that lets you find a mistake while it is still cheap.\n\n"]
-    out.append("## 1. Print and leak-test the shells BEFORE anything else\n\n"
-               "Print `hull_aft`, `hull_mid`, `hull_bow` and the four plates. Then, and "
-               "this is the step every source agrees on and everybody skips: **fill each "
-               "hull segment with water, stand it on a dry towel, and leave it for two or "
-               "three hours.** Mark every damp spot. Coat only what leaked, coat it from "
-               "the inside, and re-test.\n\n"
+           "Written in the order that lets you find a mistake while it is still cheap.\n\n",
+           "Six printed parts, two glued hull joints. The transom, both watertight "
+           "bulkheads, the centre girder, the shaft seat and the aft deck are printed "
+           "into the hull segments rather than glued on -- a bulkhead with no bond line "
+           "cannot leak at the bond line.\n\n"]
+    out.append("## 1. Print and leak-test the three hull segments BEFORE anything else\n\n"
+               "Print `hull_aft`, `hull_mid` and `hull_bow`. Then, and this is the step "
+               "every source agrees on and everybody skips: **fill each segment with "
+               "water, stand it on a dry towel, and leave it two or three hours.** Mark "
+               "every damp spot. Coat only what leaked, from the inside, and re-test.\n\n"
                "Doing this now costs an evening. Doing it after the electronics are in "
                "costs the electronics.\n\n")
     out.append("## 2. Seal the inside\n\n"
                "One or two thin brush coats of XTC-3D on the INSIDE of every segment, "
                "seams first. Thin coats: pooled epoxy adds mass without adding sealing, "
-               "and mass is the budget this hull spends its freeboard out of. The printed "
-               "seam is not the seal; the fillet over it is.\n\n")
-    out.append("## 3. Driveline, before the bulkheads go in\n\n"
-               f"Drill the 10.2 mm stuffing-tube hole through the hull bottom at "
-               f"x = {B['shaft_exit_x_mm']:.0f} mm at {B['shaft_angle_deg']:.0f} degrees. "
-               "Bond `shaft_block` to the hull floor on that line, pass the tube through "
-               "both, and **epoxy-fillet the tube on BOTH sides, inside and out**. Pack "
-               "the tube one third to one half full of marine grease from the propeller "
-               "end. This is the only penetration below the waterline and it is where "
-               "boats actually sink.\n\n")
-    out.append("## 4. Bulkheads, girder, transom, stem\n\n"
-               "Drill 2 mm pin holes through each joint face, three per joint. Dry-fit "
-               "everything with filament pins before any glue. Then CA the joints to tack "
-               "them and epoxy-fillet every seam on the inside. Bond the girder down the "
-               "centreline of the equipment bay and drill its limber holes.\n\n")
-    out.append("## 5. Foam the ends, then close them\n\n"
-               "Fill the bow and stern compartments with closed-cell foam, around the "
-               "stuffing tube and the pushrod tube. **Closed cell, not open**: open-cell "
-               "foam is a sponge and becomes ballast. Then bond `deck_aft` and `deck_bow` "
-               "down. Those two compartments never open again, and they are what makes a "
-               "swamped boat recoverable rather than gone.\n\n")
+               "and mass is the budget this hull spends its freeboard out of.\n\n"
+               "`hull_aft` is open at its forward end and `hull_bow` at its bow end, "
+               "which is how you get a brush into both sealed compartments. That access "
+               "is the reason `stem_plate` and `deck_bow` are still separate parts.\n\n")
+    out.append("## 3. Driveline, while hull_aft is still open\n\n")
+    out.append(f"Drill the 10.2 mm stuffing-tube hole through the hull bottom at "
+               f"x = {B['shaft_exit_x_mm']:.0f} mm at {B['shaft_angle_deg']:.0f} degrees, "
+               "and ream the matching bore through the shaft seat that is printed into "
+               "the hull floor on that line. Pass the tube through both and "
+               "**epoxy-fillet it on BOTH sides, inside and out**. Pack it one third to "
+               "one half full of marine grease from the propeller end. This is the only "
+               "penetration below the waterline and it is where boats actually sink.\n\n")
+    out.append("## 4. Foam the ends, then close them\n\n"
+               "Fill the stern compartment (inside `hull_aft`) and the bow compartment "
+               "(inside `hull_bow`) with closed-cell foam, around the stuffing tube and "
+               "the pushrod tube. **Closed cell, not open**: open-cell foam is a sponge "
+               "and becomes ballast. Then bond `stem_plate` into the bow and `deck_bow` "
+               "onto hull_bow's sheer. Those compartments never open again, and they are "
+               "what makes a swamped boat recoverable rather than gone.\n\n")
+    out.append("## 5. Join the three segments\n\n"
+               "Two joints, both landing on a printed bulkhead face. Drill 2 mm pin holes "
+               "through each joint face, three per joint, and dry-fit with 1.75 mm "
+               "filament pins before any glue. Then CA the joints to tack them and "
+               "epoxy-fillet each seam on the inside, through the hatch.\n\n")
     out.append("## 6. Fit out the equipment bay\n\n")
     at = boat.G._sampler(boat.Config())
     comps = boat.place_components(boat.Config(), at)
@@ -166,11 +184,12 @@ def build_order():
                f"from the transom in the model and sliding it is how you trim the boat: "
                f"the model floats {B['trim_deg']:+.2f} degrees and every 10 mm of battery "
                f"movement is worth roughly 0.1 degrees.\n\n")
-    out.append("## 7. Deck and hatch\n\n"
-               f"Bond `deck_mid` on. Lay the foam tape on the coaming's top face, and screw "
-               f"`hatch_cover` down onto it with four M3 self-tappers. Silicone-grease the "
-               f"tape every session. **Never glue the hatch shut** -- it is the only way "
-               f"back into the boat.\n\n")
+    out.append("## 7. Hatch\n\n"
+               "Lay the foam tape on the coaming's top face -- the coaming is printed "
+               "into `hull_mid`'s deck rails and continues across both bulkhead tops -- "
+               "and screw `hatch_cover` down onto it with four M3 self-tappers. "
+               "Silicone-grease the tape every session. **Never glue the hatch shut**: it "
+               "is the only way back into the boat.\n\n")
     out.append("## 8. Before the first sail\n\n"
                "- Set the ESC to **Forward/Reverse**, not Forward/Brake/Reverse.\n"
                "- Set **throttle failsafe to neutral**. A lost link with the throttle open "
@@ -181,8 +200,8 @@ def build_order():
                "by the stern, slide the battery forward.\n"
                "- First run: five minutes, close to shore. Open it, look for water, feel "
                "the motor and the ESC.\n\n")
-    out.append("## What this boat will and will not do\n\n"
-               f"Design speed **{B['design_speed_m_s']:.1f} m/s**, which is Froude "
+    out.append("## What this boat will and will not do\n\n")
+    out.append(f"Design speed **{B['design_speed_m_s']:.1f} m/s**, which is Froude "
                f"{B['froude']:.2f} on a {B['loa_mm']:.0f} mm hull -- at hull speed. It is a "
                "displacement hull: past about 0.9 m/s it will squat by the stern, drag a "
                "large wake, and drink current without going meaningfully faster. That is "

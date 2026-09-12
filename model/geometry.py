@@ -377,55 +377,80 @@ def deck_panel(cfg, x0, x1, hatch=None, coaming=0.0):
     return trimesh.util.concatenate(out)
 
 
-def fuse(mesh, name=""):
-    """Union a multi-body part into one solid, CHECKED, or hand back the original.
+def fuse(bodies, name=""):
+    """Union a list of overlapping bodies into ONE solid, CHECKED, or hand back the
+    concatenation unchanged.
 
-    The module builds parts as abutting closed bodies and avoids booleans on purpose
-    (see the header). One part -- the mid deck, which is four slabs and four coaming
-    rails -- has to be a single body anyway, because a multi-body mesh has internal
-    faces and the mesh gates cannot tell an internal face from a void:
-    cad.wall_thickness cast a ray along the seam between two overlapping deck slabs
-    and reported a 0.003 mm section through 1.4 mm of solid plastic.
+    This module builds parts out of separate closed bodies and, for a long time,
+    avoided booleans entirely (see the header). That worked until the part count had
+    to come down: a bulkhead printed integral with its hull segment has no bond line
+    to fail, and watertightness is the top physical risk on the whole boat -- but an
+    integral bulkhead emitted as a SEPARATE body inside the same STL is not integral,
+    it is two bodies with an internal face between them, and cad.wall_thickness casts
+    a ray along that face and measures nothing.
 
-    So the boolean is used, and it is WRAPPED (rule 7). A boolean that quietly
-    returns an empty mesh is how a part disappears from an assembly with every gate
-    still green, so the result has to be one watertight positive-volume body whose
-    volume is within 25% of the sum of the inputs -- overlaps mean it must be a
-    little smaller, never larger, and never a fraction. Anything else, the original
-    multi-body mesh is returned unchanged and the gates get to complain about the
-    real thing rather than about a silent substitution.
+    So the boolean is used, and it is WRAPPED (rule 7), with three things learned the
+    hard way:
+
+    * **Union the ORIGINAL body list, not a re-split of their concatenation.**
+      `trimesh.boolean.union(mesh.split(...))` and `union([a, b, c])` are not the same
+      call: the first round-trips the geometry through concatenate/split first, and
+      its output did not survive STL where the direct call's output did. Same engine,
+      same inputs, different answer.
+    * **The bodies have to genuinely OVERLAP.** Abutting bodies union to a no-op --
+      same body count, same volume, and it looks like it worked. Every merged
+      sub-body bites `merge_bite_mm` into its host on purpose.
+    * **manifold3d is fast and wrong here.** It returns a watertight single body in
+      milliseconds whose STL round-trip is not watertight. Blender takes two seconds
+      and survives. The fast answer that fails the check is worse than no answer.
+
+    The guard is the STL round-trip, because that is the artifact the gates read --
+    checking the in-memory object was checking the wrong thing, which is the same
+    mistake as judging a part in assembly coordinates. One watertight positive-volume
+    body, volume within 25% of the inputs (overlaps mean a little smaller, never
+    larger). Anything else and the caller gets the concatenation and the gates get to
+    complain about the real thing rather than a silent substitution.
     """
-    if mesh.body_count <= 1:
-        return mesh
-    before = float(mesh.volume)
+    bodies = [b for b in bodies if b is not None and len(b.faces)]
+    if len(bodies) == 1:
+        return bodies[0]
+    plain = trimesh.util.concatenate(bodies)
+    if len(bodies) == 0:
+        return plain
+    before = float(plain.volume)
     try:
-        u = trimesh.boolean.union(mesh.split(only_watertight=False))
+        u = trimesh.boolean.union(bodies, engine="blender")
     except Exception:
-        return mesh
+        return plain
     if u is None or len(u.faces) == 0:
-        return mesh
-    if not (u.is_watertight and u.is_volume and u.body_count == 1):
-        return mesh
-    if not (0.75 * before <= float(u.volume) <= 1.02 * before):
-        return mesh
-    # Clean the slivers the boolean leaves behind, then CHECK IT THROUGH STL.
-    # In memory the union came back watertight and a valid volume; through the file
-    # format the gates actually read, it came back with 2 non-manifold edges and 59
-    # zero-area faces, because STL has no vertex identity and the loader welds at
-    # 1e-4 mm. Checking the in-memory object was checking the wrong artifact -- the
-    # same mistake as judging a part in assembly coordinates.
+        return plain
     try:
-        u.update_faces(u.nondegenerate_faces(height=1e-4))
-        u.remove_unreferenced_vertices()
-        u.merge_vertices(digits_vertex=4)
+        # fill_holes ONLY. The obvious cleanup -- dropping degenerate faces and
+        # re-merging vertices -- takes a union with 18 open edges and returns one
+        # with 412, and takes hull_bow's union, which was already watertight, and
+        # breaks it. Blender's output is nearly closed and very fragile; the least
+        # that closes it is the most that should be done to it.
+        trimesh.repair.fill_holes(u)
         rt = trimesh.load(trimesh.util.wrap_as_stream(u.export(file_type="stl")),
                           file_type="stl", process=True)
     except Exception:
-        return mesh
+        return plain
+    # The guard has to be at least as strict as the gate, or it passes meshes the
+    # gate then rejects. cad-solid does not just load the STL: it welds at 1e-4 mm
+    # and drops faces under 1e-8 mm2 over two passes, and hull_aft came back from a
+    # union that satisfied is_watertight with 2 non-manifold edges and 11 degenerate
+    # faces once that ran. So the same normalisation runs here.
     if not (rt.is_watertight and rt.is_volume and rt.body_count == 1):
-        return mesh
-    if not (0.75 * before <= float(rt.volume) <= 1.02 * before):
-        return mesh
+        return plain
+    probe = rt.copy()
+    keep = probe.nondegenerate_faces(height=1e-4)
+    if not bool(keep.all()):
+        return plain
+    probe.merge_vertices(digits_vertex=4)
+    if not (probe.is_watertight and probe.is_volume and probe.body_count == 1):
+        return plain
+    if not (0.70 * before <= float(rt.volume) <= 1.02 * before):
+        return plain
     return u
 
 
@@ -436,42 +461,34 @@ def box(cx, cy, cz, lx, ly, lz):
 
 
 def hatch_cover(cfg, hx0, hx1, hhw):
-    """Lid for the equipment bay: a plate with two downstand side rails, swept as ONE
-    closed body.
+    """Lid for the equipment bay: a flat plate, one body, no downstand rails.
 
-    Built as a single swept profile rather than a plate plus four boxes, because a
-    multi-body mesh has INTERNAL faces and the fdm mesh gates cannot tell an internal
-    face from a ceiling. The four-box version put the rails' undersides 0.1 mm inside
-    the plate, and fdm.bridge_span read them as a 149 mm unsupported span over solid
-    material that a slicer would have unioned away. The gate was not wrong about the
-    mesh it was given; the mesh was the wrong thing to give it.
+    The rails went. They located the lid in y, and they cost more than that was
+    worth: they ran the full length of a constant-section sweep, so where the lid
+    lands on the bulkhead tops they dipped into solid plate and cad.clash found
+    119 mm3 of lid inside hull_bow. Shortening only the rails means a varying
+    section, which means a second body, which means internal faces -- the thing this
+    module keeps paying for.
 
-    Fore and aft the cover is flat and lands on the foam tape; the rails are what
-    locate it in the opening and shed water sideways.
+    What locates the lid instead: the coaming it drops against on both sides, and
+    four M3 screws. What seals it: closed-cell foam tape on the rim, compressed by
+    those screws. Prusa's measured result is that O-rings and tapes seal and printed
+    flexible gaskets do not; a printed rail was never the seal, only a guide.
     """
     at = _sampler(cfg)
     dz = deck_z(cfg.hull_scale, cfg.loa_mm) + cfg.deck_gap_mm
-    c = cfg.fit_clearance_mm
-    w = cfg.lip_wall_mm
-    W = hhw + cfg.coaming_w_mm + cfg.hatch_land_mm   # lid covers the coaming
-    ro = hhw - c                           # outer face of the rail
-    ri = ro - w                            # inner face of the rail
-    # The lid sits ON TOP of the coaming, with the foam tape on the coaming's top
-    # face, and its rails drop through the coaming into the opening. The first
-    # version put the lid at deck level, where its outboard land ran straight through
-    # the coaming: cad.clash, 34325 mm3, 1.9 mm deep over 18040 mm2.
     z0 = dz + cfg.deck_mm + cfg.coaming_h_mm + cfg.gasket_mm
-    _rail = cfg.coaming_h_mm + cfg.hatch_lip_mm + cfg.fit_clearance_mm
-    # a Pi section: lid across the top, two legs hanging into the opening
-    poly = np.array([
-        [-W, z0 + cfg.hatch_mm], [W, z0 + cfg.hatch_mm],
-        [W, z0], [ro, z0], [ro, z0 - _rail], [ri, z0 - _rail],
-        [ri, z0], [-ri, z0], [-ri, z0 - _rail],
-        [-ro, z0 - _rail], [-ro, z0], [-W, z0],
-    ], float)
+    W = hhw + cfg.coaming_w_mm + cfg.hatch_land_mm
     a = hx0 - cfg.hatch_land_mm
     b = hx1 + cfg.hatch_land_mm
-    return _sweep([(float(a), poly), (float(b), poly)])
+    n = max(4, int((b - a) / cfg.mesh_dx_mm) + 1)
+    secs = []
+    for x in np.linspace(a, b, n):
+        hb = max(at(x)[0] - cfg.merge_inset_mm, 0.8)
+        w = min(W, hb)
+        secs.append((float(x), np.array([[-w, z0], [w, z0],
+                                         [w, z0 + cfg.hatch_mm], [-w, z0 + cfg.hatch_mm]])))
+    return _sweep(secs)
 
 
 def girder(cfg, x0, x1):
@@ -506,3 +523,159 @@ def shaft_block(cfg, spec):
     # so. The bore is drilled at the shaft angle after printing, which is how the
     # stuffing tube gets bonded anyway -- the hole has to be reamed to suit the tube.
     return box(cx, 0.0, cz, L, cfg.shaft_block_w_mm, cfg.shaft_block_h_mm)
+
+
+# --------------------------------------------------------------------------- #
+# Integral features
+#
+# Everything below returns a body that deliberately BITES `cfg.merge_bite_mm` into
+# the hull segment it belongs to, so that geometry.fuse has something to union.
+# A feature that merely touches its host unions to a no-op.
+# --------------------------------------------------------------------------- #
+def integral_plate(cfg, x, thickness, section_x=None, top_extra=0.0):
+    """A transom, stem or bulkhead, sized to bite into the hull wall.
+
+    `top_extra` carries the plate above deck level, which is how the fore and aft
+    coamings are made: they are the tops of the two bulkheads, so the hatch lands on
+    a continuous rim without any part having to grow a cross-piece that its own
+    print would have to bridge.
+    """
+    at = _sampler(cfg)
+    dz = deck_z(cfg.hull_scale, cfg.loa_mm) + cfg.deck_mm + top_extra
+    # Sized at the WIDEST station the plate spans, not at one end of it. The hull
+    # changes half-beam along x, so a plate cut to its forward face is narrower than
+    # the hull at its aft face -- by only 0.2 mm at the forward bulkhead, which was
+    # still enough of a rim for cad.wall_thickness to cast a ray down and report a
+    # 0.002 mm wall.
+    if section_x is None:
+        section_x = max((x, x + thickness), key=lambda xx: at(xx)[0])
+    hb, dep, kz = at(section_x)
+    # The plate covers the FULL section and stands `plate_proud_mm` past the hull's
+    # outer skin -- it is not inset into the cavity. Two failures drove that:
+    #   * inset by less than the wall, it leaves a rim of bare hull wall beside it,
+    #     and a ray cast along that rim measures wall - bite, not the wall.
+    #     cad.wall_thickness: 0.001 mm on hull_bow.
+    #   * inset at all, the hull tube's end ring lands PARTLY on the plate and partly
+    #     on nothing, which printed is an unsupported annulus all round the part.
+    #     fdm.bridge_span: a 157 mm span on a 384 mm2 ceiling.
+    # Standing proud fixes both and gives the joint a 0.3 mm register into the
+    # bargain. Flush was not an option: it makes the plate's rim exactly coplanar
+    # with the hull's outer skin, which STL welds into non-manifold edges.
+    # Built from the hull's OUTER section pushed outward, not from the inner section
+    # pushed back out. The two are not the same near the keel, where the inward
+    # offset clamps at the centreline: run backwards from there, the plate stopped
+    # about 1.6 mm short of the hull's outer skin along the flat of the bottom, so
+    # the hull tube's end ring landed on nothing for a strip the width of the wall,
+    # and fdm.bridge_span reported a 157 mm unsupported ceiling. Offsetting the outer
+    # curve outward has no clamp in it and covers the section by construction.
+    oy, oz = _half_section(hb, dep, kz, cfg.section_points, dz)
+    py, pz = offset_inward(oy, oz, -cfg.plate_proud_mm, clamp=False)
+    body = np.column_stack([np.concatenate([-py[::-1], py[1:]]),
+                            np.concatenate([pz[::-1], pz[1:]])])
+    return _sweep([(float(x), body), (float(x + thickness), body)])
+
+
+def integral_deck(cfg, x0, x1, y_lo=None, y_hi=None, top_extra=0.0):
+    """A deck slab that sinks into the sheer instead of floating above it.
+
+    `y_lo`/`y_hi` cut it down to a side rail; `top_extra` raises it into a coaming.
+    """
+    at = _sampler(cfg)
+    dz = deck_z(cfg.hull_scale, cfg.loa_mm)
+    n = max(4, int((x1 - x0) / cfg.mesh_dx_mm) + 1)
+    secs = []
+    for x in np.linspace(x0, x1, n):
+        hb = max(at(x)[0], 0.6)
+        # The deck's outboard edge stops INSIDE the hull's outer skin. Flush with it
+        # gives the boolean a pair of exactly coplanar vertical faces the full length
+        # of the part, and its answer then is a single body that is not watertight.
+        edge = max(hb - cfg.merge_inset_mm, 0.8)
+        lo = -edge if y_lo is None else max(y_lo, -edge)
+        hi = edge if y_hi is None else min(y_hi, edge)
+        if hi - lo < 0.6:
+            hi = lo + 0.6
+        secs.append((float(x), np.array([[lo, dz - cfg.merge_bite_mm],
+                                         [hi, dz - cfg.merge_bite_mm],
+                                         [hi, dz + cfg.deck_mm + top_extra],
+                                         [lo, dz + cfg.deck_mm + top_extra]])))
+    return _sweep(secs)
+
+
+def integral_girder(cfg, x0, x1):
+    """Centre girder whose foot sinks into the hull floor.
+
+    Limber holes are drilled, not printed: a 6 mm hole in a 2.4 mm web printed on
+    its side is a support problem and a drill is four seconds.
+    """
+    at = _sampler(cfg)
+    n = max(4, int((x1 - x0) / cfg.mesh_dx_mm) + 1)
+    secs = []
+    for x in np.linspace(x0, x1, n):
+        hb, dep, kz = at(x)
+        iy, iz = _inner_u(hb, dep, kz, cfg.wall_mm, cfg.section_points)
+        zf = iz.min()
+        t = cfg.girder_t_mm / 2.0
+        secs.append((float(x), np.array([[-t, zf - cfg.merge_bite_mm],
+                                         [t, zf - cfg.merge_bite_mm],
+                                         [t, zf + cfg.girder_h_mm],
+                                         [-t, zf + cfg.girder_h_mm]])))
+    return _sweep(secs)
+
+
+def integral_shaft_seat(cfg, spec, x_from=None):
+    """The seat the stuffing tube is bonded through, grown UP OUT OF the hull floor
+    rather than floated on the shaft axis.
+
+    Floating it on the axis left its underside unsupported and put an unsupported
+    ceiling in the print; sitting it on the floor also gives the tube a real bonded
+    bearing length, which is what stops the one penetration below the waterline from
+    working loose.
+    """
+    at = _sampler(cfg)
+    ax, az, ang = spec["exit_x_mm"], spec["exit_z_mm"], spec["angle_deg"]
+    L = cfg.shaft_block_len_mm
+    x0 = ax if x_from is None else float(x_from)
+    n = max(4, int((ax + L - x0) / cfg.mesh_dx_mm) + 1)
+    secs = []
+    for x in np.linspace(x0, ax + L, n):
+        hb, dep, kz = at(x)
+        iy, iz = _inner_u(hb, dep, kz, cfg.wall_mm, cfg.section_points)
+        zf = iz.min() - cfg.merge_bite_mm
+        ztop = az + (x - ax) * np.tan(np.radians(ang)) + cfg.shaft_block_h_mm / 2.0
+        if ztop <= zf + 1.0:
+            ztop = zf + 1.0
+        # Clamped to the CAVITY, not to a constant. Near the transom this hull is
+        # shallow and its section pinches hard at the turn of bilge, so a seat of
+        # constant 18 mm width poked straight out through the topsides: a ray from
+        # its own side face found the hull's inner surface 0.085 mm away. The seat
+        # narrows to fit and widens as the hull does.
+        half = iy[cfg.section_points:]          # keel -> sheer, starboard
+        room = float(np.interp(ztop, iz[cfg.section_points:][::-1], half[::-1]))
+        w = max(min(cfg.shaft_block_w_mm / 2.0, room - cfg.seat_side_clear_mm), 1.5)
+        secs.append((float(x), np.array([[-w, zf], [w, zf], [w, ztop], [-w, ztop]])))
+    return _sweep(secs)
+
+
+def integral_coaming(cfg, x0, x1, y_lo, y_hi):
+    """The raised lip around the hatch opening, sitting ON the deck rail.
+
+    Deliberately NOT the same z range as the rail it stands on. The first version
+    made the coaming a second slab over the same z band as the rail, with the same
+    underside and a shared inboard face -- two coplanar pairs -- and the part came
+    back not watertight after process() welded them. This one starts inside the
+    rail's top surface and stops short of the rail's inboard edge, so it crosses the
+    rail rather than lying against it.
+    """
+    at = _sampler(cfg)
+    dz = deck_z(cfg.hull_scale, cfg.loa_mm)
+    z0 = dz + cfg.deck_mm - cfg.merge_bite_mm
+    z1 = dz + cfg.deck_mm + cfg.coaming_h_mm
+    n = max(4, int((x1 - x0) / cfg.mesh_dx_mm) + 1)
+    secs = []
+    for x in np.linspace(x0, x1, n):
+        hb = max(at(x)[0] - cfg.merge_inset_mm, 0.8)
+        lo, hi = max(y_lo, -hb), min(y_hi, hb)
+        if hi - lo < 0.6:
+            hi = lo + 0.6
+        secs.append((float(x), np.array([[lo, z0], [hi, z0], [hi, z1], [lo, z1]])))
+    return _sweep(secs)

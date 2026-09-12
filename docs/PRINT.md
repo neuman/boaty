@@ -2,7 +2,7 @@
 
 # Print list
 
-**13 parts, 480 g of filament, 19.8 h estimated.**
+**6 parts, 516 g of filament, 21.3 h estimated.**
 
 Material PETG, 0.4 mm nozzle, 0.24 mm layers, 4 perimeters, 15% infill, 60 mm/s, on a 220 x 220 x 250 mm bed.
 
@@ -12,21 +12,19 @@ PETG needs four perimeters to be watertight untreated, which is why the shell is
 
 | Part | Print bbox mm | Mass g | Time h | Orientation | Support |
 |---|---|---|---|---|---|
-| `hull_mid` | 82 x 186 x 190 | 105 | 4.3 | standing on a transverse face | none |
-| `hull_aft` | 79 x 186 x 150 | 82 | 3.4 | standing on a transverse face | none |
-| `hull_bow` | 80 x 136 x 130 | 52 | 2.1 | standing on a transverse face | yes, ~453 mm2 at the stem |
-| `deck_mid` | 190 x 186 x 5 | 50 | 2.1 | flat on the bed | none |
-| `hatch_cover` | 164 x 120 x 11 | 42 | 1.7 | flat on the bed, flipped | none |
-| `deck_aft` | 150 x 186 x 1 | 41 | 1.7 | flat on the bed | none |
-| `bulkhead_aft` | 77 x 182 x 2 | 27 | 1.1 | standing on a transverse face | none |
-| `transom_plate` | 69 x 156 x 2 | 21 | 0.9 | standing on a transverse face | none |
-| `bulkhead_fwd` | 78 x 130 x 2 | 19 | 0.8 | standing on a transverse face | none |
-| `deck_bow` | 140 x 136 x 1 | 18 | 0.8 | flat on the bed | none |
-| `shaft_block` | 45 x 18 x 16 | 14 | 0.6 | flat on the bed | none |
-| `girder` | 186 x 13 x 2 | 5 | 0.2 | web flat | none |
-| `stem_plate` | 54 x 24 x 2 | 2 | 0.1 | standing on a transverse face | none |
+| `hull_mid` | 88 x 187 x 188 | 191 | 7.9 | standing on a transverse face | none |
+| `hull_aft` | 81 x 186 x 150 | 177 | 7.3 | standing on a transverse face | none |
+| `hull_bow` | 86 x 137 x 121 | 83 | 3.4 | standing on a transverse face | none |
+| `hatch_cover` | 200 x 120 x 2 | 43 | 1.8 | flat on the bed, flipped | none |
+| `deck_bow` | 121 x 137 x 1 | 18 | 0.7 | flat on the bed | none |
+| `stem_plate` | 69 x 39 x 2 | 5 | 0.2 | standing on a transverse face | none |
 
-Largest footprint 190 mm against 208 mm of usable bed once the brim is on.
+Largest footprint 200 mm against 208 mm of usable bed once the brim is on.
+
+## Plates
+
+These 6 parts bin into **4 beds** of 220 mm (tools/render.py, shelf-packed, 8 mm between parts). Three of them are the full 186 mm beam of the boat on one axis, and two of those cannot share a 220 mm bed with anything, which is what sets the floor.
+
 
 ## Holes to drill after printing
 
@@ -34,7 +32,7 @@ Nothing below is printed as a hole: a printed hole in a thin wall is a support p
 
 - **Stuffing tube**, through the hull bottom at x = 52 mm, at 8 degrees down-aft, and through `shaft_block` on the same line. **10.2 mm** for a 9.5 mm tube plus an epoxy fillet.
 - **Pushrod tube**, through `bulkhead_aft` and `transom_plate` at the same height, above the waterline. 3.2 mm.
-- **Limber holes**, 6 mm, through the bottom of `girder` every 40 mm, so bilge water can reach one place instead of two.
+- **Limber holes**, 6 mm, through the foot of the centre girder inside `hull_mid`, every 40 mm, so bilge water can reach one place instead of two.
 - **Hatch screws**, 4 x 2.5 mm pilot through the lid into the coaming for M3 self-tappers.
-- **Joint pins**, 2 mm through each bulkhead-to-hull joint face, for 1.75 mm filament shear pins. Three per joint.
+- **Joint pins**, 2 mm through each of the two hull-to-hull joint faces, for 1.75 mm filament shear pins. Three per joint. There are only two joints left: the bulkheads that used to be loose plates are now printed into the segments.
 - **Rudder bracket**, to the transom, to suit the bracket you get: its hole spacing is not published by the vendor. Measure first.

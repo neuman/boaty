@@ -139,3 +139,14 @@ def top_heavy_empty(ctx):
     """boat.empty -- the same solved mass, in the condition where KG is already highest."""
     m = _solve_topside(ctx, "empty_gm_mm", "min_gm_free_surface_mm")
     return _with(ctx, topside_mass_g=m)
+
+
+def bed_overflow(ctx):
+    """boat.bed_fit_all -- hull_scale 2.2, a 660 mm boat.
+
+    Distinct from oversize_hull (3.0) so the two gates' controls cannot be satisfied
+    by one accident. At 2.2 the mid segment's footprint passes 208 mm and nothing
+    else about the design is obviously absurd, which is the point: the fixture has to
+    be a boat somebody could have drawn.
+    """
+    return _with(ctx, hull_scale=2.2)

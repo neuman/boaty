@@ -313,3 +313,50 @@ def envelope(ctx: GateContext) -> Verdict:
                 + " x ".join(f"{l:.0f}" for l in lim) + " mm envelope "
                 f"(worst axis {util*100:.0f}%)"),
     )
+
+
+@gate(
+    id="boat.bed_fit_all",
+    title="EVERY printed part fits the build volume, not just the one fdm-print judged",
+    claims=["fdm-multipart"],
+    tier=Tier.INSTANT,
+    settles="worst per-part bed utilisation",
+    negative_control=NegativeControl(
+        fixture="selftest/bad_boat.py:bed_overflow",
+        note="hull_scale 2.2, a 660 mm boat whose mid segment no longer fits a "
+             "220 mm bed. The hull FORM is untouched and every other claim is still "
+             "arguable at that size, so the only thing this fixture breaks is the "
+             "thing this gate measures",
+    ),
+)
+def bed_fit_all(ctx: GateContext) -> Verdict:
+    """Every part's printed footprint against the usable bed.
+
+    fdm.bed_fit reads ONE part, and this project prints six. The projection hands it
+    the part that is worst by overhang, because overhang has no other cover -- which
+    leaves bed fit covered for one part out of six unless something else does it.
+    This is that something else. It is the multi-part mode fdm-print does not have,
+    written where a project is allowed to write it rather than pretended away in the
+    report.
+    """
+    cfg = ctx.params["config"]
+    usable_x = float(cfg["bed_x_mm"]) - 2.0 * float(cfg["brim_mm"])
+    usable_y = float(cfg["bed_y_mm"]) - 2.0 * float(cfg["brim_mm"])
+    usable_z = float(cfg["bed_z_mm"])
+    boxes = _p(ctx, "print_bbox_by_part_mm")
+    worst_name, worst = None, 0.0
+    for name, bb in boxes.items():
+        u = max(float(bb[0]) / usable_x, float(bb[1]) / usable_y, float(bb[2]) / usable_z)
+        if u > worst:
+            worst_name, worst = name, u
+    return Verdict(
+        gate="boat.bed_fit_all", passed=worst <= 1.0, measured=round(worst, 3),
+        limit=1.0, units="fraction",
+        detail=(f"{len(boxes)} part(s); worst is {worst_name} at {worst*100:.0f}% of "
+                f"{usable_x:.0f} x {usable_y:.0f} x {usable_z:.0f} mm usable "
+                f"({cfg['bed_x_mm']:.0f} x {cfg['bed_y_mm']:.0f} bed less "
+                f"{cfg['brim_mm']:.0f} mm of brim a side): "
+                + ", ".join(f"{k} {max(v[0], v[1]):.0f} mm"
+                            for k, v in sorted(boxes.items(),
+                                               key=lambda kv: -max(kv[1][0], kv[1][1])))),
+    )
