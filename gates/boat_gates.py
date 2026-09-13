@@ -404,9 +404,15 @@ def hull_penetrations(ctx: GateContext) -> Verdict:
     def is_shell(p):
         return "hull shell" in str(p.get("through", ""))
 
+    # An entry may be listed WITHOUT being a pressure boundary -- the rudder stock's
+    # bearing is in a bracket outside the hull, with nothing dry behind it. Those are
+    # still required to be declared, because the value of the list is that the question
+    # "does this pierce the hull?" has a written answer for every shaft on the boat;
+    # they are just not counted by height.
     undeclared = [p["name"] for p in pens
                   if not p.get("declared") or not str(p.get("seal", "")).strip()]
-    below = [p for p in pens if float(p["z_mm"]) < wl]
+    boundary = [p for p in pens if p.get("pressure_boundary", True)]
+    below = [p for p in boundary if float(p["z_mm"]) < wl]
     # The SHELL is what the pond is on the other side of, and that is the count with a
     # hard limit. A watertight bulkhead below the waterline matters too -- it is what
     # stops one flooded compartment flooding the next -- but it is a second line of
@@ -424,12 +430,13 @@ def hull_penetrations(ctx: GateContext) -> Verdict:
         problems.append(f"{len(below_shell)} SHELL penetration(s) below the "
                         f"{wl:.1f} mm waterline vs {limit} allowed: "
                         + ", ".join(p["name"] for p in below_shell))
-    above = [p for p in pens if float(p["z_mm"]) >= wl]
+    above = [p for p in boundary if float(p["z_mm"]) >= wl]
     return Verdict(
         gate="boat.hull_penetrations", passed=not problems,
         measured=len(below_shell), limit=limit, units="shell holes below waterline",
         detail=("; ".join(problems) if problems else
-                f"{len(pens)} penetration(s), all declared and sealed. "
+                f"{len(pens)} penetration(s) listed, {len(boundary)} of them "
+                f"through a pressure boundary, all declared and sealed. "
                 f"Below the {wl:.1f} mm loaded waterline: "
                 f"{len(below_shell)} through the shell ("
                 + (", ".join(p["name"] for p in below_shell) or "none") + ") and "
@@ -438,4 +445,67 @@ def hull_penetrations(ctx: GateContext) -> Verdict:
                 f"The other {len(above)} sit "
                 + ", ".join(f"{p['name']} +{float(p['z_mm']) - wl:.0f} mm"
                             for p in above) + " above it."),
+    )
+
+
+@gate(
+    id="boat.linkage_closed",
+    title="Every drive and steering chain is continuous from one end to the other",
+    claims=["linkage"],
+    tier=Tier.INSTANT,
+    settles="gaps in the drive and steering chains",
+    negative_control=NegativeControl(
+        fixture="selftest/bad_boat.py:short_pushrod",
+        note="the pushrod's aft end pulled 6 mm short of the tiller -- a clevis on the "
+             "wrong hole, or a rod cut to the wrong length, which is the most ordinary "
+             "mistake there is. Nothing else moves, and every other gate still passes, "
+             "which is exactly the point",
+    ),
+)
+def linkage_closed(ctx: GateContext) -> Verdict:
+    """The gap between each consecutive pair in every named chain.
+
+    THIS GATE EXISTS BECAUSE OF A HOLE IN THE WHOLE METHOD, not just in this boat.
+    Every geometry gate in the project -- cad.clash, cad.watertight, cad.wall_thickness,
+    fdm.overhang, fdm.bridge_span -- checks that things do NOT touch, or that a single
+    solid is well formed. Nothing checked that things which MUST touch DO.
+
+    So the steering was open in two places for an entire revision and every gate was
+    green. The rudder blade hung 43 mm below its own bracket, attached to nothing;
+    there was no stock and no tiller arm; and the pushrod stopped 11 mm short of the
+    nothing it was pushing. cad.clash was perfectly happy -- they were not
+    interfering. The readiness report said the boat was fine.
+
+    An absence is invisible to a gate that looks for presence. That is the general
+    lesson and it is written up in FRICTION.md.
+
+    The chains are named in model/boat.py's LINKAGES, and the measurement is
+    surface-to-surface, sampled over both surfaces rather than at vertices -- a rod
+    has no vertices along its length, and a stock passing clean through a bearing
+    bore was measured 5.5 mm away by the vertex-only version.
+    """
+    gaps = _p(ctx, "linkage_gaps_mm")
+    tol = float(_p(ctx, "max_mating_gap_mm"))
+    bad, unknown = [], []
+    for pair, g in gaps.items():
+        if g != g:                      # NaN: a member of the chain is missing entirely
+            unknown.append(pair)
+        elif float(g) > tol:
+            bad.append((pair, float(g)))
+    worst = max((g for _, g in bad), default=0.0)
+    problems = []
+    if unknown:
+        problems.append(f"{len(unknown)} pair(s) could not be measured — a named member "
+                        f"is not in the assembly at all: " + ", ".join(unknown))
+    if bad:
+        problems.append("; ".join(f"{p} OPEN {g:.1f} mm" for p, g in
+                                  sorted(bad, key=lambda kv: -kv[1])))
+    chains = sorted({p.split(":")[0] for p in gaps})
+    return Verdict(
+        gate="boat.linkage_closed", passed=not problems,
+        measured=round(worst, 3), limit=tol, units="mm",
+        detail=("; ".join(problems) if problems else
+                f"{len(gaps)} consecutive pair(s) across {len(chains)} chain(s) "
+                f"({', '.join(chains)}), every one of them touching or "
+                f"interpenetrating (worst gap {worst:.2f} mm vs {tol:.1f} mm allowed)"),
     )

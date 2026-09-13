@@ -54,6 +54,24 @@ deck. Both would have roofed an open cavity at the top of a print, and both bein
 separate is also what leaves the bow compartment open until its foam and interior
 epoxy are in.
 
+## Why the hull is in three pieces
+
+Because a one-piece hull does not exist at any length that floats. On the
+220×220×250 machine this project targets, an exhaustive orientation search against
+the real hull surface gives:
+
+| | |
+|---|---|
+| largest hull that prints in ONE piece | **321 mm LOA** |
+| shortest hull that floats the payload with 25 mm freeboard | **376 mm LOA** |
+| payload a one-piece 321 mm hull could carry | 245 g, against 630 g of fixed hardware |
+| build volume a one-piece 480 mm hull needs | **336 × 336 × 336 mm** |
+
+Splitting horizontally at the waterline does not help: the binding dimension is
+LENGTH, and removing the topsides shrinks the required box by 1.2%. Two segments is
+blocked on sourcing, not printing — it needs a 260 mm stuffing tube and the kit on the
+BOM has a 200 mm one. All three rejections are in the decision log with their numbers.
+
 ## One hole below the waterline
 
 The driveline, the rudder, twelve M3 screws, ten brass inserts and four wire runs are
@@ -68,6 +86,18 @@ unavoidable because the propeller has to be driven from inside.
 
 The gate found a second one the minute it existed — the same stuffing tube also
 crosses the aft bulkhead, 9 mm under water, and nothing had ever said so.
+
+## The gate that found the hole in the method
+
+Every geometry gate in every installed pack checks that things do **not** touch, or
+that one solid is well formed. None of them can express an absence. So the boat
+shipped a revision whose rudder had no stock and no tiller arm, whose blade hung 43 mm
+below its own bracket attached to nothing, and whose pushrod stopped 11 mm short of
+what it was pushing — with every gate green.
+
+`boat.linkage_closed` names the chains that must be continuous and measures every
+joint. See [`FRICTION.md`](FRICTION.md) item 26; it is the most transferable thing in
+this repository.
 
 ## Layout
 

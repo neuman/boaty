@@ -282,7 +282,18 @@ def hydrostatics(scale: float, loa: float, draft: float, rho_kg_m3: float = 998.
         "wl_beam_mm": 2.0 * float(hb_wl.max()),
         "wetted_area_mm2": wetted,
         "midship_area_mm2": float(area.max()),
-        "min_freeboard_mm": float(np.min((kad + dep - draft)[shb > 1.0])),
+        # Freeboard is measured to the DECK EDGE, which on this boat is the flat deck
+        # at deck_z, not to the traced sheer. The hull's topsides are carried up to
+        # deck_z at every station by a vertical strake -- that is what makes the deck
+        # flat and printable -- so the deck edge is at deck_z everywhere and the
+        # traced sheer is an interior line with no water on the other side of it.
+        #
+        # Measuring to the sheer under-reported freeboard by about 20 mm on the 480 mm
+        # boat: 31 mm against a true 50 mm. Conservative, and wrong, and it made the
+        # freeboard claim look like the tightest margin on the boat when it is not
+        # remotely. Caught while sweeping hull length for the one-piece study, because
+        # two routes to the same number disagreed.
+        "min_freeboard_mm": float(deck_z(scale, loa) - draft),
     }
 
 
@@ -366,7 +377,10 @@ def _integrate_wl(scale, loa, wl_at, n=121, m=40, rho=998.0):
         "kb": float(np.trapezoid(zmom, x) / vol) if vol > 0 else 0.0,
         "awp": float(np.trapezoid(2.0 * hb, x)),
         "iwp": float(np.trapezoid((2.0 / 3.0) * hb ** 3, x)),
-        "freeboard": float(np.min((kad + dep - wl)[live])),
+        # To the DECK EDGE at deck_z, not to the traced sheer -- see hydrostatics().
+        # With trim the waterline is a plane, so the least freeboard is at whichever
+        # end is deepest, which is what max(wl) picks out.
+        "freeboard": float(deck_z(scale, loa) - float(np.max(wl[live]))),
     }
 
 

@@ -469,6 +469,19 @@ class Config:
     insert. Big enough for 4.6 mm of insert plus 2 mm of wall plus somewhere to put
     the drill."""
 
+    pushrod_shortfall_mm: float = 0.0
+    """FIXTURE KNOB: how far the pushrod's aft end stops short of the tiller. Zero in
+    the design. boat.linkage_closed's negative control sets it to 6 mm, which is a
+    clevis on the wrong hole -- and is what the boat actually had, unnoticed, for a
+    whole revision."""
+
+    max_mating_gap_mm: float = 1.0
+    """How far apart two consecutive members of a drive or steering chain may be
+    before they are not connected. Every pair in the design is at 0.00 mm -- they
+    interpenetrate, because that is what a shaft in a coupler or a stock in a bearing
+    does -- so 1 mm is not a tolerance being used up, it is the width of the band in
+    which a modelling slip is still recoverable. See boat.linkage_closed."""
+
     max_below_waterline_penetrations: int = 1
     """How many holes through the shell below the loaded waterline this design is
     allowed. ONE: the propeller shaft, which is unavoidable because the propeller has
@@ -599,6 +612,10 @@ class Config:
     prop_hub_d_mm: float = 8.0
     prop_hub_len_mm: float = 14.0
     rudder_stock_d_mm: float = 3.0
+    rudder_blade_top_mm: float = 2.0
+    """Top of the rudder blade, just above the keel datum. The stock runs from the
+    BOTTOM of the blade up through the bracket's bore to the tiller, so blade, stock
+    and tiller are one connected assembly rather than three solids near each other."""
     rudder_tiller_mm: float = 20.0
     rudder_bracket_lwh_mm: tuple = (16.0, 60.0, 22.0)
     """The transom bracket the rudder hangs from, as a solid. Its hole spacing is NOT
@@ -1322,33 +1339,46 @@ def hardware(c: Config, at, comps) -> dict:
     add("prop_shaft", G.rod(p_out, p_prop, c.shaft_d_mm), 12.0, "shaft_kit")
 
     motor_aft = placed_centre(c, "motor", at)[0] - _part_size(c, "motor")[0] / 2.0
-    p_cpl_a = _axis_point(c, at, motor_aft - c.coupler_len_mm - 2.0)
-    p_cpl_b = _axis_point(c, at, motor_aft - 2.0)
+    # The coupler abuts the motor's aft face, because that is where it slides onto the
+    # output shaft. A 2 mm standoff read as a 1.16 mm gap in the chain check, which is
+    # true of the model and false of the boat -- the motor's 11 mm shaft stub is not
+    # modelled, so the coupler has to reach the face instead.
+    p_cpl_a = _axis_point(c, at, motor_aft - c.coupler_len_mm)
+    p_cpl_b = _axis_point(c, at, motor_aft)
     add("coupler", G.rod(p_cpl_a, p_cpl_b, c.coupler_d_mm), 22.0, "shaft_kit")
-    add("shaft_inboard", G.rod(_axis_point(c, at, c.tube_inboard_x_mm + 1.0),
+    # Runs INTO the tube, not up to it. The tube is modelled as a solid rod rather
+    # than a bore, so the only way to say "the shaft is inside the tube" is to let the
+    # two interpenetrate.
+    add("shaft_inboard", G.rod(_axis_point(c, at, c.tube_inboard_x_mm - 3.0),
                                p_cpl_a, c.shaft_d_mm), 12.0, "shaft_kit")
 
     add("propeller", G.propeller(p_prop, ang, c.prop_dia_mm,
                                  c.prop_hub_d_mm, c.prop_hub_len_mm), 14.0, "prop")
 
     # ---- rudder ----------------------------------------------------------
-    add("rudder", G.rudder(c.rudder_x_mm, -c.rudder_depth_mm + c.rudder_depth_mm * 0.14,
-                           c.rudder_depth_mm, c.rudder_chord_mm, 3.0,
-                           c.rudder_stock_d_mm, c.rudder_tiller_mm), 24.0, "rudder")
+    add("rudder", G.rudder(c.rudder_x_mm, c.rudder_blade_top_mm, c.rudder_depth_mm,
+                           c.rudder_chord_mm, 3.0, c.rudder_stock_d_mm,
+                           c.pushrod_z_mm, c.rudder_tiller_mm), 24.0, "rudder")
     bl, bw, bh = c.rudder_bracket_lwh_mm
     _, _, kz0 = at(1.0)
     z_br = kz0 + 26.0
     # An arm off the transom, not a slab. The plate that bolts to the transom is the
     # full bracket width; the arm that reaches aft to the rudder stock is not.
+    # Transom plate, arm, and a BEARING BOSS at the aft end of the arm that the stock
+    # actually turns in. The arm runs past the stock rather than stopping on its
+    # centreline, so the bore has material all round it.
     add("rudder_bracket", trimesh.util.concatenate([
         G.box(-bl / 2.0, 0.0, z_br, bl, bw, bh),
-        G.box(c.rudder_x_mm / 2.0, 0.0, z_br, abs(c.rudder_x_mm), 14.0, 10.0),
-    ]), 13.0, "rudder")
+        G.box((c.rudder_x_mm - 7.0) / 2.0, 0.0, z_br, abs(c.rudder_x_mm) + 7.0, 14.0, 10.0),
+        G.rod((c.rudder_x_mm, 0.0, z_br - 9.0), (c.rudder_x_mm, 0.0, z_br + 9.0), 11.0),
+    ]), 15.0, "rudder")
 
     # ---- steering linkage -------------------------------------------------
     sx, sy, sz = placed_centre(c, "servo", at)
-    tiller = np.array([c.rudder_x_mm, -c.rudder_tiller_mm * 0.8,
-                       z_br + bh / 2.0 + 6.0])
+    # The pushrod's aft end lands ON the tiller arm, at the same height the tiller is
+    # actually at. It used to aim 68 mm above it.
+    tiller = np.array([c.rudder_x_mm + c.pushrod_shortfall_mm,
+                       -c.rudder_tiller_mm * 0.8, c.pushrod_z_mm])
     add("pushrod_tube", G.rod((c.bulkhead_aft_x + 4.0, c.pushrod_y_mm, c.pushrod_z_mm),
                               (-2.0, c.pushrod_y_mm, c.pushrod_z_mm),
                               c.pushrod_tube_od_mm), 8.0, "linkage")
@@ -1444,6 +1474,34 @@ def _fastener_groups(c: Config, at):
     ]
 
 
+#: The chains that must be CONTINUOUS for the boat to work. Every geometry gate in
+#: this project checks that things do not touch; nothing checked that things which
+#: must touch do, and the steering was open in two places for a whole revision --
+#: a rudder blade hanging 43 mm below its own bracket, attached to nothing, and a
+#: pushrod stopping 11 mm short of a tiller that did not exist. Every gate passed.
+LINKAGES = {
+    "steering": ["component_servo", "hw_pushrod", "hw_rudder", "hw_rudder_bracket",
+                 "hull_aft"],
+    "driveline": ["component_motor", "hw_coupler", "hw_shaft_inboard",
+                  "hw_stuffing_tube", "hw_prop_shaft", "hw_propeller"],
+}
+
+
+def linkage_gaps(meshes: dict, comps: dict, hw: dict) -> dict:
+    """Surface-to-surface gap between each consecutive pair in every chain."""
+    lookup = dict(meshes)
+    lookup.update({f"component_{k}": d["mesh"] for k, d in comps.items()})
+    lookup.update({f"hw_{k}": d["mesh"] for k, d in hw.items()})
+    out = {}
+    for name, chain in LINKAGES.items():
+        for a, b in zip(chain[:-1], chain[1:]):
+            ma, mb = lookup.get(a), lookup.get(b)
+            out[f"{name}:{a}->{b}"] = (G.surface_gap(ma, mb)
+                                       if ma is not None and mb is not None
+                                       else float("nan"))
+    return out
+
+
 def penetrations(c: Config, at, draft_mm: float) -> list:
     """Every place something passes through a pressure boundary, enumerated.
 
@@ -1500,6 +1558,19 @@ def penetrations(c: Config, at, draft_mm: float) -> list:
                  "face of the transom",
          "note": "Two holes, both above the waterline. Measure the bracket you are "
                  "sent: its hole spacing is not published."},
+        {"name": "rudder_stock_bearing",
+         "through": "external bracket (NOT a pressure boundary)", "x_mm": 0.0,
+         "z_mm": 38.0, "bore_mm": 3.4,
+         "pressure_boundary": False,
+         "declared": True,
+         "seal": "none needed: the bearing is a bronze bush in the bracket's boss, "
+                 "outside the hull, with nothing dry behind it",
+         "note": "Listed so that the question 'does the rudder stock pierce the "
+                 "transom?' has a written answer instead of being assumed. It does "
+                 "not -- the rudder is transom-BRACKET mounted, the stock turns in the "
+                 "bracket, and the only things crossing the transom are the pushrod "
+                 "tube and the bracket's two screws. z is set above any waterline so "
+                 "the gate counts it as what it is: not a hole in the boat."},
         {"name": "switch_rod_deck",
          "through": "deck", "x_mm": c.place["switch"][0],
          "z_mm": dz, "bore_mm": 4.5,
@@ -1677,6 +1748,10 @@ def build(config: Config | None = None) -> dict:
     prop_hub_d_mm: float = 8.0
     prop_hub_len_mm: float = 14.0
     rudder_stock_d_mm: float = 3.0
+    rudder_blade_top_mm: float = 2.0
+    """Top of the rudder blade, just above the keel datum. The stock runs from the
+    BOTTOM of the blade up through the bracket's bore to the tiller, so blade, stock
+    and tiller are one connected assembly rather than three solids near each other."""
     rudder_tiller_mm: float = 20.0
     rudder_bracket_lwh_mm: tuple = (16.0, 60.0, 22.0)
     """The transom bracket the rudder hangs from, as a solid. Its hole spacing is NOT
@@ -1820,6 +1895,9 @@ def build(config: Config | None = None) -> dict:
         "part_geometry": part_geom,
         # ---- driveline ---------------------------------------------------
         **drive,
+        # ---- the chains that have to be continuous -------------------------
+        "linkage_gaps_mm": linkage_gaps(meshes, comps, hw),
+        "max_mating_gap_mm": c.max_mating_gap_mm,
         # ---- every hole through a pressure boundary, enumerated ------------
         "penetrations": penetrations(c, at, tr["draft_mm"] if "draft_mm" in tr else draft),
         "loaded_waterline_mm": draft,
@@ -1919,6 +1997,25 @@ def build(config: Config | None = None) -> dict:
                        "on both faces. Below the external waterline, so it is sealed to "
                        "the same standard as the shell: it is what stops a flooded stern "
                        "compartment flooding the equipment bay."},
+            # ---- the chains that MUST touch (boat.linkage_closed) ------------
+            {"pair": ["hw_rudder", "hw_rudder_bracket"],
+             "reason": "the rudder stock turns in the bracket's bearing boss. This is "
+                       "the connection -- the whole reason the bracket exists -- and "
+                       "for one revision it was a 43 mm GAP that cad.clash was "
+                       "perfectly happy about, because nothing was interfering. The "
+                       "bearing is a bronze bush in the boss, outside the hull, with "
+                       "nothing dry behind it, so it is not a penetration and there is "
+                       "nothing to seal."},
+            {"pair": ["hw_pushrod", "hw_rudder"],
+             "reason": "the pushrod's clevis is on the tiller arm. That is the joint."},
+            {"pair": ["component_motor", "hw_coupler"],
+             "reason": "the flexible coupler slides onto the motor's 3.17 mm output "
+                       "shaft, which is not separately modelled, so the coupler reaches "
+                       "the motor's aft face instead."},
+            {"pair": ["hw_shaft_inboard", "hw_stuffing_tube"],
+             "reason": "the propeller shaft runs INSIDE the stuffing tube. The tube is "
+                       "modelled as a solid rod rather than a bore, so the only way to "
+                       "say that is to let the two interpenetrate."},
             {"pair": ["hw_prop_shaft", "hw_propeller"],
              "reason": "the propeller is threaded onto the end of the shaft. M4, with a "
                        "drive dog behind it."},

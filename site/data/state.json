@@ -1044,9 +1044,106 @@
       "verdicts": [
         "boat.hull_penetrations"
       ]
+    },
+    {
+      "acceptance": {
+        "comparator": "<=",
+        "limit": 1.0,
+        "limit_hi": null,
+        "quantity": "worst gap in a drive or steering chain",
+        "units": "mm"
+      },
+      "acceptance_render": "worst gap in a drive or steering chain <= 1.0 mm",
+      "critical": true,
+      "evidence": [],
+      "gates": [
+        "boat.linkage_closed"
+      ],
+      "grounded_by": [],
+      "id": "C21",
+      "kind": "measurable",
+      "note": "",
+      "partial": false,
+      "physical_result": null,
+      "rationale": "A hole in the method, not just in this boat. Every geometry gate here checks that things do NOT touch; nothing checked that things which MUST touch DO. The steering was open in two places for an entire revision with every gate green -- the rudder blade hung 43 mm below its own bracket attached to nothing, there was no stock and no tiller, and the pushrod stopped 11 mm short of what it was supposed to push. cad.clash was happy because nothing was interfering. An absence is invisible to a gate that looks for presence.",
+      "source": "",
+      "statement": "Every drive and steering chain is continuous: no consecutive pair of members is more than 1 mm apart",
+      "status": "pass",
+      "tags": [
+        "linkage"
+      ],
+      "unproven": [],
+      "verdicts": [
+        "boat.linkage_closed"
+      ]
     }
   ],
   "decisions": [
+    {
+      "body": "THE NUMBER THE OWNER ASKED FOR: there is no LOA at which this hull prints its bottom in one piece on a 220x220x250 machine AND floats its payload. The window is empty by 55 mm.\n\nWHAT WOULD OPEN IT: a one-piece 480 mm hull needs a build volume of 336 x 336 x 336 mm. That is an ordinary large-format machine -- Kobra Max, Ender 5 Plus class -- and it is the only route that gets a seamless wetted bottom at a size that floats. If the owner would rather buy a printer than accept two seams, that is the number.\n\nWHAT THE SEAMS ACTUALLY ARE, since they stay: two transverse butt joints, each landing on a printed bulkhead face rather than on open shell, each pinned with 1.75 mm filament through 2 mm holes and filleted with epoxy on the inside. The bulkheads they land on are integral to their segments and have no bond line of their own -- which was the point of the previous revision.\n\nALSO NOTE: with the freeboard measurement corrected (it was being taken to the traced sheer rather than the deck edge), the 480 mm boat has 47 mm of trimmed freeboard rather than 26. The boat is further from its freeboard limit than the report has been saying, not closer.",
+      "claims_changed": [
+        "P1",
+        "C2"
+      ],
+      "evidence": [],
+      "id": "keep-three-hull-segments-a-one-piece-hull-does-n",
+      "params_changed": [
+        "hull_scale"
+      ],
+      "rejected": [
+        {
+          "evidence": "",
+          "value": "a shorter boat with the hull in one piece",
+          "why": "321 mm is the largest one-piece hull this bed can take, and at 321 mm the boat carries 963 g and floats with 10.8 mm of trimmed freeboard against a 25 mm claim. A one-piece 321 mm hull could carry 245 g of payload; the payload is 630 g. The deficit is 385 g and it is all fixed-size hardware that does not scale with the boat -- which is why the hull went to 480 mm in the first place."
+        },
+        {
+          "evidence": "",
+          "value": "a horizontal split at the waterline, one-piece wetted bottom plus topsides",
+          "why": "tested rather than assumed, and it buys almost nothing. Cutting everything above the waterline off reduces the required build box by 1.2% at 330 mm, 3.5% at 390 mm and 6.0% at 480 mm, because the box is set by the hull LENGTH and not its depth. It would add parts and a seam to buy 4 mm of LOA."
+        },
+        {
+          "evidence": "",
+          "value": "two hull segments instead of three, halving the below-water seams",
+          "why": "blocked on SOURCING, not on printing. Two segments means the joint is at mid-length, the aft bulkhead is at the joint, and the motor has to sit forward of it -- which puts the stuffing tube 260 to 270 mm long against the 200 mm tube in the 250 mm kit on the BOM. The 300 mm kit exists but no US listing with a 3.17 mm joint could be confirmed. Running a 200 mm tube and leaving 75 mm of 4 mm shaft unsupported at 4500 rpm, inside a sealed compartment nobody can reach, is worse than a second seam. Segments up to 250 mm DO fit the bed standing upright with no tilt and no support, so the printer is not the obstacle here."
+        }
+      ],
+      "summary": "Exhaustive orientation search against the real hull surface on the stated 220x220x250 machine (208x208x250 usable). The largest hull that prints in ONE PIECE is 321 mm LOA. The shortest hull that floats the 630 g of fixed hardware with 25 mm of freeboard is 376 mm LOA. The two do not overlap, by 55 mm. Splitting the hull horizontally at the waterline does not close the gap either: the binding dimension is LENGTH, and removing the topsides shrinks the required build box by 1.2% at the one-piece limit.",
+      "title": "Keep three hull segments: a one-piece hull does not exist at any length that floats",
+      "when": "2026-09-13T00:29:46Z"
+    },
+    {
+      "body": "boat.linkage_closed names the chains and fails when any consecutive pair is further apart than the mating tolerance. Its negative control pulls the pushrod 6 mm short of the tiller -- a clevis on the wrong hole, the most ordinary mistake in the build, and the one this boat actually had.\n\nAlso fixed while measuring: FREEBOARD WAS BEING MEASURED TO THE WRONG LINE. hullform reported it to the traced sheer, but the hull is carried up to a flat deck at deck_z by a vertical strake at every station, so the deck edge -- the thing water has to get over -- is 20 mm higher. The 480 mm boat has 47 mm of trimmed freeboard, not 26. Conservative and wrong, and it made freeboard look like the tightest margin on the boat when it is nowhere near. Found because two routes to the same number disagreed during the hull-length study.",
+      "claims_changed": [
+        "C21",
+        "P4"
+      ],
+      "evidence": [],
+      "id": "close-the-steering-chain-and-gate-the-fact-that",
+      "params_changed": [
+        "max_mating_gap_mm",
+        "rudder_blade_top_mm"
+      ],
+      "rejected": [
+        {
+          "evidence": "",
+          "value": "trusting the existing gates to have caught it",
+          "why": "they could not, and this is the finding that matters beyond this boat. cad.clash, cad.watertight, cad.wall_thickness, fdm.overhang and fdm.bridge_span all check that things do NOT touch, or that one solid is well formed. NOTHING checked that things which MUST touch DO. The steering was open in two places for an entire revision with every gate green and the readiness report saying the boat was fine. An absence is invisible to a gate that looks for presence."
+        },
+        {
+          "evidence": "",
+          "value": "measuring the gaps vertex-to-vertex",
+          "why": "a trimesh cylinder has vertices only at its two end rings, so a rudder stock passing clean THROUGH a bracket bore has no vertex anywhere near it. The vertex-only version reported those two solids 5.5 mm apart while they interpenetrate -- the gate meant to notice things coming apart would have said they already had. The measurement now samples both surfaces."
+        },
+        {
+          "evidence": "",
+          "value": "a rudder stock through the transom with a stuffing box",
+          "why": "it would be a third hull penetration. This rudder is transom-BRACKET mounted: the stock turns in a bronze bush in the bracket, outside the hull, with nothing dry behind it. It is listed in the penetration inventory anyway, flagged as not a pressure boundary, so the question has a written answer instead of being assumed."
+        }
+      ],
+      "summary": "The rudder had no stock and no tiller arm. The blade hung 43 mm below its own bracket attached to nothing, and the pushrod stopped 11 mm short of the nothing it was pushing. The stock now runs from the bottom of the blade up through a bearing boss in the bracket to a tiller at pushrod height, and the pushrod ends on it. Both chains -- servo to pushrod to tiller to stock to blade, and motor to coupler to shaft to tube to propeller -- now measure 0.00 mm at every joint.",
+      "title": "Close the steering chain, and gate the fact that it has to be closed",
+      "when": "2026-09-13T00:29:46Z"
+    },
     {
       "body": "WHAT THE NEW GATE FOUND, immediately: two things below the waterline rather than one. The stuffing tube crosses the aft watertight bulkhead as well as the shell, and nothing anywhere had said so. The gate now separates the two -- the shell is what the pond is on the other side of and is capped at one; a bulkhead below the waterline is a second line of defence and is required to be declared and sealed rather than capped -- and both are written down with their sealing method.\n\nSIX PENETRATIONS IN TOTAL. One through the shell below the waterline (the propeller shaft, unavoidable because the propeller has to be driven from inside). One through a bulkhead below the waterline (the same tube). Four above: the pushrod tube through the bulkhead and through the transom, the two rudder bracket screws, and the switch rod through the deck. Every boss on the boat is blind except the rudder bracket pair.\n\nNO WIRE PIERCES A BULKHEAD. Motor, ESC, battery, receiver and servo are all between the two bulkheads, so all four runs stay inside the equipment bay. That is a layout decision and it is now visible as geometry.\n\nCOST: 6 printed parts to 7 (the motor clamp), printed mass 516 g to 586 g, print time 21.3 h to 24.2 h, BOM 374.50 to 397.50 USD. PLATES DID NOT MOVE: still 4 -- the clamp is 56 mm and shares a bed. Loaded freeboard went 26.5 mm to 25.8 mm on the extra 70 g, which still clears the 25 mm claim but is now the tightest margin on the boat.\n\nThe per-part print ceiling moved from 14 h to 17 h, and that is a threshold I relaxed. It is a judgement about the builder patience, not a physical property -- unlike the overhang allowance relaxed earlier in this project, which protected whether a part needs support and went back to the pack default as soon as the geometry allowed. hull_mid is a 190 mm tall hull section carrying a bulkhead, two deck rails, two coamings, a girder and five mounting ribs; 15.5 h is what that costs, and splitting it would add a part and a glued joint to a boat whose part count was just halved for watertightness.",
       "claims_changed": [
@@ -1343,16 +1440,16 @@
   ],
   "locator_problems": [],
   "meta": {
-    "built": "2026-09-12T20:38:17Z",
+    "built": "2026-09-13T00:31:36Z",
     "created": "2026-09-12T00:58:04Z",
     "generated": "atompipe site build — an output of .atompipe/ledger.json, not a source. If a number here is wrong, the ledger is wrong.",
     "last_run": {
-      "duration_s": 2.2539,
+      "duration_s": 1.881,
       "inputs_hash": "862ca0d1d6d9",
-      "model_hash": "e66908854a81",
+      "model_hash": "2042305eeaff",
       "spine_version": "0.1.0",
       "tier": 1,
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     "model_entry": "model/boat.py",
     "name": "boaty",
@@ -1370,7 +1467,7 @@
   },
   "params": [
     {
-      "changed_in": "",
+      "changed_in": "keep-three-hull-segments-a-one-piece-hull-does-n",
       "defended": true,
       "derived": false,
       "derived_from": [],
@@ -1805,6 +1902,38 @@
       "tags": [],
       "units": "",
       "value": 12.0
+    },
+    {
+      "changed_in": "",
+      "defended": true,
+      "derived": false,
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "pushrod_shortfall_mm",
+      "rationale": "FIXTURE KNOB: how far the pushrod's aft end stops short of the tiller. Zero in the design. boat.linkage_closed's negative control sets it to 6 mm, which is a clevis on the wrong hole -- and is what the boat actually had, unnoticed, for a whole revision.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 0.0
+    },
+    {
+      "changed_in": "close-the-steering-chain-and-gate-the-fact-that",
+      "defended": true,
+      "derived": false,
+      "derived_from": [],
+      "gates": [
+        "boat.linkage_closed"
+      ],
+      "grounded_by": [],
+      "name": "max_mating_gap_mm",
+      "rationale": "How far apart two consecutive members of a drive or steering chain may be before they are not connected. Every pair in the design is at 0.00 mm -- they interpenetrate, because that is what a shaft in a coupler or a stock in a bearing does -- so 1 mm is not a tolerance being used up, it is the width of the band in which a modelling slip is still recoverable. See boat.linkage_closed.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 1.0
     },
     {
       "changed_in": "model-the-fasteners-the-driveline-and-the-wiring",
@@ -2242,6 +2371,21 @@
       "tags": [],
       "units": "",
       "value": 3.0
+    },
+    {
+      "changed_in": "close-the-steering-chain-and-gate-the-fact-that",
+      "defended": true,
+      "derived": false,
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "rudder_blade_top_mm",
+      "rationale": "Top of the rudder blade, just above the keel datum. The stock runs from the BOTTOM of the blade up through the bracket's bore to the tiller, so blade, stock and tiller are one connected assembly rather than three solids near each other.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 2.0
     },
     {
       "changed_in": "",
@@ -3226,7 +3370,7 @@
       "asserted": 8,
       "blocked": 0,
       "fail": 1,
-      "pass": 19,
+      "pass": 20,
       "pending": 0,
       "refuted": 0,
       "stale": 0,
@@ -3236,25 +3380,25 @@
     },
     "kinds": {
       "assumption": 8,
-      "measurable": 20,
+      "measurable": 21,
       "physical": 5
     },
-    "n_claims": 33,
-    "n_critical": 33,
+    "n_claims": 34,
+    "n_critical": 34,
     "n_gaps": 0,
-    "n_gates": 36,
+    "n_gates": 37,
     "ready": false,
-    "verdict": "v0.1 is NOT ready: 1 of 33 critical claims is unsettled — 1 failing (C8). 19 of 33 claims are machine-verified against the current model. It is unverified in physical hardware: 5 claims need a real object (P1, P2, P3, P4, +1 more)."
+    "verdict": "v0.1 is NOT ready: 1 of 34 critical claims is unsettled — 1 failing (C8). 20 of 34 claims are machine-verified against the current model. It is unverified in physical hardware: 5 claims need a real object (P1, P2, P3, P4, +1 more)."
   },
   "verdicts": [
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "drag",
         "resistance"
       ],
       "detail": "drag 0.27 N at 0.80 m/s vs 3.00 N budget (Cd 0.21, A 0.0040 m2, rho 998); Re 3.8e5 turbulent on L 0.480 m, nu from nu; model-supplied Cd (its regime is the model's to defend)",
-      "duration_s": 6.5e-05,
+      "duration_s": 7.3e-05,
       "error": "",
       "evidence": [],
       "gate": "fluid.drag",
@@ -3270,17 +3414,17 @@
       "tier": 0,
       "units": "N",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "pressure-drop",
         "head-loss",
         "pipe-flow"
       ],
       "detail": "",
-      "duration_s": 2.1e-05,
+      "duration_s": 2.3e-05,
       "error": "",
       "evidence": [],
       "gate": "fluid.pipe_pressure_drop",
@@ -3297,10 +3441,10 @@
       "unanchored": true,
       "units": "",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "flow-regime",
         "drag",
@@ -3310,7 +3454,7 @@
         "pipe-flow"
       ],
       "detail": "regimes valid: external Re 3.8e5 turbulent, no table class declared - the model owns its Cd's valid range | rho 998 kg/m3, nu 1.00e-06 m2/s",
-      "duration_s": 2.2e-05,
+      "duration_s": 2.7e-05,
       "error": "",
       "evidence": [],
       "gate": "fluid.flow_regime",
@@ -3326,17 +3470,17 @@
       "tier": 0,
       "units": "Re",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "buoyancy",
         "flotation",
         "displacement"
       ],
       "detail": "floats: 1.3 kg needs 0.0013 m3 of the 0.0038 m3 watertight volume at rho 998 kg/m3 -> volume fraction 0.342 vs 0.55 limit (0.0025 m3 reserve buoyancy); this is a VOLUME fraction, not a draft fraction - see fluid.freeboard for draft",
-      "duration_s": 5.2e-05,
+      "duration_s": 3.6e-05,
       "error": "",
       "evidence": [],
       "gate": "fluid.buoyancy",
@@ -3352,16 +3496,16 @@
       "tier": 0,
       "units": "V_displaced/V_hull",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "freeboard",
         "reserve-buoyancy"
       ],
       "detail": "freeboard 0.050 m = depth 0.082 - draft 0.032 at 1.3 kg, vs 0.025 m minimum [stated min_freeboard_m]",
-      "duration_s": 2.4e-05,
+      "duration_s": 2.7e-05,
       "error": "",
       "evidence": [],
       "gate": "fluid.freeboard",
@@ -3377,22 +3521,22 @@
       "tier": 0,
       "units": "m",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "stability",
         "metacentric-height"
       ],
-      "detail": "GM 0.062 m = BM 0.079 - BG 0.017, vs 0.015 m [stated min_gm_m]; positive GM is necessary NOT sufficient - it is the slope at 0 deg only",
-      "duration_s": 3.1e-05,
+      "detail": "GM 0.061 m = BM 0.079 - BG 0.018, vs 0.015 m [stated min_gm_m]; positive GM is necessary NOT sufficient - it is the slope at 0 deg only",
+      "duration_s": 3.6e-05,
       "error": "",
       "evidence": [],
       "gate": "fluid.metacentric",
       "limit": 0.015,
       "locators": [],
-      "measured": 0.0621,
+      "measured": 0.0612,
       "ok": true,
       "pack": "fluids-analytic",
       "passed": true,
@@ -3402,22 +3546,22 @@
       "tier": 0,
       "units": "m",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "righting-arm",
         "stability-margin"
       ],
-      "detail": "GZ 0.0086 m at 8.0 deg (GM 0.062, BM 0.079), righting moment 0 N.m vs demand 0 N.m; limit 0.0020 m [stated min_righting_arm_m]; small-angle void past 10 deg",
-      "duration_s": 4.5e-05,
+      "detail": "GZ 0.0085 m at 8.0 deg (GM 0.061, BM 0.079), righting moment 0 N.m vs demand 0 N.m; limit 0.0020 m [stated min_righting_arm_m]; small-angle void past 10 deg",
+      "duration_s": 5.1e-05,
       "error": "",
       "evidence": [],
       "gate": "fluid.righting_arm",
       "limit": 0.002,
       "locators": [],
-      "measured": 0.0086,
+      "measured": 0.0085,
       "ok": true,
       "pack": "fluids-analytic",
       "passed": true,
@@ -3427,10 +3571,10 @@
       "tier": 0,
       "units": "m",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "geometry",
         "envelope",
@@ -3439,7 +3583,7 @@
         "cad"
       ],
       "detail": "",
-      "duration_s": 1.7e-05,
+      "duration_s": 1.9e-05,
       "error": "",
       "evidence": [],
       "gate": "cad.bounding",
@@ -3456,10 +3600,10 @@
       "unanchored": true,
       "units": "",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "manufacturability",
         "fdm",
@@ -3483,10 +3627,10 @@
       "tier": 0,
       "units": "utilisation",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "manufacturability",
         "fdm",
@@ -3494,7 +3638,7 @@
         "printability"
       ],
       "detail": "thinnest section 1.40 mm = 3.0 beads vs 1.38 mm minimum (3 x 0.46 mm line width)",
-      "duration_s": 2.3e-05,
+      "duration_s": 2.2e-05,
       "error": "",
       "evidence": [],
       "gate": "fdm.min_wall",
@@ -3510,10 +3654,10 @@
       "tier": 0,
       "units": "mm",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "manufacturability",
         "fdm",
@@ -3522,7 +3666,7 @@
         "printability"
       ],
       "detail": "load at 0 deg to the layer plane (build axis from the model): stress utilisation 0.12 (utilisation) / knockdown 1.00 = 0.12 vs 1.00 (layer-normal strength 0.55x in-plane)",
-      "duration_s": 6.6e-05,
+      "duration_s": 6.3e-05,
       "error": "",
       "evidence": [],
       "gate": "fdm.layer_alignment",
@@ -3538,10 +3682,10 @@
       "tier": 0,
       "units": "derated utilisation",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "manufacturability",
         "fdm",
@@ -3550,7 +3694,7 @@
         "printability"
       ],
       "detail": "ESTIMATE ~16.2 h of 17 h, ~238 g of 1000 g (187.5 cm^3 at 15% infill, 4x0.46 mm shell on 197764 mm^2) — 0.24 mm layers at 60 mm/s x 0.55 duty; time is the binding one at 0.95 of its ceiling. Not a slice.",
-      "duration_s": 5.1e-05,
+      "duration_s": 4.8e-05,
       "error": "",
       "evidence": [],
       "gate": "fdm.print_time_est",
@@ -3566,10 +3710,10 @@
       "tier": 0,
       "units": "of limit",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "manufacturability",
         "fdm",
@@ -3579,7 +3723,7 @@
         "process-validity"
       ],
       "detail": "process model applies — extent 188 mm reads as millimetres; volume fills 0.06 of the bbox; layer/nozzle 0.60 inside 0.1-0.75; width/nozzle 1.15 inside 0.8-2.0; thinnest section 3.5 beads wide",
-      "duration_s": 4.7e-05,
+      "duration_s": 4.4e-05,
       "error": "",
       "evidence": [],
       "gate": "fdm.process_model_valid",
@@ -3595,10 +3739,10 @@
       "tier": 0,
       "units": "problems",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "sourcing",
         "procurement",
@@ -3608,7 +3752,7 @@
         "supply-chain"
       ],
       "detail": "0 of 21 lines not orderable (limit 0) — every line has a part number, a quantity and a usable price",
-      "duration_s": 0.000436,
+      "duration_s": 0.000464,
       "error": "",
       "evidence": [
         "/home/neuman/Documents/work/boaty/.atompipe/out/bom_complete.json"
@@ -3626,10 +3770,10 @@
       "tier": 0,
       "units": "lines",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "cost",
         "build-cost",
@@ -3637,7 +3781,7 @@
         "unit-cost"
       ],
       "detail": "397.50 USD/unit at qty 1 vs 400.00 USD budget; parts 397.50 USD + minimums 0.00 USD + one-time 0.00 USD (0.00 USD/unit amortised) = 397.50 USD run",
-      "duration_s": 0.000559,
+      "duration_s": 0.000531,
       "error": "",
       "evidence": [
         "/home/neuman/Documents/work/boaty/.atompipe/out/bom_cost.json"
@@ -3655,10 +3799,10 @@
       "tier": 0,
       "units": "USD/unit",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "availability",
         "lead-time",
@@ -3666,7 +3810,7 @@
         "stock"
       ],
       "detail": "longest lead 0 wk (motor); vs 3 wk budget; 0 unknown, 0 EOL, 0 flagged",
-      "duration_s": 0.000421,
+      "duration_s": 0.000375,
       "error": "",
       "evidence": [
         "/home/neuman/Documents/work/boaty/.atompipe/out/bom_availability.json"
@@ -3684,10 +3828,10 @@
       "tier": 0,
       "units": "weeks",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "moq",
         "minimum-order",
@@ -3695,7 +3839,7 @@
         "inventory"
       ],
       "detail": "idle capital 0.00 USD vs 39.75 USD (10% of the 397.50 parts spend); no line buys more than the build consumes; 0 line(s) past 3x",
-      "duration_s": 0.000463,
+      "duration_s": 0.000427,
       "error": "",
       "evidence": [
         "/home/neuman/Documents/work/boaty/.atompipe/out/bom_moq.json"
@@ -3713,10 +3857,10 @@
       "tier": 0,
       "units": "USD",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "process-rules",
         "vendor-capability",
@@ -3724,7 +3868,7 @@
         "dfm"
       ],
       "detail": "0 violation(s) of 3 project-supplied rule(s) (limit 0) — design is inside every stated capability",
-      "duration_s": 0.000708,
+      "duration_s": 0.000183,
       "error": "",
       "evidence": [
         "/home/neuman/Documents/work/boaty/.atompipe/out/bom_process_rules.json"
@@ -3742,10 +3886,10 @@
       "tier": 0,
       "units": "violations",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "single-source",
         "supply-risk",
@@ -3753,7 +3897,7 @@
         "supply-chain-risk"
       ],
       "detail": "0 unrecorded single-source line(s) vs limit 0 (13 behind one source in total, 0 with a qualified alternate, 13 accepted in writing)",
-      "duration_s": 0.000402,
+      "duration_s": 0.000288,
       "error": "",
       "evidence": [
         "/home/neuman/Documents/work/boaty/.atompipe/out/bom_single_source.json"
@@ -3771,10 +3915,10 @@
       "tier": 0,
       "units": "lines",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "currency",
         "fx",
@@ -3782,7 +3926,7 @@
         "cost"
       ],
       "detail": "0 of 21 line(s) priced in a currency this document cannot convert (limit 0) — base USD (the document's 'currency'), every line quoted in the base currency",
-      "duration_s": 0.000254,
+      "duration_s": 0.000163,
       "error": "",
       "evidence": [
         "/home/neuman/Documents/work/boaty/.atompipe/out/bom_currency.json"
@@ -3800,22 +3944,22 @@
       "tier": 0,
       "units": "lines",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "trim",
         "longitudinal-stability"
       ],
-      "detail": "trim -0.88 deg (-7.4 mm bow-to-stern) vs 1.50 limit; freeboard 25.8 mm after trim vs 25 mm required (level flotation would have reported 29.0 mm, so trim costs 3.2 mm); LCG 200.8 vs LCB 211.0 mm",
-      "duration_s": 5.5e-05,
+      "detail": "trim -0.88 deg (-7.4 mm bow-to-stern) vs 1.50 limit; freeboard 47.1 mm after trim vs 25 mm required (level flotation would have reported 50.3 mm, so trim costs 3.2 mm); LCG 200.8 vs LCB 211.0 mm",
+      "duration_s": 3.8e-05,
       "error": "",
       "evidence": [],
       "gate": "boat.trim",
       "limit": 1.5,
       "locators": [],
-      "measured": 0.881,
+      "measured": 0.88,
       "ok": true,
       "pack": "",
       "passed": true,
@@ -3825,21 +3969,21 @@
       "tier": 0,
       "units": "deg",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "free-surface"
       ],
-      "detail": "GM 62.1 mm solid, minus 3.6 mm of free surface = 58.5 mm vs 10 mm; the girder divides the bilge into 53 mm cells -- undivided the correction would be 14.6 mm",
-      "duration_s": 3.1e-05,
+      "detail": "GM 61.2 mm solid, minus 3.6 mm of free surface = 57.6 mm vs 10 mm; the girder divides the bilge into 53 mm cells -- undivided the correction would be 14.6 mm",
+      "duration_s": 1.9e-05,
       "error": "",
       "evidence": [],
       "gate": "boat.free_surface",
       "limit": 10.0,
       "locators": [],
-      "measured": 58.47,
+      "measured": 57.57,
       "ok": true,
       "pack": "",
       "passed": true,
@@ -3849,16 +3993,16 @@
       "tier": 0,
       "units": "mm",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "swamped",
         "reserve-buoyancy-sealed"
       ],
       "detail": "sealed compartments support 1827 g against an all-up 1313 g -> +513 g margin with the equipment bay full. Foam-filled, so the reserve fails gracefully rather than closed-loop",
-      "duration_s": 2.1e-05,
+      "duration_s": 1.4e-05,
       "error": "",
       "evidence": [],
       "gate": "boat.swamped",
@@ -3874,21 +4018,21 @@
       "tier": 0,
       "units": "g",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "loading-cases"
       ],
-      "detail": "empty GM 63.0 mm (KG 38.2 mm vs 37.1 loaded) at 30.4 mm draft, vs 10 mm",
-      "duration_s": 2.5e-05,
+      "detail": "empty GM 62.0 mm (KG 39.2 mm vs 38.0 loaded) at 30.4 mm draft, vs 10 mm",
+      "duration_s": 1.6e-05,
       "error": "",
       "evidence": [],
       "gate": "boat.empty",
       "limit": 10.0,
       "locators": [],
-      "measured": 62.98,
+      "measured": 62.01,
       "ok": true,
       "pack": "",
       "passed": true,
@@ -3898,15 +4042,15 @@
       "tier": 0,
       "units": "mm",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "driveline"
       ],
       "detail": "shaft exits the bottom at x=52 mm at 8.0 deg; prop clears the hull by 17.4 mm and leads the rudder by 12.7 mm; prop tip sits 19.8 mm below the keel",
-      "duration_s": 2.6e-05,
+      "duration_s": 1.7e-05,
       "error": "",
       "evidence": [],
       "gate": "boat.driveline",
@@ -3922,15 +4066,15 @@
       "tier": 0,
       "units": "violations",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "mesh-agreement"
       ],
       "detail": "worst disagreement 6.4% on hull_bow (1.498 mm from mesh volume/area vs 1.60 mm specified); all shells: hull_aft 1.566, hull_bow 1.498, hull_mid 1.565",
-      "duration_s": 3.4e-05,
+      "duration_s": 2.8e-05,
       "error": "",
       "evidence": [],
       "gate": "boat.wall_agreement",
@@ -3946,16 +4090,16 @@
       "tier": 0,
       "units": "fraction",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "envelope",
         "packaging"
       ],
       "detail": "assembled 480 x 186 x 87 mm vs 560 x 230 x 170 mm envelope (worst axis 86%)",
-      "duration_s": 2.5e-05,
+      "duration_s": 2.2e-05,
       "error": "",
       "evidence": [],
       "gate": "boat.envelope",
@@ -3971,10 +4115,10 @@
       "tier": 0,
       "units": "fraction",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "geometry",
         "mesh",
@@ -3982,7 +4126,7 @@
         "manufacturability"
       ],
       "detail": "0 bad edge(s) across 30 part(s), limit 0 — worst component_battery: 0 open, 0 non-manifold of 12 faces; 30 part(s) welded at 0.0001 mm on load (component_battery, component_esc, component_motor...) — a soup format has no vertex identity of its own",
-      "duration_s": 0.081734,
+      "duration_s": 0.076102,
       "error": "",
       "evidence": [],
       "gate": "cad.watertight",
@@ -3998,18 +4142,18 @@
       "tier": 1,
       "units": "edges",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "geometry",
         "mesh",
         "cad",
         "manufacturability"
       ],
-      "detail": "0 of 30 part(s) are not volumes, limit 0 (total 700572 mm^3 enclosed); 30 part(s) welded at 0.0001 mm on load (component_battery, component_esc, component_motor...) — a soup format has no vertex identity of its own",
-      "duration_s": 0.060808,
+      "detail": "0 of 30 part(s) are not volumes, limit 0 (total 703759 mm^3 enclosed); 30 part(s) welded at 0.0001 mm on load (component_battery, component_esc, component_motor...) — a soup format has no vertex identity of its own",
+      "duration_s": 0.056237,
       "error": "",
       "evidence": [],
       "gate": "cad.is_volume",
@@ -4025,10 +4169,10 @@
       "tier": 1,
       "units": "parts",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "geometry",
         "mesh",
@@ -4036,7 +4180,7 @@
         "manufacturability"
       ],
       "detail": "0 repair(s) needed across 30 part(s), limit 0 — worst component_battery: welded 0 vertex/vertices at 0.0001 mm, dropped 0 face(s) below 1e-08 mm^2 over 1 pass(es); 30 part(s) welded at 0.0001 mm on load (component_battery, component_esc, component_motor...) — a soup format has no vertex identity of its own",
-      "duration_s": 0.05078,
+      "duration_s": 0.048299,
       "error": "",
       "evidence": [],
       "gate": "cad.degenerate_faces",
@@ -4052,10 +4196,10 @@
       "tier": 1,
       "units": "repairs",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "geometry",
         "mesh",
@@ -4063,8 +4207,8 @@
         "manufacturability",
         "wall"
       ],
-      "detail": "thinnest wall 0.033 mm on hull_mid at (282.378, -50.4, 11.472) vs 1.400 mm minimum (15891/16856 inward face-normal rays hit; sampler, not a proof)",
-      "duration_s": 1.6581,
+      "detail": "thinnest wall 0.033 mm on hull_mid at (282.378, -50.4, 11.472) vs 1.400 mm minimum (15927/16920 inward face-normal rays hit; sampler, not a proof)",
+      "duration_s": 1.327224,
       "error": "",
       "evidence": [
         "/home/neuman/Documents/work/boaty/.atompipe/out/cad-solid/wall_thickness.json"
@@ -4074,7 +4218,7 @@
       "locators": [
         {
           "kind": "point",
-          "label": "0.033 mm wall vs 1.400 mm minimum (16856 rays sampled)",
+          "label": "0.033 mm wall vs 1.400 mm minimum (16920 rays sampled)",
           "position": [
             282.378,
             -50.4,
@@ -4098,10 +4242,10 @@
       "views": [
         "assembly"
       ],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "geometry",
         "fit",
@@ -4110,8 +4254,8 @@
         "mechanical",
         "cad"
       ],
-      "detail": "0 interfering pairs of 435 (55 booleaned, rest AABB-clear); largest shared volume 1662.6286 mm^3 on hull_aft/hw_stuffing_tube vs 0.2 mm^3 tolerance; deepest equivalent penetration 1.9542 mm; 28 intended contact(s) allowlisted",
-      "duration_s": 0.358069,
+      "detail": "0 interfering pairs of 435 (59 booleaned, rest AABB-clear); largest shared volume 1662.6286 mm^3 on hull_aft/hw_stuffing_tube vs 0.2 mm^3 tolerance; deepest equivalent penetration 1.9542 mm; 32 intended contact(s) allowlisted",
+      "duration_s": 0.329361,
       "error": "",
       "evidence": [
         "/home/neuman/Documents/work/boaty/.atompipe/out/cad-solid/clash_pairs.json"
@@ -4129,10 +4273,10 @@
       "tier": 1,
       "units": "pairs",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "manufacturability",
         "fdm",
@@ -4140,7 +4284,7 @@
         "printability"
       ],
       "detail": "worst supportable face 75.8 deg vs 45 deg limit; 24 faces past it covering 497.4 mm^2 = 0.25% of surface (allowance 0.50%); steepest downward face on the part 75.8 deg, 0 at or past 80 deg excluded as ceilings — they are fdm.bridge_span's",
-      "duration_s": 0.019571,
+      "duration_s": 0.020168,
       "error": "",
       "evidence": [
         "/home/neuman/Documents/work/boaty/.atompipe/out/fdm-overhang.txt"
@@ -4158,10 +4302,10 @@
       "tier": 1,
       "units": "area fraction",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "manufacturability",
         "fdm",
@@ -4169,7 +4313,7 @@
         "printability"
       ],
       "detail": "no ceiling faces at or past 80 deg off the bed — nothing to bridge (12196 faces checked)",
-      "duration_s": 0.018022,
+      "duration_s": 0.017853,
       "error": "",
       "evidence": [],
       "gate": "fdm.bridge_span",
@@ -4185,15 +4329,15 @@
       "tier": 1,
       "units": "mm",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "fdm-multipart"
       ],
       "detail": "7 part(s); worst is hatch_cover at 96% of 208 x 208 x 250 mm usable (220 x 220 bed less 6 mm of brim a side): hatch_cover 200 mm, hull_mid 187 mm, hull_aft 186 mm, hull_bow 137 mm, deck_bow 137 mm, stem_plate 69 mm, motor_clamp 56 mm",
-      "duration_s": 4.5e-05,
+      "duration_s": 4e-05,
       "error": "",
       "evidence": [],
       "gate": "boat.bed_fit_all",
@@ -4209,15 +4353,15 @@
       "tier": 0,
       "units": "fraction",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
     },
     {
-      "age_s": 49.0,
+      "age_s": 44.0,
       "claims": [
         "penetrations"
       ],
-      "detail": "6 penetration(s), all declared and sealed. Below the 32.0 mm loaded waterline: 1 through the shell (stuffing_tube_hull) and 1 through a watertight bulkhead (stuffing_tube_bulkhead). The other 4 sit pushrod_tube_bulkhead +17 mm, pushrod_tube_transom +17 mm, rudder_bracket_screws +9 mm, switch_rod_deck +50 mm above it.",
-      "duration_s": 3.4e-05,
+      "detail": "7 penetration(s) listed, 6 of them through a pressure boundary, all declared and sealed. Below the 32.0 mm loaded waterline: 1 through the shell (stuffing_tube_hull) and 1 through a watertight bulkhead (stuffing_tube_bulkhead). The other 4 sit pushrod_tube_bulkhead +17 mm, pushrod_tube_transom +17 mm, rudder_bracket_screws +9 mm, switch_rod_deck +50 mm above it.",
+      "duration_s": 3.5e-05,
       "error": "",
       "evidence": [],
       "gate": "boat.hull_penetrations",
@@ -4233,7 +4377,31 @@
       "tier": 0,
       "units": "shell holes below waterline",
       "views": [],
-      "when": "2026-09-12T20:37:28Z"
+      "when": "2026-09-13T00:30:52Z"
+    },
+    {
+      "age_s": 44.0,
+      "claims": [
+        "linkage"
+      ],
+      "detail": "9 consecutive pair(s) across 2 chain(s) (driveline, steering), every one of them touching or interpenetrating (worst gap 0.00 mm vs 1.0 mm allowed)",
+      "duration_s": 2.7e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "boat.linkage_closed",
+      "limit": 1.0,
+      "locators": [],
+      "measured": 0.0,
+      "ok": true,
+      "pack": "",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "status": "pass",
+      "tier": 0,
+      "units": "mm",
+      "views": [],
+      "when": "2026-09-13T00:30:52Z"
     }
   ],
   "views": [
@@ -4260,12 +4428,12 @@
           "center": [
             192.8765,
             0.0,
-            8.2476
+            27.3076
           ],
           "extent": [
             531.7529,
             186.808,
-            172.7352
+            134.6152
           ],
           "movers": {
             "component_battery": {
@@ -4273,9 +4441,9 @@
                 "component_battery__0"
               ],
               "offset": [
-                74.0586,
+                57.715,
                 0.0,
-                -1887.132
+                -1470.671
               ],
               "rank": 5
             },
@@ -4284,9 +4452,9 @@
                 "component_esc__0"
               ],
               "offset": [
-                56.1274,
+                43.7409,
                 0.0,
-                99.3227
+                77.4037
               ],
               "rank": 15
             },
@@ -4295,9 +4463,9 @@
                 "component_motor__0"
               ],
               "offset": [
-                16.5293,
+                12.8815,
                 0.0,
-                -1092.5501
+                -851.4411
               ],
               "rank": 9
             },
@@ -4306,9 +4474,9 @@
                 "component_radio__0"
               ],
               "offset": [
-                93.4841,
+                72.8536,
                 0.0,
-                -297.9682
+                -232.2112
               ],
               "rank": 13
             },
@@ -4317,9 +4485,9 @@
                 "component_servo__0"
               ],
               "offset": [
-                -11.1147,
+                -8.6619,
                 0.0,
-                -695.2592
+                -541.8262
               ],
               "rank": 11
             },
@@ -4328,9 +4496,9 @@
                 "component_switch__0"
               ],
               "offset": [
-                89.0013,
+                69.3601,
                 0.0,
-                1489.8411
+                1161.0561
               ],
               "rank": 22
             },
@@ -4339,9 +4507,9 @@
                 "deck_bow__0"
               ],
               "offset": [
-                153.5361,
+                119.6531,
                 0.0,
-                2483.0685
+                1935.0934
               ],
               "rank": 27
             },
@@ -4350,9 +4518,9 @@
                 "hatch_cover__0"
               ],
               "offset": [
-                38.9433,
+                30.3491,
                 0.0,
-                2880.3594
+                2244.7084
               ],
               "rank": 29
             },
@@ -4361,9 +4529,9 @@
                 "hull_aft__0"
               ],
               "offset": [
-                -88.0696,
+                -68.634,
                 0.0,
-                893.9047
+                696.6336
               ],
               "rank": 19
             },
@@ -4372,9 +4540,9 @@
                 "hull_bow__0"
               ],
               "offset": [
-                153.5361,
+                119.6531,
                 0.0,
-                1291.1956
+                1006.2486
               ],
               "rank": 21
             },
@@ -4383,9 +4551,9 @@
                 "hull_mid__0"
               ],
               "offset": [
-                38.1962,
+                29.7669,
                 0.0,
-                1092.5501
+                851.4411
               ],
               "rank": 20
             },
@@ -4394,9 +4562,9 @@
                 "hw_coupler__0"
               ],
               "offset": [
-                -12.9826,
+                -8.953,
                 0.0,
-                -1489.8411
+                -1161.0561
               ],
               "rank": 7
             },
@@ -4405,9 +4573,9 @@
                 "hw_fast_hatch__0"
               ],
               "offset": [
-                38.9433,
+                30.3491,
                 0.0,
-                2681.714
+                2089.9009
               ],
               "rank": 28
             },
@@ -4416,9 +4584,9 @@
                 "hw_fast_motor__0"
               ],
               "offset": [
-                16.5293,
+                12.8815,
                 0.0,
-                -893.9047
+                -696.6336
               ],
               "rank": 10
             },
@@ -4427,9 +4595,9 @@
                 "hw_fast_rudder__0"
               ],
               "offset": [
-                -142.3489,
+                -110.9347,
                 0.0,
-                695.2592
+                541.8262
               ],
               "rank": 18
             },
@@ -4438,9 +4606,9 @@
                 "hw_fast_servo__0"
               ],
               "offset": [
-                -11.1147,
+                -8.6619,
                 0.0,
-                -2085.7775
+                -1625.4785
               ],
               "rank": 4
             },
@@ -4449,31 +4617,31 @@
                 "hw_prop_shaft__0"
               ],
               "offset": [
-                -163.5302,
+                -127.4416,
                 0.0,
-                -2483.0685
+                -2089.9009
               ],
-              "rank": 2
+              "rank": 1
             },
             "hw_propeller": {
               "nodes": [
                 "hw_propeller__0"
               ],
               "offset": [
-                -168.013,
+                -130.9351,
                 0.0,
-                -2681.714
+                -2244.7084
               ],
-              "rank": 1
+              "rank": 0
             },
             "hw_pushrod": {
               "nodes": [
                 "hw_pushrod__0"
               ],
               "offset": [
-                -104.5489,
+                -81.477,
                 0.0,
-                2085.7775
+                1625.4785
               ],
               "rank": 25
             },
@@ -4482,9 +4650,9 @@
                 "hw_pushrod_tube__0"
               ],
               "offset": [
-                -87.3224,
+                -68.0517,
                 0.0,
-                2284.423
+                1780.286
               ],
               "rank": 26
             },
@@ -4493,20 +4661,20 @@
                 "hw_rudder__0"
               ],
               "offset": [
-                -190.427,
+                -148.4027,
                 0.0,
-                -2880.3594
+                -1935.0934
               ],
-              "rank": 0
+              "rank": 2
             },
             "hw_rudder_bracket": {
               "nodes": [
                 "hw_rudder_bracket__0"
               ],
               "offset": [
-                -167.2658,
+                -132.3907,
                 0.0,
-                -99.3227
+                -77.4037
               ],
               "rank": 14
             },
@@ -4515,9 +4683,9 @@
                 "hw_shaft_inboard__0"
               ],
               "offset": [
-                -24.5631,
+                -19.7247,
                 0.0,
-                -1688.4866
+                -1315.8635
               ],
               "rank": 6
             },
@@ -4526,9 +4694,9 @@
                 "hw_stuffing_tube__0"
               ],
               "offset": [
-                -93.2995,
+                -72.7097,
                 0.0,
-                -2284.423
+                -1780.286
               ],
               "rank": 3
             },
@@ -4537,9 +4705,9 @@
                 "hw_wire_esc_battery__0"
               ],
               "offset": [
-                57.5566,
+                44.8547,
                 0.0,
-                -1291.1956
+                -1006.2486
               ],
               "rank": 8
             },
@@ -4548,9 +4716,9 @@
                 "hw_wire_esc_rx__0"
               ],
               "offset": [
-                75.4089,
+                58.7673,
                 0.0,
-                297.9682
+                232.2112
               ],
               "rank": 16
             },
@@ -4559,9 +4727,9 @@
                 "hw_wire_motor_esc__0"
               ],
               "offset": [
-                24.1421,
+                18.8143,
                 0.0,
-                496.6137
+                387.0187
               ],
               "rank": 17
             },
@@ -4570,9 +4738,9 @@
                 "hw_wire_rx_servo__0"
               ],
               "offset": [
-                41.889,
+                32.6447,
                 0.0,
-                -496.6137
+                -387.0187
               ],
               "rank": 12
             },
@@ -4581,9 +4749,9 @@
                 "motor_clamp__0"
               ],
               "offset": [
-                16.5293,
+                12.8815,
                 0.0,
-                1688.4866
+                1315.8635
               ],
               "rank": 23
             },
@@ -4592,14 +4760,14 @@
                 "stem_plate__0"
               ],
               "offset": [
-                197.8983,
+                154.2252,
                 0.0,
-                1887.132
+                1470.671
               ],
               "rank": 24
             }
           },
-          "step": 198.6455
+          "step": 154.8075
         },
         "frame": "model frame, untransformed — a locator position in the model's coordinates addresses the same point in this GLB",
         "nodes": [
@@ -4810,10 +4978,10 @@
         "markers": [
           {
             "key": "design",
-            "label": "design heel 8 deg -> GZ 0.0086 m, righting moment 0 N.m (432% of the demand)",
+            "label": "design heel 8 deg -> GZ 0.0085 m, righting moment 0 N.m (426% of the demand)",
             "series": "gz",
             "x": 8.0,
-            "y": 0.008645
+            "y": 0.00852
           }
         ],
         "series": [
@@ -4827,163 +4995,163 @@
               ],
               [
                 0.25,
-                0.000271
+                0.000267
               ],
               [
                 0.5,
-                0.000542
+                0.000534
               ],
               [
                 0.75,
-                0.000813
+                0.000801
               ],
               [
                 1.0,
-                0.001084
+                0.001068
               ],
               [
                 1.25,
-                0.001355
+                0.001336
               ],
               [
                 1.5,
-                0.001626
+                0.001603
               ],
               [
                 1.75,
-                0.001897
+                0.00187
               ],
               [
                 2.0,
-                0.002168
+                0.002137
               ],
               [
                 2.25,
-                0.002439
+                0.002404
               ],
               [
                 2.5,
-                0.00271
+                0.00267
               ],
               [
                 2.75,
-                0.00298
+                0.002937
               ],
               [
                 3.0,
-                0.003251
+                0.003204
               ],
               [
                 3.25,
-                0.003522
+                0.003471
               ],
               [
                 3.5,
-                0.003792
+                0.003737
               ],
               [
                 3.75,
-                0.004063
+                0.004004
               ],
               [
                 4.0,
-                0.004333
+                0.004271
               ],
               [
                 4.25,
-                0.004604
+                0.004537
               ],
               [
                 4.5,
-                0.004874
+                0.004803
               ],
               [
                 4.75,
-                0.005144
+                0.00507
               ],
               [
                 5.0,
-                0.005414
+                0.005336
               ],
               [
                 5.25,
-                0.005684
+                0.005602
               ],
               [
                 5.5,
-                0.005954
+                0.005868
               ],
               [
                 5.75,
-                0.006224
+                0.006134
               ],
               [
                 6.0,
-                0.006493
+                0.006399
               ],
               [
                 6.25,
-                0.006763
+                0.006665
               ],
               [
                 6.5,
-                0.007032
+                0.00693
               ],
               [
                 6.75,
-                0.007301
+                0.007196
               ],
               [
                 7.0,
-                0.00757
+                0.007461
               ],
               [
                 7.25,
-                0.007839
+                0.007726
               ],
               [
                 7.5,
-                0.008108
+                0.007991
               ],
               [
                 7.75,
-                0.008377
+                0.008256
               ],
               [
                 8.0,
-                0.008645
+                0.00852
               ],
               [
                 8.25,
-                0.008914
+                0.008785
               ],
               [
                 8.5,
-                0.009182
+                0.009049
               ],
               [
                 8.75,
-                0.00945
+                0.009313
               ],
               [
                 9.0,
-                0.009718
+                0.009577
               ],
               [
                 9.25,
-                0.009985
+                0.009841
               ],
               [
                 9.5,
-                0.010253
+                0.010104
               ],
               [
                 9.75,
-                0.01052
+                0.010368
               ],
               [
                 10.0,
-                0.010787
+                0.010631
               ]
             ],
             "units": "m"
@@ -4998,7 +5166,7 @@
       "id": "righting_arm_curve",
       "kind": "chart",
       "meta": {
-        "basis": "GZ = GM.sin(theta), GM 0.0621 m = BM 0.0793 - BG 0.0172",
+        "basis": "GZ = GM.sin(theta), GM 0.0612 m = BM 0.0793 - BG 0.0181",
         "gate": "fluid.righting_arm",
         "valid_to_deg": 10.0,
         "validity": "small-angle only. Past 10 deg the waterplane has moved and the deck edge may be immersed, so GM.sin(theta) over-predicts the real arm — that region needs a full hydrostatic GZ curve at each angle, not this formula, and the gate skips rather than answering there",

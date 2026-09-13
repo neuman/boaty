@@ -146,4 +146,4 @@ One spool covers the whole boat (about 480 g) with enough left to reprint the pa
 | switch | 12 | 312 |
 | radio | 9 | 318 |
 
-Printed structure 586 g + components 630 g + 8% contingency = **1313 g all-up**, which floats at **32.0 mm draft** with **25.8 mm of freeboard** once the trim is taken into account.
+Printed structure 586 g + components 630 g + 8% contingency = **1313 g all-up**, which floats at **32.0 mm draft** with **47.1 mm of freeboard** once the trim is taken into account.

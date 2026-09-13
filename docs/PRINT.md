@@ -54,6 +54,7 @@ The boat floats at **32.0 mm** of draft. A hole below that line is a leak path, 
 | `pushrod_tube_bulkhead` | watertight bulkhead (aft) | 50 mm | +17 mm | brass tube epoxy-filleted on both faces |
 | `pushrod_tube_transom` | hull shell (transom) | 50 mm | +17 mm | same tube, epoxy fillet outside and in, plus a smear of neutral-cure RTV round the pushrod at the outer end |
 | `rudder_bracket_screws` | hull shell (transom) | 41 mm | +9 mm | M3 stainless through a neutral-cure RTV bead under the head and a nylon washer, into heat-set inserts in a thickened pad on the inside face of the transom |
+| `rudder_stock_bearing` | external bracket (NOT a pressure boundary) | 38 mm | +6 mm | none needed: the bearing is a bronze bush in the bracket's boss, outside the hull, with nothing dry behind it |
 | `switch_rod_deck` | deck | 82 mm | +50 mm | bushing bedded in neutral-cure RTV; the switch body stays inside and only the actuating rod passes through |
 
 No wire pierces a watertight bulkhead: the motor, ESC, battery, receiver and servo are all between the two bulkheads, so all four runs stay inside the equipment bay. That is a layout decision, not luck.

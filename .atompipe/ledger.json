@@ -765,9 +765,98 @@
       "tags": [
         "penetrations"
       ]
+    },
+    {
+      "acceptance": {
+        "comparator": "<=",
+        "limit": 1.0,
+        "limit_hi": null,
+        "quantity": "worst gap in a drive or steering chain",
+        "units": "mm"
+      },
+      "critical": true,
+      "gates": [
+        "boat.linkage_closed"
+      ],
+      "grounded_by": [],
+      "id": "C21",
+      "kind": "measurable",
+      "note": "",
+      "physical_result": null,
+      "rationale": "A hole in the method, not just in this boat. Every geometry gate here checks that things do NOT touch; nothing checked that things which MUST touch DO. The steering was open in two places for an entire revision with every gate green -- the rudder blade hung 43 mm below its own bracket attached to nothing, there was no stock and no tiller, and the pushrod stopped 11 mm short of what it was supposed to push. cad.clash was happy because nothing was interfering. An absence is invisible to a gate that looks for presence.",
+      "source": "",
+      "statement": "Every drive and steering chain is continuous: no consecutive pair of members is more than 1 mm apart",
+      "tags": [
+        "linkage"
+      ]
     }
   ],
   "decisions": [
+    {
+      "body": "THE NUMBER THE OWNER ASKED FOR: there is no LOA at which this hull prints its bottom in one piece on a 220x220x250 machine AND floats its payload. The window is empty by 55 mm.\n\nWHAT WOULD OPEN IT: a one-piece 480 mm hull needs a build volume of 336 x 336 x 336 mm. That is an ordinary large-format machine -- Kobra Max, Ender 5 Plus class -- and it is the only route that gets a seamless wetted bottom at a size that floats. If the owner would rather buy a printer than accept two seams, that is the number.\n\nWHAT THE SEAMS ACTUALLY ARE, since they stay: two transverse butt joints, each landing on a printed bulkhead face rather than on open shell, each pinned with 1.75 mm filament through 2 mm holes and filleted with epoxy on the inside. The bulkheads they land on are integral to their segments and have no bond line of their own -- which was the point of the previous revision.\n\nALSO NOTE: with the freeboard measurement corrected (it was being taken to the traced sheer rather than the deck edge), the 480 mm boat has 47 mm of trimmed freeboard rather than 26. The boat is further from its freeboard limit than the report has been saying, not closer.",
+      "claims_changed": [
+        "P1",
+        "C2"
+      ],
+      "evidence": [],
+      "id": "keep-three-hull-segments-a-one-piece-hull-does-n",
+      "params_changed": [
+        "hull_scale"
+      ],
+      "rejected": [
+        {
+          "evidence": "",
+          "value": "a shorter boat with the hull in one piece",
+          "why": "321 mm is the largest one-piece hull this bed can take, and at 321 mm the boat carries 963 g and floats with 10.8 mm of trimmed freeboard against a 25 mm claim. A one-piece 321 mm hull could carry 245 g of payload; the payload is 630 g. The deficit is 385 g and it is all fixed-size hardware that does not scale with the boat -- which is why the hull went to 480 mm in the first place."
+        },
+        {
+          "evidence": "",
+          "value": "a horizontal split at the waterline, one-piece wetted bottom plus topsides",
+          "why": "tested rather than assumed, and it buys almost nothing. Cutting everything above the waterline off reduces the required build box by 1.2% at 330 mm, 3.5% at 390 mm and 6.0% at 480 mm, because the box is set by the hull LENGTH and not its depth. It would add parts and a seam to buy 4 mm of LOA."
+        },
+        {
+          "evidence": "",
+          "value": "two hull segments instead of three, halving the below-water seams",
+          "why": "blocked on SOURCING, not on printing. Two segments means the joint is at mid-length, the aft bulkhead is at the joint, and the motor has to sit forward of it -- which puts the stuffing tube 260 to 270 mm long against the 200 mm tube in the 250 mm kit on the BOM. The 300 mm kit exists but no US listing with a 3.17 mm joint could be confirmed. Running a 200 mm tube and leaving 75 mm of 4 mm shaft unsupported at 4500 rpm, inside a sealed compartment nobody can reach, is worse than a second seam. Segments up to 250 mm DO fit the bed standing upright with no tilt and no support, so the printer is not the obstacle here."
+        }
+      ],
+      "summary": "Exhaustive orientation search against the real hull surface on the stated 220x220x250 machine (208x208x250 usable). The largest hull that prints in ONE PIECE is 321 mm LOA. The shortest hull that floats the 630 g of fixed hardware with 25 mm of freeboard is 376 mm LOA. The two do not overlap, by 55 mm. Splitting the hull horizontally at the waterline does not close the gap either: the binding dimension is LENGTH, and removing the topsides shrinks the required build box by 1.2% at the one-piece limit.",
+      "title": "Keep three hull segments: a one-piece hull does not exist at any length that floats",
+      "when": "2026-09-13T00:29:46Z"
+    },
+    {
+      "body": "boat.linkage_closed names the chains and fails when any consecutive pair is further apart than the mating tolerance. Its negative control pulls the pushrod 6 mm short of the tiller -- a clevis on the wrong hole, the most ordinary mistake in the build, and the one this boat actually had.\n\nAlso fixed while measuring: FREEBOARD WAS BEING MEASURED TO THE WRONG LINE. hullform reported it to the traced sheer, but the hull is carried up to a flat deck at deck_z by a vertical strake at every station, so the deck edge -- the thing water has to get over -- is 20 mm higher. The 480 mm boat has 47 mm of trimmed freeboard, not 26. Conservative and wrong, and it made freeboard look like the tightest margin on the boat when it is nowhere near. Found because two routes to the same number disagreed during the hull-length study.",
+      "claims_changed": [
+        "C21",
+        "P4"
+      ],
+      "evidence": [],
+      "id": "close-the-steering-chain-and-gate-the-fact-that",
+      "params_changed": [
+        "max_mating_gap_mm",
+        "rudder_blade_top_mm"
+      ],
+      "rejected": [
+        {
+          "evidence": "",
+          "value": "trusting the existing gates to have caught it",
+          "why": "they could not, and this is the finding that matters beyond this boat. cad.clash, cad.watertight, cad.wall_thickness, fdm.overhang and fdm.bridge_span all check that things do NOT touch, or that one solid is well formed. NOTHING checked that things which MUST touch DO. The steering was open in two places for an entire revision with every gate green and the readiness report saying the boat was fine. An absence is invisible to a gate that looks for presence."
+        },
+        {
+          "evidence": "",
+          "value": "measuring the gaps vertex-to-vertex",
+          "why": "a trimesh cylinder has vertices only at its two end rings, so a rudder stock passing clean THROUGH a bracket bore has no vertex anywhere near it. The vertex-only version reported those two solids 5.5 mm apart while they interpenetrate -- the gate meant to notice things coming apart would have said they already had. The measurement now samples both surfaces."
+        },
+        {
+          "evidence": "",
+          "value": "a rudder stock through the transom with a stuffing box",
+          "why": "it would be a third hull penetration. This rudder is transom-BRACKET mounted: the stock turns in a bronze bush in the bracket, outside the hull, with nothing dry behind it. It is listed in the penetration inventory anyway, flagged as not a pressure boundary, so the question has a written answer instead of being assumed."
+        }
+      ],
+      "summary": "The rudder had no stock and no tiller arm. The blade hung 43 mm below its own bracket attached to nothing, and the pushrod stopped 11 mm short of the nothing it was pushing. The stock now runs from the bottom of the blade up through a bearing boss in the bracket to a tiller at pushrod height, and the pushrod ends on it. Both chains -- servo to pushrod to tiller to stock to blade, and motor to coupler to shaft to tube to propeller -- now measure 0.00 mm at every joint.",
+      "title": "Close the steering chain, and gate the fact that it has to be closed",
+      "when": "2026-09-13T00:29:46Z"
+    },
     {
       "body": "WHAT THE NEW GATE FOUND, immediately: two things below the waterline rather than one. The stuffing tube crosses the aft watertight bulkhead as well as the shell, and nothing anywhere had said so. The gate now separates the two -- the shell is what the pond is on the other side of and is capped at one; a bulkhead below the waterline is a second line of defence and is required to be declared and sealed rather than capped -- and both are written down with their sealing method.\n\nSIX PENETRATIONS IN TOTAL. One through the shell below the waterline (the propeller shaft, unavoidable because the propeller has to be driven from inside). One through a bulkhead below the waterline (the same tube). Four above: the pushrod tube through the bulkhead and through the transom, the two rudder bracket screws, and the switch rod through the deck. Every boss on the boat is blind except the rudder bracket pair.\n\nNO WIRE PIERCES A BULKHEAD. Motor, ESC, battery, receiver and servo are all between the two bulkheads, so all four runs stay inside the equipment bay. That is a layout decision and it is now visible as geometry.\n\nCOST: 6 printed parts to 7 (the motor clamp), printed mass 516 g to 586 g, print time 21.3 h to 24.2 h, BOM 374.50 to 397.50 USD. PLATES DID NOT MOVE: still 4 -- the clamp is 56 mm and shares a bed. Loaded freeboard went 26.5 mm to 25.8 mm on the extra 70 g, which still clears the 25 mm claim but is now the tightest margin on the boat.\n\nThe per-part print ceiling moved from 14 h to 17 h, and that is a threshold I relaxed. It is a judgement about the builder patience, not a physical property -- unlike the overhang allowance relaxed earlier in this project, which protected whether a part needs support and went back to the pack default as soon as the geometry allowed. hull_mid is a 190 mm tall hull section carrying a bulkhead, two deck rails, two coamings, a girder and five mounting ribs; 15.5 h is what that costs, and splitting it would add a part and a glued joint to a boat whose part count was just halved for watertightness.",
       "claims_changed": [
@@ -1061,12 +1150,12 @@
     }
   ],
   "last_run": {
-    "duration_s": 2.2539,
+    "duration_s": 1.881,
     "inputs_hash": "862ca0d1d6d9",
-    "model_hash": "e66908854a81",
+    "model_hash": "2042305eeaff",
     "spine_version": "0.1.0",
     "tier": 1,
-    "when": "2026-09-12T20:37:28Z"
+    "when": "2026-09-13T00:30:52Z"
   },
   "meta": {
     "created": "2026-09-12T00:58:04Z",
@@ -1085,7 +1174,7 @@
   "needs": [],
   "params": [
     {
-      "changed_in": "",
+      "changed_in": "keep-three-hull-segments-a-one-piece-hull-does-n",
       "derived_from": [],
       "gates": [],
       "grounded_by": [
@@ -1462,6 +1551,34 @@
       "tags": [],
       "units": "",
       "value": 12.0
+    },
+    {
+      "changed_in": "",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "pushrod_shortfall_mm",
+      "rationale": "FIXTURE KNOB: how far the pushrod's aft end stops short of the tiller. Zero in the design. boat.linkage_closed's negative control sets it to 6 mm, which is a clevis on the wrong hole -- and is what the boat actually had, unnoticed, for a whole revision.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 0.0
+    },
+    {
+      "changed_in": "close-the-steering-chain-and-gate-the-fact-that",
+      "derived_from": [],
+      "gates": [
+        "boat.linkage_closed"
+      ],
+      "grounded_by": [],
+      "name": "max_mating_gap_mm",
+      "rationale": "How far apart two consecutive members of a drive or steering chain may be before they are not connected. Every pair in the design is at 0.00 mm -- they interpenetrate, because that is what a shaft in a coupler or a stock in a bearing does -- so 1 mm is not a tolerance being used up, it is the width of the band in which a modelling slip is still recoverable. See boat.linkage_closed.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 1.0
     },
     {
       "changed_in": "model-the-fasteners-the-driveline-and-the-wiring",
@@ -1841,6 +1958,19 @@
       "tags": [],
       "units": "",
       "value": 3.0
+    },
+    {
+      "changed_in": "close-the-steering-chain-and-gate-the-fact-that",
+      "derived_from": [],
+      "gates": [],
+      "grounded_by": [],
+      "name": "rudder_blade_top_mm",
+      "rationale": "Top of the rudder blade, just above the keel datum. The stock runs from the BOTTOM of the blade up through the bracket's bore to the tiller, so blade, stock and tiller are one connected assembly rather than three solids near each other.",
+      "rejected": [],
+      "source": "",
+      "tags": [],
+      "units": "",
+      "value": 2.0
     },
     {
       "changed_in": "",
@@ -2704,7 +2834,7 @@
         "resistance"
       ],
       "detail": "drag 0.27 N at 0.80 m/s vs 3.00 N budget (Cd 0.21, A 0.0040 m2, rho 998); Re 3.8e5 turbulent on L 0.480 m, nu from nu; model-supplied Cd (its regime is the model's to defend)",
-      "duration_s": 6.5e-05,
+      "duration_s": 7.3e-05,
       "error": "",
       "evidence": [],
       "gate": "fluid.drag",
@@ -2725,7 +2855,7 @@
         "pipe-flow"
       ],
       "detail": "",
-      "duration_s": 2.1e-05,
+      "duration_s": 2.3e-05,
       "error": "",
       "evidence": [],
       "gate": "fluid.pipe_pressure_drop",
@@ -2749,7 +2879,7 @@
         "pipe-flow"
       ],
       "detail": "regimes valid: external Re 3.8e5 turbulent, no table class declared - the model owns its Cd's valid range | rho 998 kg/m3, nu 1.00e-06 m2/s",
-      "duration_s": 2.2e-05,
+      "duration_s": 2.7e-05,
       "error": "",
       "evidence": [],
       "gate": "fluid.flow_regime",
@@ -2770,7 +2900,7 @@
         "displacement"
       ],
       "detail": "floats: 1.3 kg needs 0.0013 m3 of the 0.0038 m3 watertight volume at rho 998 kg/m3 -> volume fraction 0.342 vs 0.55 limit (0.0025 m3 reserve buoyancy); this is a VOLUME fraction, not a draft fraction - see fluid.freeboard for draft",
-      "duration_s": 5.2e-05,
+      "duration_s": 3.6e-05,
       "error": "",
       "evidence": [],
       "gate": "fluid.buoyancy",
@@ -2790,7 +2920,7 @@
         "reserve-buoyancy"
       ],
       "detail": "freeboard 0.050 m = depth 0.082 - draft 0.032 at 1.3 kg, vs 0.025 m minimum [stated min_freeboard_m]",
-      "duration_s": 2.4e-05,
+      "duration_s": 2.7e-05,
       "error": "",
       "evidence": [],
       "gate": "fluid.freeboard",
@@ -2809,14 +2939,14 @@
         "stability",
         "metacentric-height"
       ],
-      "detail": "GM 0.062 m = BM 0.079 - BG 0.017, vs 0.015 m [stated min_gm_m]; positive GM is necessary NOT sufficient - it is the slope at 0 deg only",
-      "duration_s": 3.1e-05,
+      "detail": "GM 0.061 m = BM 0.079 - BG 0.018, vs 0.015 m [stated min_gm_m]; positive GM is necessary NOT sufficient - it is the slope at 0 deg only",
+      "duration_s": 3.6e-05,
       "error": "",
       "evidence": [],
       "gate": "fluid.metacentric",
       "limit": 0.015,
       "locators": [],
-      "measured": 0.0621,
+      "measured": 0.0612,
       "pack": "fluids-analytic",
       "passed": true,
       "skip_reason": "",
@@ -2829,14 +2959,14 @@
         "righting-arm",
         "stability-margin"
       ],
-      "detail": "GZ 0.0086 m at 8.0 deg (GM 0.062, BM 0.079), righting moment 0 N.m vs demand 0 N.m; limit 0.0020 m [stated min_righting_arm_m]; small-angle void past 10 deg",
-      "duration_s": 4.5e-05,
+      "detail": "GZ 0.0085 m at 8.0 deg (GM 0.061, BM 0.079), righting moment 0 N.m vs demand 0 N.m; limit 0.0020 m [stated min_righting_arm_m]; small-angle void past 10 deg",
+      "duration_s": 5.1e-05,
       "error": "",
       "evidence": [],
       "gate": "fluid.righting_arm",
       "limit": 0.002,
       "locators": [],
-      "measured": 0.0086,
+      "measured": 0.0085,
       "pack": "fluids-analytic",
       "passed": true,
       "skip_reason": "",
@@ -2853,7 +2983,7 @@
         "cad"
       ],
       "detail": "",
-      "duration_s": 1.7e-05,
+      "duration_s": 1.9e-05,
       "error": "",
       "evidence": [],
       "gate": "cad.bounding",
@@ -2897,7 +3027,7 @@
         "printability"
       ],
       "detail": "thinnest section 1.40 mm = 3.0 beads vs 1.38 mm minimum (3 x 0.46 mm line width)",
-      "duration_s": 2.3e-05,
+      "duration_s": 2.2e-05,
       "error": "",
       "evidence": [],
       "gate": "fdm.min_wall",
@@ -2920,7 +3050,7 @@
         "printability"
       ],
       "detail": "load at 0 deg to the layer plane (build axis from the model): stress utilisation 0.12 (utilisation) / knockdown 1.00 = 0.12 vs 1.00 (layer-normal strength 0.55x in-plane)",
-      "duration_s": 6.6e-05,
+      "duration_s": 6.3e-05,
       "error": "",
       "evidence": [],
       "gate": "fdm.layer_alignment",
@@ -2943,7 +3073,7 @@
         "printability"
       ],
       "detail": "ESTIMATE ~16.2 h of 17 h, ~238 g of 1000 g (187.5 cm^3 at 15% infill, 4x0.46 mm shell on 197764 mm^2) — 0.24 mm layers at 60 mm/s x 0.55 duty; time is the binding one at 0.95 of its ceiling. Not a slice.",
-      "duration_s": 5.1e-05,
+      "duration_s": 4.8e-05,
       "error": "",
       "evidence": [],
       "gate": "fdm.print_time_est",
@@ -2967,7 +3097,7 @@
         "process-validity"
       ],
       "detail": "process model applies — extent 188 mm reads as millimetres; volume fills 0.06 of the bbox; layer/nozzle 0.60 inside 0.1-0.75; width/nozzle 1.15 inside 0.8-2.0; thinnest section 3.5 beads wide",
-      "duration_s": 4.7e-05,
+      "duration_s": 4.4e-05,
       "error": "",
       "evidence": [],
       "gate": "fdm.process_model_valid",
@@ -2991,7 +3121,7 @@
         "supply-chain"
       ],
       "detail": "0 of 21 lines not orderable (limit 0) — every line has a part number, a quantity and a usable price",
-      "duration_s": 0.000436,
+      "duration_s": 0.000464,
       "error": "",
       "evidence": [
         "/home/neuman/Documents/work/boaty/.atompipe/out/bom_complete.json"
@@ -3015,7 +3145,7 @@
         "unit-cost"
       ],
       "detail": "397.50 USD/unit at qty 1 vs 400.00 USD budget; parts 397.50 USD + minimums 0.00 USD + one-time 0.00 USD (0.00 USD/unit amortised) = 397.50 USD run",
-      "duration_s": 0.000559,
+      "duration_s": 0.000531,
       "error": "",
       "evidence": [
         "/home/neuman/Documents/work/boaty/.atompipe/out/bom_cost.json"
@@ -3039,7 +3169,7 @@
         "stock"
       ],
       "detail": "longest lead 0 wk (motor); vs 3 wk budget; 0 unknown, 0 EOL, 0 flagged",
-      "duration_s": 0.000421,
+      "duration_s": 0.000375,
       "error": "",
       "evidence": [
         "/home/neuman/Documents/work/boaty/.atompipe/out/bom_availability.json"
@@ -3063,7 +3193,7 @@
         "inventory"
       ],
       "detail": "idle capital 0.00 USD vs 39.75 USD (10% of the 397.50 parts spend); no line buys more than the build consumes; 0 line(s) past 3x",
-      "duration_s": 0.000463,
+      "duration_s": 0.000427,
       "error": "",
       "evidence": [
         "/home/neuman/Documents/work/boaty/.atompipe/out/bom_moq.json"
@@ -3087,7 +3217,7 @@
         "dfm"
       ],
       "detail": "0 violation(s) of 3 project-supplied rule(s) (limit 0) — design is inside every stated capability",
-      "duration_s": 0.000708,
+      "duration_s": 0.000183,
       "error": "",
       "evidence": [
         "/home/neuman/Documents/work/boaty/.atompipe/out/bom_process_rules.json"
@@ -3111,7 +3241,7 @@
         "supply-chain-risk"
       ],
       "detail": "0 unrecorded single-source line(s) vs limit 0 (13 behind one source in total, 0 with a qualified alternate, 13 accepted in writing)",
-      "duration_s": 0.000402,
+      "duration_s": 0.000288,
       "error": "",
       "evidence": [
         "/home/neuman/Documents/work/boaty/.atompipe/out/bom_single_source.json"
@@ -3135,7 +3265,7 @@
         "cost"
       ],
       "detail": "0 of 21 line(s) priced in a currency this document cannot convert (limit 0) — base USD (the document's 'currency'), every line quoted in the base currency",
-      "duration_s": 0.000254,
+      "duration_s": 0.000163,
       "error": "",
       "evidence": [
         "/home/neuman/Documents/work/boaty/.atompipe/out/bom_currency.json"
@@ -3156,14 +3286,14 @@
         "trim",
         "longitudinal-stability"
       ],
-      "detail": "trim -0.88 deg (-7.4 mm bow-to-stern) vs 1.50 limit; freeboard 25.8 mm after trim vs 25 mm required (level flotation would have reported 29.0 mm, so trim costs 3.2 mm); LCG 200.8 vs LCB 211.0 mm",
-      "duration_s": 5.5e-05,
+      "detail": "trim -0.88 deg (-7.4 mm bow-to-stern) vs 1.50 limit; freeboard 47.1 mm after trim vs 25 mm required (level flotation would have reported 50.3 mm, so trim costs 3.2 mm); LCG 200.8 vs LCB 211.0 mm",
+      "duration_s": 3.8e-05,
       "error": "",
       "evidence": [],
       "gate": "boat.trim",
       "limit": 1.5,
       "locators": [],
-      "measured": 0.881,
+      "measured": 0.88,
       "pack": "",
       "passed": true,
       "skip_reason": "",
@@ -3175,14 +3305,14 @@
       "claims": [
         "free-surface"
       ],
-      "detail": "GM 62.1 mm solid, minus 3.6 mm of free surface = 58.5 mm vs 10 mm; the girder divides the bilge into 53 mm cells -- undivided the correction would be 14.6 mm",
-      "duration_s": 3.1e-05,
+      "detail": "GM 61.2 mm solid, minus 3.6 mm of free surface = 57.6 mm vs 10 mm; the girder divides the bilge into 53 mm cells -- undivided the correction would be 14.6 mm",
+      "duration_s": 1.9e-05,
       "error": "",
       "evidence": [],
       "gate": "boat.free_surface",
       "limit": 10.0,
       "locators": [],
-      "measured": 58.47,
+      "measured": 57.57,
       "pack": "",
       "passed": true,
       "skip_reason": "",
@@ -3196,7 +3326,7 @@
         "reserve-buoyancy-sealed"
       ],
       "detail": "sealed compartments support 1827 g against an all-up 1313 g -> +513 g margin with the equipment bay full. Foam-filled, so the reserve fails gracefully rather than closed-loop",
-      "duration_s": 2.1e-05,
+      "duration_s": 1.4e-05,
       "error": "",
       "evidence": [],
       "gate": "boat.swamped",
@@ -3214,14 +3344,14 @@
       "claims": [
         "loading-cases"
       ],
-      "detail": "empty GM 63.0 mm (KG 38.2 mm vs 37.1 loaded) at 30.4 mm draft, vs 10 mm",
-      "duration_s": 2.5e-05,
+      "detail": "empty GM 62.0 mm (KG 39.2 mm vs 38.0 loaded) at 30.4 mm draft, vs 10 mm",
+      "duration_s": 1.6e-05,
       "error": "",
       "evidence": [],
       "gate": "boat.empty",
       "limit": 10.0,
       "locators": [],
-      "measured": 62.98,
+      "measured": 62.01,
       "pack": "",
       "passed": true,
       "skip_reason": "",
@@ -3234,7 +3364,7 @@
         "driveline"
       ],
       "detail": "shaft exits the bottom at x=52 mm at 8.0 deg; prop clears the hull by 17.4 mm and leads the rudder by 12.7 mm; prop tip sits 19.8 mm below the keel",
-      "duration_s": 2.6e-05,
+      "duration_s": 1.7e-05,
       "error": "",
       "evidence": [],
       "gate": "boat.driveline",
@@ -3253,7 +3383,7 @@
         "mesh-agreement"
       ],
       "detail": "worst disagreement 6.4% on hull_bow (1.498 mm from mesh volume/area vs 1.60 mm specified); all shells: hull_aft 1.566, hull_bow 1.498, hull_mid 1.565",
-      "duration_s": 3.4e-05,
+      "duration_s": 2.8e-05,
       "error": "",
       "evidence": [],
       "gate": "boat.wall_agreement",
@@ -3273,7 +3403,7 @@
         "packaging"
       ],
       "detail": "assembled 480 x 186 x 87 mm vs 560 x 230 x 170 mm envelope (worst axis 86%)",
-      "duration_s": 2.5e-05,
+      "duration_s": 2.2e-05,
       "error": "",
       "evidence": [],
       "gate": "boat.envelope",
@@ -3295,7 +3425,7 @@
         "manufacturability"
       ],
       "detail": "0 bad edge(s) across 30 part(s), limit 0 — worst component_battery: 0 open, 0 non-manifold of 12 faces; 30 part(s) welded at 0.0001 mm on load (component_battery, component_esc, component_motor...) — a soup format has no vertex identity of its own",
-      "duration_s": 0.081734,
+      "duration_s": 0.076102,
       "error": "",
       "evidence": [],
       "gate": "cad.watertight",
@@ -3316,8 +3446,8 @@
         "cad",
         "manufacturability"
       ],
-      "detail": "0 of 30 part(s) are not volumes, limit 0 (total 700572 mm^3 enclosed); 30 part(s) welded at 0.0001 mm on load (component_battery, component_esc, component_motor...) — a soup format has no vertex identity of its own",
-      "duration_s": 0.060808,
+      "detail": "0 of 30 part(s) are not volumes, limit 0 (total 703759 mm^3 enclosed); 30 part(s) welded at 0.0001 mm on load (component_battery, component_esc, component_motor...) — a soup format has no vertex identity of its own",
+      "duration_s": 0.056237,
       "error": "",
       "evidence": [],
       "gate": "cad.is_volume",
@@ -3339,7 +3469,7 @@
         "manufacturability"
       ],
       "detail": "0 repair(s) needed across 30 part(s), limit 0 — worst component_battery: welded 0 vertex/vertices at 0.0001 mm, dropped 0 face(s) below 1e-08 mm^2 over 1 pass(es); 30 part(s) welded at 0.0001 mm on load (component_battery, component_esc, component_motor...) — a soup format has no vertex identity of its own",
-      "duration_s": 0.05078,
+      "duration_s": 0.048299,
       "error": "",
       "evidence": [],
       "gate": "cad.degenerate_faces",
@@ -3361,8 +3491,8 @@
         "manufacturability",
         "wall"
       ],
-      "detail": "thinnest wall 0.033 mm on hull_mid at (282.378, -50.4, 11.472) vs 1.400 mm minimum (15891/16856 inward face-normal rays hit; sampler, not a proof)",
-      "duration_s": 1.6581,
+      "detail": "thinnest wall 0.033 mm on hull_mid at (282.378, -50.4, 11.472) vs 1.400 mm minimum (15927/16920 inward face-normal rays hit; sampler, not a proof)",
+      "duration_s": 1.327224,
       "error": "",
       "evidence": [
         "/home/neuman/Documents/work/boaty/.atompipe/out/cad-solid/wall_thickness.json"
@@ -3372,7 +3502,7 @@
       "locators": [
         {
           "kind": "point",
-          "label": "0.033 mm wall vs 1.400 mm minimum (16856 rays sampled)",
+          "label": "0.033 mm wall vs 1.400 mm minimum (16920 rays sampled)",
           "position": [
             282.378,
             -50.4,
@@ -3401,8 +3531,8 @@
         "mechanical",
         "cad"
       ],
-      "detail": "0 interfering pairs of 435 (55 booleaned, rest AABB-clear); largest shared volume 1662.6286 mm^3 on hull_aft/hw_stuffing_tube vs 0.2 mm^3 tolerance; deepest equivalent penetration 1.9542 mm; 28 intended contact(s) allowlisted",
-      "duration_s": 0.358069,
+      "detail": "0 interfering pairs of 435 (59 booleaned, rest AABB-clear); largest shared volume 1662.6286 mm^3 on hull_aft/hw_stuffing_tube vs 0.2 mm^3 tolerance; deepest equivalent penetration 1.9542 mm; 32 intended contact(s) allowlisted",
+      "duration_s": 0.329361,
       "error": "",
       "evidence": [
         "/home/neuman/Documents/work/boaty/.atompipe/out/cad-solid/clash_pairs.json"
@@ -3426,7 +3556,7 @@
         "printability"
       ],
       "detail": "worst supportable face 75.8 deg vs 45 deg limit; 24 faces past it covering 497.4 mm^2 = 0.25% of surface (allowance 0.50%); steepest downward face on the part 75.8 deg, 0 at or past 80 deg excluded as ceilings — they are fdm.bridge_span's",
-      "duration_s": 0.019571,
+      "duration_s": 0.020168,
       "error": "",
       "evidence": [
         "/home/neuman/Documents/work/boaty/.atompipe/out/fdm-overhang.txt"
@@ -3450,7 +3580,7 @@
         "printability"
       ],
       "detail": "no ceiling faces at or past 80 deg off the bed — nothing to bridge (12196 faces checked)",
-      "duration_s": 0.018022,
+      "duration_s": 0.017853,
       "error": "",
       "evidence": [],
       "gate": "fdm.bridge_span",
@@ -3469,7 +3599,7 @@
         "fdm-multipart"
       ],
       "detail": "7 part(s); worst is hatch_cover at 96% of 208 x 208 x 250 mm usable (220 x 220 bed less 6 mm of brim a side): hatch_cover 200 mm, hull_mid 187 mm, hull_aft 186 mm, hull_bow 137 mm, deck_bow 137 mm, stem_plate 69 mm, motor_clamp 56 mm",
-      "duration_s": 4.5e-05,
+      "duration_s": 4e-05,
       "error": "",
       "evidence": [],
       "gate": "boat.bed_fit_all",
@@ -3487,8 +3617,8 @@
       "claims": [
         "penetrations"
       ],
-      "detail": "6 penetration(s), all declared and sealed. Below the 32.0 mm loaded waterline: 1 through the shell (stuffing_tube_hull) and 1 through a watertight bulkhead (stuffing_tube_bulkhead). The other 4 sit pushrod_tube_bulkhead +17 mm, pushrod_tube_transom +17 mm, rudder_bracket_screws +9 mm, switch_rod_deck +50 mm above it.",
-      "duration_s": 3.4e-05,
+      "detail": "7 penetration(s) listed, 6 of them through a pressure boundary, all declared and sealed. Below the 32.0 mm loaded waterline: 1 through the shell (stuffing_tube_hull) and 1 through a watertight bulkhead (stuffing_tube_bulkhead). The other 4 sit pushrod_tube_bulkhead +17 mm, pushrod_tube_transom +17 mm, rudder_bracket_screws +9 mm, switch_rod_deck +50 mm above it.",
+      "duration_s": 3.5e-05,
       "error": "",
       "evidence": [],
       "gate": "boat.hull_penetrations",
@@ -3501,6 +3631,25 @@
       "skipped": false,
       "tier": 0,
       "units": "shell holes below waterline"
+    },
+    {
+      "claims": [
+        "linkage"
+      ],
+      "detail": "9 consecutive pair(s) across 2 chain(s) (driveline, steering), every one of them touching or interpenetrating (worst gap 0.00 mm vs 1.0 mm allowed)",
+      "duration_s": 2.7e-05,
+      "error": "",
+      "evidence": [],
+      "gate": "boat.linkage_closed",
+      "limit": 1.0,
+      "locators": [],
+      "measured": 0.0,
+      "pack": "",
+      "passed": true,
+      "skip_reason": "",
+      "skipped": false,
+      "tier": 0,
+      "units": "mm"
     }
   ],
   "views": []

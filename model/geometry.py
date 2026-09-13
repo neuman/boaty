@@ -803,15 +803,58 @@ def propeller(centre, axis_deg, dia, hub_d, hub_l, blades=3, pitch_deg=28.0,
     return prop
 
 
-def rudder(x, z_top, depth, chord, thickness, stock_d, tiller_len):
-    """Blade, stock and tiller arm. The blade hangs below `z_top`; the stock runs up
-    past it to the tiller, which is what the pushrod pulls on."""
+def rudder(x, blade_top_z, depth, chord, thickness, stock_d, tiller_z, tiller_len,
+           tiller_y=-1.0):
+    """Blade, STOCK and TILLER ARM, as one connected assembly.
+
+    The previous version took a single `z_top` and ran the stock only 26 mm above it,
+    which put the whole assembly below the keel: the blade hung 43 mm under its own
+    bracket attached to nothing, there was no tiller for the pushrod to reach, and the
+    pushrod stopped 11 mm short of anything. Every gate in the project passed that,
+    because every geometry gate checks that things do NOT touch and nothing checked
+    that things that MUST touch DO. boat.linkage_closed exists because of this.
+
+    Now the heights are explicit and the members OVERLAP:
+
+        blade      blade_top_z down to blade_top_z - depth
+        stock      from the BOTTOM of the blade up past the bracket to tiller_z + 3,
+                   so it passes through the blade rather than sitting on top of it
+        tiller     at tiller_z, reaching tiller_len to one side, where the pushrod
+                   clevis meets it
+
+    The stock turns in the bracket's bore, which is outside the hull, so it is not a
+    hull penetration and there is nothing behind it to seal.
+    """
     blade = trimesh.creation.box(extents=(chord, thickness, depth))
-    blade.apply_translation((x, 0.0, z_top - depth / 2.0))
-    stock = rod((x, 0.0, z_top - depth), (x, 0.0, z_top + 26.0), stock_d)
-    tiller = trimesh.creation.box(extents=(thickness + 1.0, tiller_len, 4.0))
-    tiller.apply_translation((x, -tiller_len / 2.0, z_top + 24.0))
+    blade.apply_translation((x, 0.0, blade_top_z - depth / 2.0))
+    stock = rod((x, 0.0, blade_top_z - depth), (x, 0.0, tiller_z + 3.0), stock_d)
+    tiller = trimesh.creation.box(extents=(thickness + 3.0, tiller_len, 5.0))
+    tiller.apply_translation((x, tiller_y * tiller_len / 2.0, tiller_z))
     return trimesh.util.concatenate([blade, stock, tiller])
+
+
+def surface_gap(a, b):
+    """Least distance between two solids' surfaces, 0 if they interpenetrate.
+
+    Sampled over both SURFACES, not just at vertices, and that distinction is not
+    academic. A cylinder from trimesh has vertices only at its two end rings: a rudder
+    stock passing clean through a bracket's bore has no vertex anywhere near the
+    bracket, and a vertex-only test reported the two 5.5 mm apart when they
+    interpenetrate. The gate that is supposed to notice things coming apart would have
+    said they already had.
+    """
+    try:
+        pa = np.vstack([a.vertices, a.sample(2500)])
+        pb = np.vstack([b.vertices, b.sample(2500)])
+        sa = trimesh.proximity.signed_distance(a, pb)
+        if float(np.nanmax(sa)) > 0.0:
+            return 0.0
+        sb = trimesh.proximity.signed_distance(b, pa)
+        if float(np.nanmax(sb)) > 0.0:
+            return 0.0
+        return float(min(-np.nanmax(sa), -np.nanmax(sb)))
+    except Exception:
+        return float("nan")
 
 
 def integral_rib(cfg, x0, x1, y_centre, width, z_top, z_from=None,

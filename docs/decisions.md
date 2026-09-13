@@ -7,6 +7,52 @@ rejected alternative with its reason is the only thing that stops the next
 person (or the next context window) re-proposing it and re-discovering the same
 wall. `atompipe why <param-or-claim>` pulls one item's slice of this file.
 
+## 2026-09-13 — Keep three hull segments: a one-piece hull does not exist at any length that floats
+
+`keep-three-hull-segments-a-one-piece-hull-does-n`
+
+Exhaustive orientation search against the real hull surface on the stated 220x220x250 machine (208x208x250 usable). The largest hull that prints in ONE PIECE is 321 mm LOA. The shortest hull that floats the 630 g of fixed hardware with 25 mm of freeboard is 376 mm LOA. The two do not overlap, by 55 mm. Splitting the hull horizontally at the waterline does not close the gap either: the binding dimension is LENGTH, and removing the topsides shrinks the required build box by 1.2% at the one-piece limit.
+
+**Rejected**
+
+- **a shorter boat with the hull in one piece** — 321 mm is the largest one-piece hull this bed can take, and at 321 mm the boat carries 963 g and floats with 10.8 mm of trimmed freeboard against a 25 mm claim. A one-piece 321 mm hull could carry 245 g of payload; the payload is 630 g. The deficit is 385 g and it is all fixed-size hardware that does not scale with the boat -- which is why the hull went to 480 mm in the first place.
+- **a horizontal split at the waterline, one-piece wetted bottom plus topsides** — tested rather than assumed, and it buys almost nothing. Cutting everything above the waterline off reduces the required build box by 1.2% at 330 mm, 3.5% at 390 mm and 6.0% at 480 mm, because the box is set by the hull LENGTH and not its depth. It would add parts and a seam to buy 4 mm of LOA.
+- **two hull segments instead of three, halving the below-water seams** — blocked on SOURCING, not on printing. Two segments means the joint is at mid-length, the aft bulkhead is at the joint, and the motor has to sit forward of it -- which puts the stuffing tube 260 to 270 mm long against the 200 mm tube in the 250 mm kit on the BOM. The 300 mm kit exists but no US listing with a 3.17 mm joint could be confirmed. Running a 200 mm tube and leaving 75 mm of 4 mm shaft unsupported at 4500 rpm, inside a sealed compartment nobody can reach, is worse than a second seam. Segments up to 250 mm DO fit the bed standing upright with no tilt and no support, so the printer is not the obstacle here.
+
+**Params:** `hull_scale`  
+**Claims:** `P1`, `C2`
+
+THE NUMBER THE OWNER ASKED FOR: there is no LOA at which this hull prints its bottom in one piece on a 220x220x250 machine AND floats its payload. The window is empty by 55 mm.
+
+WHAT WOULD OPEN IT: a one-piece 480 mm hull needs a build volume of 336 x 336 x 336 mm. That is an ordinary large-format machine -- Kobra Max, Ender 5 Plus class -- and it is the only route that gets a seamless wetted bottom at a size that floats. If the owner would rather buy a printer than accept two seams, that is the number.
+
+WHAT THE SEAMS ACTUALLY ARE, since they stay: two transverse butt joints, each landing on a printed bulkhead face rather than on open shell, each pinned with 1.75 mm filament through 2 mm holes and filleted with epoxy on the inside. The bulkheads they land on are integral to their segments and have no bond line of their own -- which was the point of the previous revision.
+
+ALSO NOTE: with the freeboard measurement corrected (it was being taken to the traced sheer rather than the deck edge), the 480 mm boat has 47 mm of trimmed freeboard rather than 26. The boat is further from its freeboard limit than the report has been saying, not closer.
+
+---
+
+## 2026-09-13 — Close the steering chain, and gate the fact that it has to be closed
+
+`close-the-steering-chain-and-gate-the-fact-that`
+
+The rudder had no stock and no tiller arm. The blade hung 43 mm below its own bracket attached to nothing, and the pushrod stopped 11 mm short of the nothing it was pushing. The stock now runs from the bottom of the blade up through a bearing boss in the bracket to a tiller at pushrod height, and the pushrod ends on it. Both chains -- servo to pushrod to tiller to stock to blade, and motor to coupler to shaft to tube to propeller -- now measure 0.00 mm at every joint.
+
+**Rejected**
+
+- **trusting the existing gates to have caught it** — they could not, and this is the finding that matters beyond this boat. cad.clash, cad.watertight, cad.wall_thickness, fdm.overhang and fdm.bridge_span all check that things do NOT touch, or that one solid is well formed. NOTHING checked that things which MUST touch DO. The steering was open in two places for an entire revision with every gate green and the readiness report saying the boat was fine. An absence is invisible to a gate that looks for presence.
+- **measuring the gaps vertex-to-vertex** — a trimesh cylinder has vertices only at its two end rings, so a rudder stock passing clean THROUGH a bracket bore has no vertex anywhere near it. The vertex-only version reported those two solids 5.5 mm apart while they interpenetrate -- the gate meant to notice things coming apart would have said they already had. The measurement now samples both surfaces.
+- **a rudder stock through the transom with a stuffing box** — it would be a third hull penetration. This rudder is transom-BRACKET mounted: the stock turns in a bronze bush in the bracket, outside the hull, with nothing dry behind it. It is listed in the penetration inventory anyway, flagged as not a pressure boundary, so the question has a written answer instead of being assumed.
+
+**Params:** `max_mating_gap_mm`, `rudder_blade_top_mm`  
+**Claims:** `C21`, `P4`
+
+boat.linkage_closed names the chains and fails when any consecutive pair is further apart than the mating tolerance. Its negative control pulls the pushrod 6 mm short of the tiller -- a clevis on the wrong hole, the most ordinary mistake in the build, and the one this boat actually had.
+
+Also fixed while measuring: FREEBOARD WAS BEING MEASURED TO THE WRONG LINE. hullform reported it to the traced sheer, but the hull is carried up to a flat deck at deck_z by a vertical strake at every station, so the deck edge -- the thing water has to get over -- is 20 mm higher. The 480 mm boat has 47 mm of trimmed freeboard, not 26. Conservative and wrong, and it made freeboard look like the tightest margin on the boat when it is nowhere near. Found because two routes to the same number disagreed during the hull-length study.
+
+---
+
 ## 2026-09-12 — Model the fasteners, the driveline and the wiring as geometry, and gate the hull penetrations
 
 `model-the-fasteners-the-driveline-and-the-wiring`

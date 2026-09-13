@@ -608,3 +608,135 @@ and `cad.wall_thickness` cost far more than they returned on this change: every 
 was true of the mesh and almost none was true of the boat, and I spent the day making
 geometry legible to a ray caster rather than making a better boat. That is the honest
 split.
+
+---
+
+# Round four: the hole in the method
+
+## 26. EVERY GEOMETRY GATE CHECKS THAT THINGS DO NOT TOUCH. NOTHING CHECKS THAT THINGS WHICH MUST TOUCH DO.
+
+This is the most important entry in this file and it is not about a bug in atompipe.
+It is about a whole class of defect the method, as it stands, cannot see.
+
+Look at the geometry gates available across the installed packs:
+
+| Gate | What it asserts |
+|---|---|
+| `cad.clash` | no two solids interfere |
+| `cad.watertight` | each solid is closed |
+| `cad.is_volume` | each solid encloses positive volume |
+| `cad.degenerate_faces` | no slivers |
+| `cad.wall_thickness` | no section thinner than X |
+| `cad.bounding` | nothing is bigger than X |
+| `fdm.overhang` | no face hangs past X |
+| `fdm.bridge_span` | no ceiling spans more than X |
+| `fdm.min_wall` | no wall thinner than X |
+
+Every one is a statement about **presence** — this thing exists and is too big, too
+thin, too close, too steep. **Not one of them can express an absence.**
+
+So the boat shipped a revision in which:
+
+* the rudder had **no stock and no tiller arm** — neither was ever modelled;
+* the rudder blade hung **43 mm below its own bracket**, attached to nothing;
+* the pushrod stopped **11 mm short** of the nothing it was supposed to push.
+
+The steering did not work. It could not have worked. And the sweep was green —
+33 of 36 gates passing, 36 of 36 negative controls firing, the readiness report saying
+the boat was fine. `cad.clash` was *especially* happy: nothing was interfering, because
+nothing was touching anything.
+
+I did not find it. The owner found it, by measuring surface-to-surface gaps in the GLB
+I had published.
+
+### Why this is structural, not careless
+
+A missing part has no mesh. A gate that iterates over meshes will never visit it. A
+disconnected part has a perfectly good mesh that passes every check about itself —
+it is watertight, it is a volume, its walls are thick enough, it is not clashing with
+anything. **Every property a mesh gate can measure is a property of a mesh in
+isolation, and "is connected to the thing it drives" is not one of them.**
+
+The same shape of hole exists anywhere else this method gets applied. An electrical
+harness where a connector is 3 mm from its header. A linkage where a bellcrank was
+deleted. A thermal path where the pad and the heatsink are near each other. A pipe run
+missing an elbow. In every case the DRC is clean and the thing does not work.
+
+### What fixes it
+
+Name the chains and measure the joints. `boat.linkage_closed` does this:
+
+```
+LINKAGES = {
+  "steering":  servo -> pushrod -> rudder -> bracket -> hull_aft,
+  "driveline": motor -> coupler -> shaft -> stuffing tube -> prop shaft -> propeller,
+}
+```
+
+and fails when any consecutive pair is further apart than a stated mating tolerance.
+All nine pairs now read 0.00 mm — they interpenetrate, because that is what a shaft in
+a coupler and a stock in a bearing actually do.
+
+**This belongs in `cad-solid` as a pack gate, not in my project.** It is a domain
+question, not a boat question: any assembly has chains that must be continuous, and
+the pack that already knows how to load meshes and compute interference is one function
+away from computing closure. I would propose `cad.assembly_connected`, taking a
+`connections` list the same shape as the existing `clash_allow`.
+
+Note the symmetry that makes this obvious in hindsight: `clash_allow` already
+enumerates pairs that are ALLOWED to touch. Half of those pairs — the screw in its
+insert, the stock in its bearing, the shaft in its tube — are pairs that are
+**REQUIRED** to touch. The project already had the list. Nothing read it that way.
+
+## 27. A measurement that samples vertices will miss a rod through a hole
+
+My first `surface_gap` compared each mesh's VERTICES against the other's surface. It
+reported the rudder stock and its bearing bore **5.5 mm apart** while they
+interpenetrate.
+
+A `trimesh` cylinder has vertices only at its two end rings. A stock passing cleanly
+through a bracket has no vertex anywhere near the bracket, and the bracket's corners
+are nowhere near the stock. Both sets of sample points miss the intersection entirely.
+
+So the first version of the gate that was written to catch things coming apart would
+have reported the one joint that was correctly assembled as the one that had failed.
+Fixed by sampling both surfaces (`mesh.sample`) rather than their vertices — but it is
+worth stating the general form: **a proximity check is only as good as where it
+samples, and the geometry most likely to be missed is exactly the slender geometry that
+linkages are made of.**
+
+## 28. Two routes to one number, again, and again it paid
+
+The one-piece hull study needed freeboard as a function of hull length. I computed it
+as `deck_z − draft` in the study script; the model had been reporting
+`min(traced_sheer − waterline)`. They disagreed by 20 mm.
+
+The model was wrong. The hull's topsides are carried up to a flat deck at `deck_z` by
+a vertical strake at every station — that is what makes the deck flat and printable —
+so the deck edge, which is the thing water has to get over, is 20 mm above the traced
+sheer. The 480 mm boat has **47 mm** of trimmed freeboard, not 26.
+
+Conservative, and wrong, and it had made freeboard look like the tightest margin on
+the boat for two revisions when it is nowhere near. That is rule 6 paying out for the
+third time in this project, and all three times it was the same mechanism: compute one
+number two ways and look at the difference.
+
+## 29. The thing I keep wanting: geometry the gates cannot misread
+
+Round after round, the pattern is the same. A mesh representation that is *correct*
+is not necessarily *legible* to the gates:
+
+- multi-body parts are one printed object to a slicer and several disconnected
+  objects to `cad.wall_thickness` and `fdm.bridge_span`;
+- a solid rod standing in for a tube means "the shaft is inside it" has to be spelled
+  as interference and then allow-listed;
+- a cylinder's vertices are in the wrong places for proximity;
+- a face perpendicular to the build direction is an unanchored ceiling whatever is
+  underneath it in another body.
+
+None of this is wrong of the gates. But the cumulative effect is that a meaningful
+share of my time in rounds two, three and four went into making geometry that the
+gates could read correctly rather than geometry that made a better boat. The gates
+that paid — `cad.clash`, `boat.hull_penetrations`, `boat.linkage_closed`,
+`boat.wall_agreement` — all found real defects. The mesh-hygiene gates mostly found
+true statements about meshes that were not statements about the boat.
