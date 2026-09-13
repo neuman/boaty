@@ -95,9 +95,22 @@ shipped a revision whose rudder had no stock and no tiller arm, whose blade hung
 below its own bracket attached to nothing, and whose pushrod stopped 11 mm short of
 what it was pushing — with every gate green.
 
-`boat.linkage_closed` names the chains that must be continuous and measures every
-joint. See [`FRICTION.md`](FRICTION.md) item 26; it is the most transferable thing in
-this repository.
+That idea is now `cad.assembly_connected` in the `cad-solid` pack, with the question
+turned around: instead of checking chains somebody declared, it builds the contact
+graph from the geometry and asks whether **every part is held by something**. The
+declared-pairs version found nothing on this project; the coverage version immediately
+found the on/off switch floating 5.5 mm from the nearest part, held by tape that
+existed only in my head.
+
+The project's own copy has been retired — it duplicated the pack, measured worse, and
+depended on `rtree`, which this project never declared. Where `rtree` was missing every
+gap came back `NaN`, and `NaN` defeats every comparator, so the gate written to prove
+the steering was connected was the one gate that could neither pass nor fail. The
+project now declares its dependencies in [`requirements.txt`](requirements.txt) and
+needs no `rtree` at all.
+
+See [`FRICTION.md`](FRICTION.md) items 26 and 30-33; they are the most transferable
+things in this repository.
 
 ## Layout
 

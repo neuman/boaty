@@ -7,6 +7,51 @@ rejected alternative with its reason is the only thing that stops the next
 person (or the next context window) re-proposing it and re-discovering the same
 wall. `atompipe why <param-or-claim>` pulls one item's slice of this file.
 
+## 2026-09-13 — Give the on/off switch a real mount
+
+`give-the-on-off-switch-a-real-mount`
+
+The switch sat 27 mm above the hull floor, 5.50 mm from the nearest part in a 31-body assembly where every other body touched something. It now sits on a longitudinal shelf rib in hull_mid with two M3 screws into heat-set inserts, declared as a required contact.
+
+**Rejected**
+
+- **double-sided tape or hook-and-loop, as for the ESC and receiver** — the switch is not like them. It has an actuating rod through the deck, so it has to be LOCATED against the hole it operates through, not merely retained. Tape lets it rotate and bind the rod.
+- **declaring it free-standing** — cad.assembly_connected allows that with a stated reason, and it would have been a lie. A part with a rod through the deck is held by something or it is broken.
+
+**Params:** `place`  
+**Claims:** `C9`, `P4`
+
+WHAT WAS HOLDING IT IN MY HEAD: tape, filed mentally with the ESC and the receiver, which the BOM does say are taped.
+
+WHAT WAS ACTUALLY IN THE MODEL, and this is the part worth recording: the switch sat at an explicit z = 46.0 that I chose in round three for exactly one reason -- this hull pinches at the turn of bilge, a box placed off-centre near the floor pokes through the topsides, cad.clash found that, and I raised the part until the clash went away.
+
+So I positioned it to satisfy the only question the gates could ask. Non-interference was checkable, so non-interference is what got optimised; support was not checkable, so it never entered the design. The available checks became the design criteria. That is the method failing in the shape of its own coverage, not through carelessness, and it is why a coverage question that needs no declaration is worth more than a precise one that does.
+
+---
+
+## 2026-09-13 — Retire boat.linkage_closed; the pack does it better and without the dependency that broke it
+
+`retire-boat-linkage-closed-the-pack-does-it-bett`
+
+The chain-closure idea was promoted into cad-solid as cad.assembly_connected, which measures the same joints by sampling faces and refining any apparent gap until the answer carries an error bound, and which also asks the question mine could not: is every part held by something. The project gate, its fixture and its linkage_gaps_mm measurement are gone; the two chains are now DECLARED to the pack gate as assembly_chains and nineteen clash_allow entries are marked role=required.
+
+**Rejected**
+
+- **keeping boat.linkage_closed alongside the pack gate** — two gates measuring one thing, one of them worse, is the duplication rule 2 exists to prevent. Mine sampled at vertices until it did not, needed rtree, and returned NaN when rtree was absent.
+- **keeping the local measurement and guarding the division** — the NaN was not a division, it was an undeclared dependency swallowed by a bare except. Guarding it would have turned a silent failure into a visible SKIP, which is better -- but the measurement itself was still the inferior one, and removing it removes the dependency instead of reporting it.
+- **declaring the contacts and relying on the declared-pairs check alone** — it answers only about pairs somebody thought of. Run against this project as it shipped, it found nothing, because the part that was broken -- the switch -- was not in any chain. It is not a chain problem, it is a part with no mount. Coverage needs no foresight and found it immediately.
+
+**Params:** `max_mating_gap_mm`  
+**Claims:** `C21`
+
+THE NaN, precisely. surface_gap used trimesh.proximity.signed_distance, which needs rtree. rtree had been pip-installed here ad hoc in round three, so every gap measured correctly on this machine and returned NaN on any other -- and NaN defeats every comparator, so boat.linkage_closed could neither pass nor fail while still appearing in the sweep as a gate that had run.
+
+Did it ever mask a linkage that was not closed? No, and that can now be proved rather than asserted: cad.assembly_connected measures the same joints by a different algorithm and reports both chains continuous. But it was inert for everyone except me, so it would have masked ANY defect for ANYONE else from the moment it was written.
+
+The project now declares its Python dependencies in requirements.txt and needs no rtree: verified by uninstalling it and re-running the whole tier-1 sweep to identical verdicts.
+
+---
+
 ## 2026-09-13 — Keep three hull segments: a one-piece hull does not exist at any length that floats
 
 `keep-three-hull-segments-a-one-piece-hull-does-n`

@@ -833,30 +833,6 @@ def rudder(x, blade_top_z, depth, chord, thickness, stock_d, tiller_z, tiller_le
     return trimesh.util.concatenate([blade, stock, tiller])
 
 
-def surface_gap(a, b):
-    """Least distance between two solids' surfaces, 0 if they interpenetrate.
-
-    Sampled over both SURFACES, not just at vertices, and that distinction is not
-    academic. A cylinder from trimesh has vertices only at its two end rings: a rudder
-    stock passing clean through a bracket's bore has no vertex anywhere near the
-    bracket, and a vertex-only test reported the two 5.5 mm apart when they
-    interpenetrate. The gate that is supposed to notice things coming apart would have
-    said they already had.
-    """
-    try:
-        pa = np.vstack([a.vertices, a.sample(2500)])
-        pb = np.vstack([b.vertices, b.sample(2500)])
-        sa = trimesh.proximity.signed_distance(a, pb)
-        if float(np.nanmax(sa)) > 0.0:
-            return 0.0
-        sb = trimesh.proximity.signed_distance(b, pa)
-        if float(np.nanmax(sb)) > 0.0:
-            return 0.0
-        return float(min(-np.nanmax(sa), -np.nanmax(sb)))
-    except Exception:
-        return float("nan")
-
-
 def integral_rib(cfg, x0, x1, y_centre, width, z_top, z_from=None,
                  boss_xs=(), boss_w=None, boss_half=7.0, ramp=8.0,
                  full_from=None, full_to=None):

@@ -18,7 +18,7 @@ Prices are USD and Amazon US unless the line says otherwise. Amazon refused ever
 | `prop` | 3-blade brass scale propeller, 35 mm diameter, M4 | 1 | 13.00 | ASIN `B0D814JF9S` | spec verified; price estimated |
 | `rudder` | Hobbypark aluminium transom-mount rudder, 75 mm, frame 60 x 43 mm | 1 | 16.00 | ASIN `B07FS9KBYZ` | spec verified; price estimated |
 | `linkage` | Pushrod, clevises and 3 mm brass pushrod tube | 1 | 8.00 | search: *RC pushrod linkage clevis set 2mm brass tube* | class |
-| `switch` | RC on/off switch with an external aluminium control rod | 1 | 12.00 | ASIN `B0CCTS8BW3` | class |
+| `switch` | RC on/off switch with an external aluminium control rod and mounting bracket | 1 | 12.00 | ASIN `B0CCTS8BW3` | class |
 | `hatch_seal` | Self-adhesive silicone or EPDM closed-cell foam tape, 10 x 3 mm | 1 | 9.00 | search: *self adhesive silicone foam tape 10mm x 3mm closed cell* | class |
 | `foam` | Closed-cell polyethylene foam for the sealed end compartments | 1 | 7.00 | search: *closed cell polyethylene foam block* | class |
 | `grease` | Dynamite marine grease, 5 oz, for the stuffing tube | 1 | 12.00 | ASIN `B00XUM0OQK` | class |
@@ -88,7 +88,7 @@ TRANSOM mount, and that is forced rather than chosen. The bottom-mount scale rud
 
 The pushrod runs from the servo in the equipment bay through a brass tube epoxied through the aft bulkhead and the transom ABOVE the waterline, to the rudder tiller. Epoxy-fillet both ends of the tube; the aft compartment stays sealed.
 
-### `switch` — RC on/off switch with an external aluminium control rod
+### `switch` — RC on/off switch with an external aluminium control rod and mounting bracket
 
 The switch body stays inside the sealed hull and a rod through a small bushing flips it from outside. A conventional switch harness is a hole in the deck with a moving part in it. NEVER put a mechanical switch in the battery-to-ESC path; switch the receiver/BEC side only.
 
@@ -118,11 +118,11 @@ Brush-on bottle, not aerosol. MASK the ESC heatsink pad, the BEC header and ever
 
 ### `fasteners` — M3 A2 stainless pan-head screws 6/8/10 mm, washers, hook-and-loop battery strap
 
-STAINLESS or nylon, never zinc-plated. Zinc plating in fresh water beside brass inserts is a rust streak within a season, and four of these come out every time you change the battery. Twelve are used: 4 for the hatch, 4 for the motor clamp, 2 for the servo, 2 for the rudder bracket.
+STAINLESS or nylon, never zinc-plated. Zinc plating in fresh water beside brass inserts is a rust streak within a season, and four of these come out every time you change the battery. Fourteen are used: 4 for the hatch, 4 for the motor clamp, 2 for the servo, 2 for the switch bracket, 2 for the rudder bracket.
 
 ### `inserts` — M3 brass heat-set threaded inserts, 4.6 mm OD x 5.7 mm long
 
-NOT screws threaded straight into PETG: a thread cut in printed plastic strips after a few cycles, and the hatch is the one interface opened every session. THE OD IS A DESIGN INPUT -- every boss on this boat is 4.6 mm plus 2 mm of wall each side, which is why the hatch coaming is 9 mm wide and not 5. Buy a different insert and the bosses are wrong. Ten are used; buy 50. Set them with a soldering iron at about 220 C, square, and let them cool before loading.
+NOT screws threaded straight into PETG: a thread cut in printed plastic strips after a few cycles, and the hatch is the one interface opened every session. THE OD IS A DESIGN INPUT -- every boss on this boat is 4.6 mm plus 2 mm of wall each side, which is why the hatch coaming is 9 mm wide and not 5. Buy a different insert and the bosses are wrong. Twelve are used; buy 50. Set them with a soldering iron at about 220 C, square, and let them cool before loading.
 
 ### `wire` — Silicone-insulated wire, 16 AWG and 22 AWG, plus a servo extension lead
 
@@ -141,9 +141,9 @@ One spool covers the whole boat (about 480 g) with enough left to reprint the pa
 |---|---|---|
 | servo | 25 | 178 |
 | motor | 156 | 215 |
-| esc | 44 | 268 |
+| esc | 44 | 256 |
 | battery | 98 | 292 |
-| switch | 12 | 312 |
+| switch | 14 | 312 |
 | radio | 9 | 318 |
 
-Printed structure 586 g + components 630 g + 8% contingency = **1313 g all-up**, which floats at **32.0 mm draft** with **47.1 mm of freeboard** once the trim is taken into account.
+Printed structure 589 g + components 632 g + 8% contingency = **1318 g all-up**, which floats at **32.1 mm draft** with **47.1 mm of freeboard** once the trim is taken into account.

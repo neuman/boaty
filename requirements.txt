@@ -1,0 +1,23 @@
+# Python packages model/ and tools/ need, beyond the atompipe spine (which has none).
+#
+# This file exists because it did not, and that cost a live defect. `surface_gap` used
+# trimesh.proximity.signed_distance, which needs rtree; rtree had been pip-installed
+# here ad hoc while debugging something else, so every measurement worked on this
+# machine and returned NaN everywhere else -- which made the gate that proved the
+# steering was connected the one gate that could neither pass nor fail. See
+# FRICTION.md item 30.
+#
+# The project no longer needs rtree at all (verified by uninstalling it and re-running
+# the full tier-1 sweep: identical verdicts, 8.9 s against 3.4 s). It is listed as
+# OPTIONAL because it is a large speed-up on the tier-1 mesh gates and nothing else.
+#
+#   .venv/bin/pip install -r requirements.txt
+
+numpy                # the model's arithmetic
+trimesh              # mesh construction, export and the mesh gates' input
+scipy                # convex hulls and rotations for the print-fit study; trimesh uses it too
+networkx             # trimesh's connected-component analysis (body counts)
+matplotlib           # tools/render.py only
+Pillow               # tools/trace_hull_profile.py only, to read the source screenshot
+manifold3d           # optional: a second boolean engine. Blender is what geometry.fuse uses
+# rtree              # OPTIONAL speed-up for the tier-1 mesh gates. Not required.

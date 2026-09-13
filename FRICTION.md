@@ -740,3 +740,115 @@ gates could read correctly rather than geometry that made a better boat. The gat
 that paid — `cad.clash`, `boat.hull_penetrations`, `boat.linkage_closed`,
 `boat.wall_agreement` — all found real defects. The mesh-hygiene gates mostly found
 true statements about meshes that were not statements about the boat.
+
+---
+
+# Round five: two defects found by tooling, neither by reading
+
+## 30. A NaN in a projection makes a gate unfalsifiable, and mine was undetectable locally
+
+`atompipe check` now refuses a projection containing NaN, with the right reason:
+
+```
+error: derived.linkage_gaps_mm.steering:component_servo->hw_pushrod is nan.
+NaN and Infinity are not JSON, and a NaN silently defeats every claim comparator
+(nan <= x and nan > x are both False), so a gate reading it can never fail or pass
+```
+
+**The cause was an undeclared dependency.** My `surface_gap` used
+`trimesh.proximity.signed_distance`, which needs `rtree`. I had `pip install`ed
+`rtree` in round three while debugging something unrelated, so on MY machine every
+gap measured correctly and the gate worked. On a fresh clone — or CI, or the
+coordinator's checkout — `signed_distance` raises, my `except` returned `float("nan")`,
+and `boat.linkage_closed` became inert: it could neither pass nor fail, while
+appearing in the sweep as a gate that had run.
+
+Three separate things went wrong and each is worth naming:
+
+1. **`except: return nan` is the same mistake as a validator that logs.** I wrote a
+   measurement that reports "I could not measure" as a NUMBER, and numbers get
+   compared. `None` and a SKIP is the only honest answer, and rule 4 already says so
+   about gates — it applies just as hard to the values gates read.
+2. **The dependency was never declared anywhere.** The project has no requirements
+   file; `trimesh`, `numpy`, `scipy`, `manifold3d` and `rtree` all got pip-installed
+   ad hoc over five rounds. Nothing in the repo says so, and `atompipe doctor` checks
+   per-GATE tool availability but cannot know about a dependency the MODEL acquired.
+3. **It was invisible from inside my own environment.** Everything passed, every run,
+   for a whole round. The only way I would have found it is by building from clean —
+   which nothing prompted me to do.
+
+**Did the NaN ever mask a linkage that was not closed?** No, and I can now prove it
+rather than assert it: `cad.assembly_connected` measures the same joints with a
+different algorithm and reports both chains continuous. But that is luck, not process.
+The gate was inert for everyone except me, so it would have masked *any* defect, for
+*anyone else*, from the moment I wrote it.
+
+The fix removed the problem rather than guarding it: the local measurement is gone
+entirely, and **the project no longer depends on `rtree` at all** — verified by
+uninstalling it and re-running the full tier-1 sweep, which produces identical
+verdicts (slower: 8.9 s against 3.4 s).
+
+## 31. The switch was held by nothing, and I had placed it to satisfy the gates
+
+`cad.assembly_connected` found `component_switch` floating 5.50 mm from the nearest
+part in a 30-body assembly where everything else touched something.
+
+**What was holding it in my head:** tape. The BOM says of the ESC and receiver
+"none — double-sided tape or hook-and-loop", and I had mentally filed the switch with
+them. But the switch is not like them: it has an actuating rod through the deck, so it
+has to be *located* against the hole it operates through, not merely retained. Tape
+was never the right answer and I never noticed, because nothing ever asked.
+
+**What was actually in the model is worse, and it is the real lesson.** The switch sat
+at an explicit `z = 46.0` that I had chosen, in round three, for exactly one reason:
+this hull's sections pinch at the turn of bilge, so a box placed off-centre near the
+floor pokes through the topsides, and `cad.clash` had found that. I raised it until the
+clash went away.
+
+**So I positioned a part to satisfy the only question the gates could ask.** Non-
+interference was checkable, therefore non-interference was what I optimised. Support
+was not checkable, therefore it did not enter the design. That is the failure mode the
+method warns about — "the design looks validated and is not" — arriving not through
+carelessness but through the gates' own shape. The available checks became the design
+criteria.
+
+It now sits on a shelf rib with two M3 screws into inserts, declared as a required
+contact, and the rib exists because a gate asked for it.
+
+## 32. The coverage question is the one that needed no foresight, and I built the other one
+
+Worth being blunt about, because it is the difference between my gate and the one that
+replaced it.
+
+`boat.linkage_closed` checked the chains **I declared**. It found nothing, because I
+had declared the two chains I had just finished fixing. Run against this project as it
+shipped last round, the declared-pairs version answers only about pairs somebody
+thought of — and the switch was not in any chain, because it is not in a chain. It is a
+part that needs a mount, which is a different sentence.
+
+`cad.assembly_connected` builds the contact graph from the geometry and asks whether
+every part is held by *something*. That question needs no foresight and it found the
+switch immediately.
+
+I had the more specific, less useful half. The general lesson: **a declaration-driven
+check inherits the blind spots of whoever wrote the declarations**, and the author of
+the declarations is always the person who just made the mistake. Where a property can
+be derived from the artifact instead of declared about it, derive it — and keep the
+declarations for what geometry genuinely cannot know (which contact, in what order,
+for what reason), which is exactly the split the pack gate ended up with.
+
+## 33. Where the packs actually live, and how long that cost me
+
+`git pull` in the atompipe repo updated `packs/cad-solid/gates/solid.py`. The gate did
+not appear. `atompipe packs list` still showed the old description and
+`atompipe gate list` had 37 gates without it.
+
+The packs the project uses are **bundled inside the installed wheel**, at
+`.venv/lib/python3.12/site-packages/atompipe/bundled/cad-solid/`, not read from the
+repo I had just pulled. `pip install --force-reinstall --no-deps <repo>` fixed it.
+
+Nothing said so. `atompipe packs list` prints a description and a version but not a
+PATH, and `atompipe doctor` reports pack discovery without saying where from. Both
+were showing me a stale pack with a straight face. One line of provenance — the
+directory each pack was loaded from — in either command would have made it obvious
+instead of a ten-minute detour through `find`.

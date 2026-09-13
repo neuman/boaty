@@ -40,12 +40,12 @@ Two joints, both landing on a printed bulkhead face. Drill 2 mm pin holes throug
 
 - **servo** at x 178 mm, y -50 mm, z 34 mm above the keel
 - **motor** at x 215 mm, y +0 mm, z 32 mm above the keel
-- **esc** at x 268 mm, y +48 mm, z 40 mm above the keel
+- **esc** at x 256 mm, y +48 mm, z 40 mm above the keel
 - **battery** at x 292 mm, y +0 mm, z 24 mm above the keel
-- **switch** at x 312 mm, y +46 mm, z 46 mm above the keel
+- **switch** at x 312 mm, y +46 mm, z 24 mm above the keel
 - **radio** at x 318 mm, y -40 mm, z 36 mm above the keel
 
-The battery is STRAPPED, not glued. It is 292 mm from the transom in the model and sliding it is how you trim the boat: the model floats -0.88 degrees and every 10 mm of battery movement is worth roughly 0.1 degrees.
+The battery is STRAPPED, not glued. It is 292 mm from the transom in the model and sliding it is how you trim the boat: the model floats -0.87 degrees and every 10 mm of battery movement is worth roughly 0.1 degrees.
 
 ## 8. Rudder and steering
 

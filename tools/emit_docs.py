@@ -121,11 +121,13 @@ def prints():
                "8.6 mm at each screw | yes |\n")
     out.append("| motor clamp | 4 x M3 x 10 | inserts in the two cradle ribs | yes |\n")
     out.append("| servo | 2 x M3 x 10 | inserts in the servo shelf rib | yes |\n")
+    out.append("| switch bracket | 2 x M3 x 8 | inserts in the switch shelf rib | yes |\n")
     out.append("| rudder bracket | 2 x M3 x 8 | inserts in a thickened pad on the "
                "INSIDE of the transom | **no — through the transom** |\n")
     out.append("| battery | none — hook-and-loop strap between two printed chocks | | |\n")
-    out.append("| ESC, receiver | none — double-sided tape or hook-and-loop | | |\n")
-    out.append("\n10 inserts, 12 screws. Set the inserts with a soldering iron at "
+    out.append("| ESC, receiver | none — double-sided tape or hook-and-loop. Neither "
+               "has mounting holes, and neither has to be located against anything | | |\n")
+    out.append("\n12 inserts, 14 screws. Set the inserts with a soldering iron at "
                "about 220 C, square to the boss, and let them cool before loading. "
                "**Every boss is blind except the rudder bracket's two**, which is the "
                "whole point of the next section.\n\n")
@@ -163,7 +165,7 @@ def prints():
                "for M3 self-tappers.\n")
     out.append("- **Insert bores**, 4.2 mm, 6 mm deep: 4 in the hatch coaming (at its "
                "widened zones), 4 in the motor cradle ribs, 2 in the servo shelf rib, "
-               "2 in the transom pad. Ten in total.\n")
+               "2 in the switch shelf rib, 2 in the transom pad. Twelve in total.\n")
     out.append("- **Clearance holes**, 3.4 mm: 4 through the hatch cover, 4 through the "
                "motor clamp's feet, 2 through the rudder bracket, 2 through the "
                "transom for the rudder bracket.\n")

@@ -161,13 +161,3 @@ def pushrod_low(ctx):
     the boat changes.
     """
     return _with(ctx, pushrod_z_mm=18.0)
-
-
-def short_pushrod(ctx):
-    """boat.linkage_closed -- the pushrod's aft end 6 mm short of the tiller.
-
-    A clevis on the wrong hole, or a rod cut to the wrong length. The most ordinary
-    mistake in the whole build, and the one the boat had for an entire revision with
-    every gate green. Nothing else about the design moves.
-    """
-    return _with(ctx, pushrod_shortfall_mm=6.0)

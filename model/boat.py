@@ -219,8 +219,9 @@ def _parts_raw() -> list:
                   "epoxied through the aft bulkhead and the transom ABOVE the waterline, to "
                   "the rudder tiller. Epoxy-fillet both ends of the tube; the aft compartment "
                   "stays sealed."),
-        Part("switch", "RC on/off switch with an external aluminium control rod", 12.0,
-             (35.0, 16.0, 14.0), 12.0, mpn="B0CCTS8BW3",
+        Part("switch", "RC on/off switch with an external aluminium control rod and "
+                       "mounting bracket", 14.0,
+             (48.0, 18.0, 14.0), 12.0, mpn="B0CCTS8BW3",
              search="RC receiver on off switch aluminum control rod boat",
              confidence="class",
              note="The switch body stays inside the sealed hull and a rod through a small "
@@ -283,9 +284,9 @@ def _parts_raw() -> list:
              confidence="class", placed=False,
              note="STAINLESS or nylon, never zinc-plated. Zinc plating in fresh water "
                   "beside brass inserts is a rust streak within a season, and four of "
-                  "these come out every time you change the battery. Twelve are used: "
+                  "these come out every time you change the battery. Fourteen are used: "
                   "4 for the hatch, 4 for the motor clamp, 2 for the servo, 2 for the "
-                  "rudder bracket."),
+                  "switch bracket, 2 for the rudder bracket."),
         Part("inserts", "M3 brass heat-set threaded inserts, 4.6 mm OD x 5.7 mm long", 11.0,
              (0.0, 0.0, 0.0), 9.0,
              search="M3 brass heat set threaded insert 4.6mm OD 5.7mm knurled",
@@ -295,7 +296,7 @@ def _parts_raw() -> list:
                   "interface opened every session. THE OD IS A DESIGN INPUT -- every "
                   "boss on this boat is 4.6 mm plus 2 mm of wall each side, which is "
                   "why the hatch coaming is 9 mm wide and not 5. Buy a different "
-                  "insert and the bosses are wrong. Ten are used; buy 50. Set them "
+                  "insert and the bosses are wrong. Twelve are used; buy 50. Set them "
                   "with a soldering iron at about 220 C, square, and let them cool "
                   "before loading."),
         Part("wire", "Silicone-insulated wire, 16 AWG and 22 AWG, plus a servo "
@@ -693,10 +694,16 @@ class Config:
         # anything heavy, because an off-centre battery is a permanent heel.
         "motor":   (215.0, 0.0, None),
         "battery": (292.0, 0.0, None),
-        "esc":     (268.0, 48.0, 40.0),
+        "esc":     (256.0, 48.0, 40.0),
         "servo":   (178.0, -50.0, 34.0),
         "radio":   (318.0, -40.0, 36.0),
-        "switch":  (312.0, 46.0, 46.0),
+        # ON ITS RIB, not floating. cad.assembly_connected found this one: the switch
+        # was 27 mm above the hull floor and 5.5 mm from the nearest part in the
+        # assembly -- held by nothing, in a boat where every other body touched
+        # something. In my head it was "velcroed to the hull side somewhere"; the
+        # model had it suspended in mid-air, and no gate could see the difference
+        # because a part that touches nothing interferes with nothing.
+        "switch":  (312.0, 46.0, 24.0),
     })
     """Where each component sits, as (x, y, z) of its box centre. z = None means "on
     the shaft axis" for the motor and "on the hull floor" for anything else on the
@@ -1051,6 +1058,7 @@ def _mount_ribs(c: Config) -> list:
     mr = _part_size(c, "motor")[1] / 2.0
     bx, by, bz = placed_centre(c, "battery")
     bhw = _part_size(c, "battery")[1] / 2.0
+    wx, wy, wz = placed_centre(c, "switch")
     boss_w = c.insert_od_mm + 2.0 * c.boss_wall_mm
     web = c.mount_web_mm
     # Every rib runs from the segment's aft face so that it starts on the print bed,
@@ -1077,6 +1085,12 @@ def _mount_ribs(c: Config) -> list:
                        full_from=bx - 30.0, full_to=bx + 30.0),
         G.integral_rib(c, x_aft, x_fwd, bhw + 3.0, 3.0, bz + 2.0,
                        full_from=bx - 30.0, full_to=bx + 30.0),
+        # switch shelf. It has a rod through the deck, so whatever holds it has to
+        # LOCATE it against the hole it operates through -- which is why it is two
+        # screws into a rib rather than a strip of tape.
+        G.integral_rib(c, x_aft, x_fwd, wy, web, wz - 7.0,
+                       boss_xs=(wx - 20.0, wx + 20.0), boss_w=boss_w,
+                       full_from=wx - 26.0, full_to=wx + 26.0),
     ]
 
 
@@ -1458,6 +1472,9 @@ def _fastener_groups(c: Config, at):
     clamp_pts = [(mx - 16.0, -(mr + 6.0), mz + 4.0), (mx - 16.0, mr + 6.0, mz + 4.0),
                  (mx + 16.0, -(mr + 6.0), mz + 4.0), (mx + 16.0, mr + 6.0, mz + 4.0)]
 
+    wx, wy, wz = placed_centre(c, "switch", at)
+    switch_pts = [(wx - 20.0, wy, wz - 7.0 + 3.0), (wx + 20.0, wy, wz - 7.0 + 3.0)]
+
     _, _, kz0 = at(1.0)
     z_br = kz0 + 26.0
     bw, bh = c.rudder_bracket_lwh_mm[1], c.rudder_bracket_lwh_mm[2]
@@ -1470,6 +1487,7 @@ def _fastener_groups(c: Config, at):
          c.hatch_mm + c.gasket_mm + c.deck_gap_mm),
         ("fast_servo", servo_pts, (0.0, 0.0, -1.0), "fasteners", 2.5),
         ("fast_motor", clamp_pts, (0.0, 0.0, -1.0), "fasteners", 4.0),
+        ("fast_switch", switch_pts, (0.0, 0.0, -1.0), "fasteners", 3.0),
         ("fast_rudder", rudder_pts, (1.0, 0.0, 0.0), "fasteners", c.plate_mm + 1.0),
     ]
 
@@ -1485,21 +1503,6 @@ LINKAGES = {
     "driveline": ["component_motor", "hw_coupler", "hw_shaft_inboard",
                   "hw_stuffing_tube", "hw_prop_shaft", "hw_propeller"],
 }
-
-
-def linkage_gaps(meshes: dict, comps: dict, hw: dict) -> dict:
-    """Surface-to-surface gap between each consecutive pair in every chain."""
-    lookup = dict(meshes)
-    lookup.update({f"component_{k}": d["mesh"] for k, d in comps.items()})
-    lookup.update({f"hw_{k}": d["mesh"] for k, d in hw.items()})
-    out = {}
-    for name, chain in LINKAGES.items():
-        for a, b in zip(chain[:-1], chain[1:]):
-            ma, mb = lookup.get(a), lookup.get(b)
-            out[f"{name}:{a}->{b}"] = (G.surface_gap(ma, mb)
-                                       if ma is not None and mb is not None
-                                       else float("nan"))
-    return out
 
 
 def penetrations(c: Config, at, draft_mm: float) -> list:
@@ -1896,7 +1899,39 @@ def build(config: Config | None = None) -> dict:
         # ---- driveline ---------------------------------------------------
         **drive,
         # ---- the chains that have to be continuous -------------------------
-        "linkage_gaps_mm": linkage_gaps(meshes, comps, hw),
+        # DECLARED, not measured here. The measuring is cad-solid's job now: the idea
+        # started as this project's boat.linkage_closed and was promoted into the pack
+        # as cad.assembly_connected, which does it better -- it samples faces rather
+        # than vertices, refines any pair that comes out apart until the answer has an
+        # error bound under it, and asks the question that needs no foresight ("is
+        # every part held by something") as well as the one that does.
+        #
+        # Retiring the local copy also removes the bug that prompted this: the local
+        # surface_gap used trimesh.proximity.signed_distance, which needs rtree, which
+        # this project never declared. Where rtree was missing every gap came back NaN,
+        # and NaN defeats every comparator -- `nan <= tol` and `nan > tol` are both
+        # False -- so the gate written to prove the steering was connected was the one
+        # gate that could neither pass nor fail. See FRICTION.md item 30.
+        "assembly_chains": {
+            "steering": {
+                "chain": ["component_servo", "hw_pushrod", "hw_rudder",
+                          "hw_rudder_bracket", "hull_aft"],
+                "reason": "the helm. The servo horn drives the pushrod, the pushrod's "
+                          "clevis is on the tiller arm, the tiller is on the stock, the "
+                          "stock turns in the bracket's bearing boss and the bracket is "
+                          "bolted to the transom. Every one of those was a step this "
+                          "boat did not have: it shipped a revision with no stock and "
+                          "no tiller, a blade hanging 42.9 mm below its own bracket and "
+                          "a pushrod stopping 11.0 mm short of nothing.",
+            },
+            "driveline": {
+                "chain": ["component_motor", "hw_coupler", "hw_shaft_inboard",
+                          "hw_stuffing_tube", "hw_prop_shaft", "hw_propeller"],
+                "reason": "torque from the motor to the water. The coupler is on the "
+                          "motor's output shaft, the shaft runs inside the stuffing "
+                          "tube, and the propeller is threaded onto its aft end.",
+            },
+        },
         "max_mating_gap_mm": c.max_mating_gap_mm,
         # ---- every hole through a pressure boundary, enumerated ------------
         "penetrations": penetrations(c, at, tr["draft_mm"] if "draft_mm" in tr else draft),
@@ -1985,20 +2020,20 @@ def build(config: Config | None = None) -> dict:
         # a wire landing on the terminal it feeds -- and each says which.
         "clash_allow": [
             # ---- the driveline, through the pressure boundary ----------------
-            {"pair": ["hull_aft", "hw_stuffing_tube"],
+            {"pair": ["hull_aft", "hw_stuffing_tube"], "role": "required",
              "reason": "THE declared through-hull. The stuffing tube passes through the "
                        "hull bottom at x=52 and through the shaft seat printed into the "
                        "floor, and is epoxy-filleted on both faces of the shell and "
                        "packed with marine grease. It is the only penetration below the "
                        "waterline on the boat and the only one that can sink it; "
                        "boat.hull_penetrations is the gate that keeps it declared."},
-            {"pair": ["hull_mid", "hw_stuffing_tube"],
+            {"pair": ["hull_mid", "hw_stuffing_tube"], "role": "required",
              "reason": "the same tube through the aft watertight bulkhead, epoxy-filleted "
                        "on both faces. Below the external waterline, so it is sealed to "
                        "the same standard as the shell: it is what stops a flooded stern "
                        "compartment flooding the equipment bay."},
             # ---- the chains that MUST touch (boat.linkage_closed) ------------
-            {"pair": ["hw_rudder", "hw_rudder_bracket"],
+            {"pair": ["hw_rudder", "hw_rudder_bracket"], "role": "required",
              "reason": "the rudder stock turns in the bracket's bearing boss. This is "
                        "the connection -- the whole reason the bracket exists -- and "
                        "for one revision it was a 43 mm GAP that cad.clash was "
@@ -2006,27 +2041,27 @@ def build(config: Config | None = None) -> dict:
                        "bearing is a bronze bush in the boss, outside the hull, with "
                        "nothing dry behind it, so it is not a penetration and there is "
                        "nothing to seal."},
-            {"pair": ["hw_pushrod", "hw_rudder"],
+            {"pair": ["hw_pushrod", "hw_rudder"], "role": "required",
              "reason": "the pushrod's clevis is on the tiller arm. That is the joint."},
-            {"pair": ["component_motor", "hw_coupler"],
+            {"pair": ["component_motor", "hw_coupler"], "role": "required",
              "reason": "the flexible coupler slides onto the motor's 3.17 mm output "
                        "shaft, which is not separately modelled, so the coupler reaches "
                        "the motor's aft face instead."},
-            {"pair": ["hw_shaft_inboard", "hw_stuffing_tube"],
+            {"pair": ["hw_shaft_inboard", "hw_stuffing_tube"], "role": "required",
              "reason": "the propeller shaft runs INSIDE the stuffing tube. The tube is "
                        "modelled as a solid rod rather than a bore, so the only way to "
                        "say that is to let the two interpenetrate."},
-            {"pair": ["hw_prop_shaft", "hw_propeller"],
+            {"pair": ["hw_prop_shaft", "hw_propeller"], "role": "required",
              "reason": "the propeller is threaded onto the end of the shaft. M4, with a "
                        "drive dog behind it."},
             # ---- steering ----------------------------------------------------
             {"pair": ["hw_pushrod", "hw_pushrod_tube"],
              "reason": "the pushrod runs INSIDE its guide tube for its whole length "
                        "between the bulkhead and the transom. That is what the tube is."},
-            {"pair": ["hull_mid", "hw_pushrod_tube"],
+            {"pair": ["hull_mid", "hw_pushrod_tube"], "role": "required",
              "reason": "guide tube through the aft bulkhead, epoxy-filleted both faces. "
                        "22 mm above the loaded waterline, by design."},
-            {"pair": ["hull_aft", "hw_pushrod_tube"],
+            {"pair": ["hull_aft", "hw_pushrod_tube"], "role": "required",
              "reason": "the same tube through the transom, epoxy-filleted outside and in "
                        "with neutral-cure RTV round the rod at the outer end. Above the "
                        "waterline."},
@@ -2037,32 +2072,32 @@ def build(config: Config | None = None) -> dict:
             {"pair": ["component_servo", "hw_pushrod"],
              "reason": "the pushrod's forward end is on the servo horn. That is the "
                        "connection."},
-            {"pair": ["hw_fast_rudder", "hw_rudder_bracket"],
+            {"pair": ["hw_fast_rudder", "hw_rudder_bracket"], "role": "required",
              "reason": "the two M3 screws that hold the rudder bracket to the transom "
                        "pass through the bracket."},
-            {"pair": ["hull_aft", "hw_fast_rudder"],
+            {"pair": ["hull_aft", "hw_fast_rudder"], "role": "required",
              "reason": "the same two screws through the transom into heat-set inserts in "
                        "a thickened pad on its inside face. Two hull penetrations, both "
                        "above the waterline, both bedded in neutral-cure RTV under a "
                        "nylon washer; declared in boat.hull_penetrations."},
             # ---- fasteners in printed material -------------------------------
-            {"pair": ["hull_mid", "hw_fast_hatch"],
+            {"pair": ["hull_mid", "hw_fast_hatch"], "role": "required",
              "reason": "the four hatch screws land in M3 brass heat-set inserts in the "
                        "coaming, which is widened locally to 8.6 mm to take them. Blind: "
                        "they do not reach the far side."},
-            {"pair": ["hatch_cover", "hw_fast_hatch"],
+            {"pair": ["hatch_cover", "hw_fast_hatch"], "role": "required",
              "reason": "the same four screws pass through the lid and its gasket on the "
                        "way to those inserts. The lid is the one part that must come "
                        "off, so it is screwed and never glued."},
-            {"pair": ["hull_mid", "hw_fast_servo"],
+            {"pair": ["hull_mid", "hw_fast_servo"], "role": "required",
              "reason": "two M3 screws through the servo's lugs into inserts in the servo "
                        "shelf rib. Blind."},
-            {"pair": ["hull_mid", "hw_fast_motor"],
+            {"pair": ["hull_mid", "hw_fast_motor"], "role": "required",
              "reason": "four M3 screws holding the motor clamp down onto the two cradle "
                        "ribs, into inserts in their boss zones. Blind."},
-            {"pair": ["motor_clamp", "hw_fast_motor"],
+            {"pair": ["motor_clamp", "hw_fast_motor"], "role": "required",
              "reason": "the same four screws pass through the clamp's feet."},
-            {"pair": ["component_servo", "hull_mid"],
+            {"pair": ["component_servo", "hull_mid"], "role": "required",
              "reason": "the servo's mounting lugs sit ON the shelf rib that carries its "
                        "screws. Contact is the point of a mount."},
             # ---- wiring ------------------------------------------------------
@@ -2087,12 +2122,23 @@ def build(config: Config | None = None) -> dict:
              "reason": "the motor leads pass over the clamp on their way forward. They "
                        "are cable-tied to it, which is why the clamp has a slot in the "
                        "build notes: a lead left loose finds the coupler."},
+            {"pair": ["hull_mid", "hw_fast_switch"], "role": "required",
+             "reason": "two M3 screws through the switch bracket's ears into inserts in "
+                       "its shelf rib. Blind. The switch has a rod through the deck, so "
+                       "what holds it also has to locate it against the hole it "
+                       "operates through -- tape would not."},
+            {"pair": ["component_switch", "hw_fast_switch"], "role": "required",
+             "reason": "the same two screws pass through the bracket's ears."},
+            {"pair": ["component_switch", "hull_mid"], "role": "required",
+             "reason": "the switch bracket sits ON its shelf rib. It used to sit on "
+                       "nothing, 27 mm above the hull floor and 5.5 mm from the nearest "
+                       "part in the assembly; cad.assembly_connected found it."},
             # ---- printed structure -------------------------------------------
-            {"pair": ["deck_bow", "hull_bow"],
+            {"pair": ["deck_bow", "hull_bow"], "role": "required",
              "reason": "deck_bow is the lid of the sealed bow compartment, bonded to "
                        "hull_bow's sheer with an epoxy fillet all round, over 16515 mm2 "
                        "of intended glue area."},
-            {"pair": ["stem_plate", "hull_bow"],
+            {"pair": ["stem_plate", "hull_bow"], "role": "required",
              "reason": "stem_plate caps the bow compartment after it has been foamed and "
                        "epoxy-coated through that opening, and is bonded into hull_bow's "
                        "moulded stem section."},
